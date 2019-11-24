@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 
-namespace Quickstart.AspNetCore.Handlers
+namespace WinTenBot.Handlers
 {
     public class TextEchoer : IUpdateHandler
     {

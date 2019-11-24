@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using Telegram.Bot.Framework.Abstractions;
 
-namespace Quickstart.AspNetCore.Services
+namespace WinTenBot.Services
 {
     internal class BotServiceProvider : IBotServiceProvider
     {

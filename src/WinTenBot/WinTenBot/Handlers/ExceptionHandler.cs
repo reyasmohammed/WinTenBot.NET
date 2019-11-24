@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 
-namespace Quickstart.AspNetCore.Handlers
+namespace WinTenBot.Handlers
 {
     public class ExceptionHandler : IUpdateHandler
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using Telegram.Bot.Framework;
 
-namespace Quickstart.AspNetCore
+namespace WinTenBot
 {
     public class WinTenBot : BotBase
     {

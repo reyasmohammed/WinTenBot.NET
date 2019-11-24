@@ -1,16 +1,16 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Quickstart.AspNetCore;
-using Quickstart.AspNetCore.Options;
-using Quickstart.AspNetCore.Services;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Telegram.Bot.Framework;
 using Telegram.Bot.Framework.Abstractions;
+using WinTenBot.Options;
+using WinTenBot.Services;
 
-namespace Microsoft.AspNetCore.Builder
+namespace WinTenBot.Extensions
 {
     static class AppStartupExtensions
     {

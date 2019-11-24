@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.Linq;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Http;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types.Enums;
 
-namespace Quickstart.AspNetCore
+namespace WinTenBot
 {
     public static class When
     {

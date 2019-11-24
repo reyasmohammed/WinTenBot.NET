@@ -1,11 +1,11 @@
-﻿using Quickstart.AspNetCore.Services;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using WinTenBot.Services;
 
-namespace Quickstart.AspNetCore.Handlers
+namespace WinTenBot.Handlers
 {
     class WeatherReporter : IUpdateHandler
     {

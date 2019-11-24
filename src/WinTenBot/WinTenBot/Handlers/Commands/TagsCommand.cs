@@ -7,7 +7,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace WinTenBot.Handlers.Commands
 {
-    internal class PingCommand : CommandBase
+    public class TagsCommand:CommandBase
     {
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args, CancellationToken cancellationToken)
         {
