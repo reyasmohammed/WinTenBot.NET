@@ -2,6 +2,8 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using WinTenBot.Interfaces;
+using WinTenBot.Model;
 
 namespace WinTenBot.Services
 {

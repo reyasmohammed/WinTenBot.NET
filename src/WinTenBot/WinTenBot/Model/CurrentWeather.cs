@@ -1,4 +1,4 @@
-﻿namespace WinTenBot.Services
+﻿namespace WinTenBot.Model
 {
     struct CurrentWeather
     {

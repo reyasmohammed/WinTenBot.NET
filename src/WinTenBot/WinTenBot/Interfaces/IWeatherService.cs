@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
+using WinTenBot.Model;
 
-namespace WinTenBot.Services
+namespace WinTenBot.Interfaces
 {
     interface IWeatherService
     {

@@ -9,6 +9,7 @@ using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Extensions;
 using WinTenBot.Handlers;
 using WinTenBot.Handlers.Commands;
+using WinTenBot.Interfaces;
 using WinTenBot.Options;
 using WinTenBot.Services;
 
