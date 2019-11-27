@@ -17,7 +17,7 @@ namespace WinTenBot
 {
     public class Startup
     {
-        private IConfiguration Configuration { get; }
+        public IConfiguration Configuration { get; }
 
         public Startup(IConfiguration configuration)
         {
@@ -30,9 +30,6 @@ namespace WinTenBot
                 .Configure<BotOptions<WinTenBot>>(Configuration.GetSection("EchoBot"))
                 .Configure<CustomBotOptions<WinTenBot>>(Configuration.GetSection("EchoBot"))
                 .AddScoped<TextEchoer>()
-                .AddScoped<PingCommand>()
-                .AddScoped<StartCommand>()
-                .AddScoped<TagsCommand>()
                 .AddScoped<WebhookLogger>()
                 .AddScoped<StickerHandler>()
                 .AddScoped<WeatherReporter>()
@@ -40,25 +37,31 @@ namespace WinTenBot
                 .AddScoped<UpdateMembersList>()
                 .AddScoped<CallbackQueryHandler>()
                 .AddScoped<IWeatherService, WeatherService>();
+
+            services.AddScoped<PingCommand>()
+                .AddScoped<StartCommand>()
+                .AddScoped<IdCommand>()
+                .AddScoped<InfoCommand>()
+                .AddScoped<TagsCommand>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
+//            if (env.IsDevelopment())
+//            {
                 app.UseDeveloperExceptionPage();
 
                 // get bot updates from Telegram via long-polling approach during development
                 // this will disable Telegram webhooks
                 app.UseTelegramBotLongPolling<WinTenBot>(ConfigureBot(), startAfter: TimeSpan.FromSeconds(1));
-            }
-            else
-            {
-                // use Telegram bot webhook middleware in higher environments
-                app.UseTelegramBotWebhook<WinTenBot>(ConfigureBot());
-                // and make sure webhook is enabled
-                app.EnsureWebhookSet<WinTenBot>();
-            }
+//            }
+//            else
+//            {
+//                use Telegram bot webhook middleware in higher environments
+//                app.UseTelegramBotWebhook<WinTenBot>(ConfigureBot());
+//                and make sure webhook is enabled
+//                app.EnsureWebhookSet<WinTenBot>();
+//            }
 
             app.Run(async context =>
             {
@@ -76,6 +79,8 @@ namespace WinTenBot
 
                 .UseWhen<UpdateMembersList>(When.MembersChanged)
 
+                .UseWhen<NewChatMembersCommand>(When.MembersChanged)
+
                 .UseWhen(When.NewMessage, msgBranch => msgBranch
                     .UseWhen(When.NewTextMessage, txtBranch => txtBranch
                         .Use<TextEchoer>()
@@ -83,6 +88,8 @@ namespace WinTenBot
                             .UseCommand<PingCommand>("ping")
                             .UseCommand<StartCommand>("start")
                             .UseCommand<TagsCommand>("tags")
+                            .UseCommand<IdCommand>("id")
+                            .UseCommand<InfoCommand>("info")
                         )
                     //.Use<NLP>()
                     )
