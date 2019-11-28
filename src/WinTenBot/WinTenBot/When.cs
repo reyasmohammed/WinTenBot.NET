@@ -20,11 +20,13 @@ namespace WinTenBot
             context.Update.Message?.Entities?.FirstOrDefault()?.Type == MessageEntityType.BotCommand;
 
         public static bool MembersChanged(IUpdateContext context) =>
-            context.Update.Message?.NewChatMembers != null ||
             context.Update.Message?.LeftChatMember != null ||
             context.Update.ChannelPost?.NewChatMembers != null ||
             context.Update.ChannelPost?.LeftChatMember != null
         ;
+
+        public static bool NewChatMembers(IUpdateContext context) =>
+            context.Update.Message?.NewChatMembers != null;
 
         public static bool LocationMessage(IUpdateContext context) =>
             context.Update.Message?.Location != null;

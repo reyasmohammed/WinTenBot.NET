@@ -38,6 +38,8 @@ namespace WinTenBot
                 .AddScoped<CallbackQueryHandler>()
                 .AddScoped<IWeatherService, WeatherService>();
 
+            services.AddScoped<NewChatMembersCommand>();
+
             services.AddScoped<PingCommand>()
                 .AddScoped<StartCommand>()
                 .AddScoped<IdCommand>()
@@ -47,21 +49,21 @@ namespace WinTenBot
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-//            if (env.IsDevelopment())
-//            {
-                app.UseDeveloperExceptionPage();
+            //            if (env.IsDevelopment())
+            //            {
+            app.UseDeveloperExceptionPage();
 
-                // get bot updates from Telegram via long-polling approach during development
-                // this will disable Telegram webhooks
-                app.UseTelegramBotLongPolling<WinTenBot>(ConfigureBot(), startAfter: TimeSpan.FromSeconds(1));
-//            }
-//            else
-//            {
-//                use Telegram bot webhook middleware in higher environments
-//                app.UseTelegramBotWebhook<WinTenBot>(ConfigureBot());
-//                and make sure webhook is enabled
-//                app.EnsureWebhookSet<WinTenBot>();
-//            }
+            // get bot updates from Telegram via long-polling approach during development
+            // this will disable Telegram webhooks
+            app.UseTelegramBotLongPolling<WinTenBot>(ConfigureBot(), startAfter: TimeSpan.FromSeconds(1));
+            //            }
+            //            else
+            //            {
+            //                use Telegram bot webhook middleware in higher environments
+            //                app.UseTelegramBotWebhook<WinTenBot>(ConfigureBot());
+            //                and make sure webhook is enabled
+            //                app.EnsureWebhookSet<WinTenBot>();
+            //            }
 
             app.Run(async context =>
             {
@@ -77,9 +79,15 @@ namespace WinTenBot
                 // .Use<CustomUpdateLogger>()
                 .UseWhen<WebhookLogger>(When.Webhook)
 
-                .UseWhen<UpdateMembersList>(When.MembersChanged)
+                //.UseWhen<UpdateMembersList>(When.MembersChanged)
 
-                .UseWhen<NewChatMembersCommand>(When.MembersChanged)
+                .UseWhen<NewChatMembersCommand>(When.NewChatMembers)
+
+                //.UseWhen(When.MembersChanged, memberChanged => memberChanged
+                //    .UseWhen(When.MembersChanged, cmdBranch => cmdBranch
+                //        .Use<NewChatMembersCommand>()
+                //        )
+                //    )
 
                 .UseWhen(When.NewMessage, msgBranch => msgBranch
                     .UseWhen(When.NewTextMessage, txtBranch => txtBranch
