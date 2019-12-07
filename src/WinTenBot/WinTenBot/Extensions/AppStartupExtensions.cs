@@ -8,11 +8,12 @@ using Microsoft.Extensions.Options;
 using Telegram.Bot.Framework;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Options;
+using WinTenBot.Providers;
 using WinTenBot.Services;
 
 namespace WinTenBot.Extensions
 {
-    static class AppStartupExtensions
+    internal static class AppStartupExtensions
     {
         public static IApplicationBuilder UseTelegramBotLongPolling<TBot>(
             this IApplicationBuilder app,
@@ -35,7 +36,8 @@ namespace WinTenBot.Extensions
                 await updateManager.RunAsync(cancellationToken: cancellationToken);
             }, cancellationToken)
             .ContinueWith(t =>
-            {// ToDo use logger
+            {
+                // ToDo use logger
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(t.Exception);
                 Console.ResetColor();

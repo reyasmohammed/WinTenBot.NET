@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
+﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 
 namespace WinTenBot
 {
@@ -20,8 +14,8 @@ namespace WinTenBot
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration((hostBuilder, configBuilder) => configBuilder
-                    .AddJsonFile("appsettings.json")
-                    .AddJsonFile($"appsettings.{hostBuilder.HostingEnvironment.EnvironmentName}.json", true)
+                    .AddJsonFile("appsettings.json", true,  true)
+                    .AddJsonFile($"appsettings.{hostBuilder.HostingEnvironment.EnvironmentName}.json", true, true)
                     .AddJsonEnvVar("QUICKSTART_SETTINGS", true)
                 ).UseStartup<Startup>();
     }

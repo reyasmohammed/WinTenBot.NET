@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -9,7 +10,12 @@ using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Extensions;
 using WinTenBot.Handlers;
 using WinTenBot.Handlers.Commands;
+using WinTenBot.Handlers.Commands.Core;
+using WinTenBot.Handlers.Commands.Tags;
+using WinTenBot.Handlers.Commands.Welcome;
+using WinTenBot.Handlers.Events;
 using WinTenBot.Interfaces;
+using WinTenBot.Model;
 using WinTenBot.Options;
 using WinTenBot.Services;
 
@@ -22,14 +28,20 @@ namespace WinTenBot
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            Bot.GlobalConfiguration = Configuration;
+            Bot.DbConnectionString = Configuration["CommonConfig:ConnectionString"];
+
+            Console.WriteLine($"ProductName: {Configuration["Engines:ProductName"]}");
+            Console.WriteLine($"Version: {Configuration["Engines:Version"]}");
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<WinTenBot>()
-                .Configure<BotOptions<WinTenBot>>(Configuration.GetSection("EchoBot"))
-                .Configure<CustomBotOptions<WinTenBot>>(Configuration.GetSection("EchoBot"))
-                .AddScoped<TextEchoer>()
+                .Configure<BotOptions<WinTenBot>>(Configuration.GetSection("ZiziBetaBot"))
+                .Configure<CustomBotOptions<WinTenBot>>(Configuration.GetSection("ZiziBetaBot"))
+                .AddScoped<GenericMessageHandler>()
                 .AddScoped<WebhookLogger>()
                 .AddScoped<StickerHandler>()
                 .AddScoped<WeatherReporter>()
@@ -38,13 +50,29 @@ namespace WinTenBot
                 .AddScoped<CallbackQueryHandler>()
                 .AddScoped<IWeatherService, WeatherService>();
 
-            services.AddScoped<NewChatMembersCommand>();
+            services.AddScoped<MediaReceivedHandler>();
+
+            services.AddScoped<MigrateCommand>()
+                .AddScoped<MediaFilterCommand>();
+
+            services.AddScoped<CallTagsReceivedHandler>()
+                .AddScoped<TagsCommand>()
+                .AddScoped<TagCommand>();
+
+
+            services.AddScoped<AdminCommand>();
+            services.AddScoped<NewChatMembersEvent>();
+            services.AddScoped<LeftChatMemberEvent>();
+
+            services.AddScoped<PinCommand>();
+
+            services.AddScoped<WelcomeCommand>();
+            services.AddScoped<SetWelcomeCommand>();
 
             services.AddScoped<PingCommand>()
                 .AddScoped<StartCommand>()
                 .AddScoped<IdCommand>()
-                .AddScoped<InfoCommand>()
-                .AddScoped<TagsCommand>();
+                .AddScoped<InfoCommand>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -75,29 +103,46 @@ namespace WinTenBot
         {
             return new BotBuilder()
                 .Use<ExceptionHandler>()
-
                 // .Use<CustomUpdateLogger>()
                 .UseWhen<WebhookLogger>(When.Webhook)
 
                 //.UseWhen<UpdateMembersList>(When.MembersChanged)
 
-                .UseWhen<NewChatMembersCommand>(When.NewChatMembers)
+                .UseWhen<NewChatMembersEvent>(When.NewChatMembers)
+                .UseWhen<LeftChatMemberEvent>(When.LeftChatMember)
 
                 //.UseWhen(When.MembersChanged, memberChanged => memberChanged
                 //    .UseWhen(When.MembersChanged, cmdBranch => cmdBranch
                 //        .Use<NewChatMembersCommand>()
                 //        )
                 //    )
+                
+                .UseWhen<MediaReceivedHandler>(When.MediaReceived)
 
                 .UseWhen(When.NewMessage, msgBranch => msgBranch
                     .UseWhen(When.NewTextMessage, txtBranch => txtBranch
-                        .Use<TextEchoer>()
+                        .Use<GenericMessageHandler>()
+                        .UseWhen<CallTagsReceivedHandler>(When.CallTagRecieved)
                         .UseWhen(When.NewCommand, cmdBranch => cmdBranch
+
+                            .UseCommand<MigrateCommand>("migrate")
+                            .UseCommand<MediaFilterCommand>("mfil")
+                            
                             .UseCommand<PingCommand>("ping")
                             .UseCommand<StartCommand>("start")
+
                             .UseCommand<TagsCommand>("tags")
+                            .UseCommand<TagCommand>("tag")
+                            
+                            .UseCommand<PinCommand>("pin")
+                            
+                            .UseCommand<AdminCommand>("admin")
+
                             .UseCommand<IdCommand>("id")
                             .UseCommand<InfoCommand>("info")
+
+                            .UseCommand<WelcomeCommand>("welcome")
+                            .UseCommand<SetWelcomeCommand>("setwelcome")
                         )
                     //.Use<NLP>()
                     )

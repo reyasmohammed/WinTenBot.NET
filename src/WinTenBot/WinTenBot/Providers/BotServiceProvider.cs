@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Telegram.Bot.Framework.Abstractions;
 
-namespace WinTenBot.Services
+namespace WinTenBot.Providers
 {
     internal class BotServiceProvider : IBotServiceProvider
     {

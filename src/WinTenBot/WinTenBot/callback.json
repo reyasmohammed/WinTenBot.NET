@@ -1,0 +1,161 @@
+﻿{
+  "id": "1014495870667288825",
+  "from": {
+    "id": 236205726,
+    "is_bot": false,
+    "first_name": "A:\\zhe\\Kun",
+    "username": "Azhe403",
+    "language_code": "id"
+  },
+  "message": {
+    "message_id": 72711,
+    "from": {
+      "id": 970735699,
+      "is_bot": true,
+      "first_name": "Zizi Beta",
+      "username": "MissZiziBetaBot"
+    },
+    "date": 1575643443,
+    "chat": {
+      "id": -1001404591750,
+      "type": "supergroup",
+      "title": "Telegram Bot API ????",
+      "
+      username
+      ":"
+      TgBotID
+      "},"
+      reply_to_message
+      ":{"
+      message_id
+      ":72705,"
+      from
+      ":{"
+      id
+      ":236205726,"
+      is_bot
+      ":false,"
+      first_name
+      ":"
+      A:
+      \
+      \
+      zhe
+      \
+      \
+      Kun
+      ","
+      username
+      ":"
+      Azhe403
+      ","
+      langua
+      ge_code
+      ":"
+      id
+      "},"
+      date
+      ":1575643439,"
+      chat
+      ":{"
+      id
+      ":-1001404591750,"
+      type
+      ":"
+      supergroup
+      ","
+      title
+      ":"
+      Telegram
+      Bot
+      API
+      ?
+      ?
+      ?
+      ?
+      ","
+      username
+      ":"
+      TgBotID
+      "},"
+      text
+      ":"
+      /start
+      ","
+      entities
+      ":[{"
+      type
+      ":"
+      bot_co
+      mmand
+      ","
+      offset
+      ":0,"
+      length
+      ":6}]},"
+      text
+      ":"
+      ?
+      ?
+      Zizi
+      Bot
+      EAP
+      3.0.1037
+      EAP
+      \
+      nby
+      WinTenDev
+      ES2.
+      \
+      nAdalah
+      bot
+      debugging,
+      manajemen
+      grup
+      yang
+      di
+      lengkapi
+      dengan
+      alat
+      keamanan.
+      Agar
+      fungsi
+      s
+      aya
+      bekerja
+      dengan
+      fitur
+      penuh,
+      jadikan
+      saya
+      admin
+      dengan
+      level
+      standard.
+      \
+      nSaran
+      dan
+      fitur
+      bisa
+      di
+      ajukan
+      di
+      @WinTenGroup
+      atau
+      @TgBotID.
+      ","
+      entities
+      ":[{"
+      type
+      ":"
+      mention
+      ","
+      offset
+      ":
+      245,
+      "length": 12
+    },{
+  "type": "mention",
+  "offset": 263,
+  "length": 8
+}]}, "chat_instance": "-6673087262465246724", "data": "help"}

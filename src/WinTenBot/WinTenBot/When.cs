@@ -19,11 +19,16 @@ namespace WinTenBot
         public static bool NewCommand(IUpdateContext context) =>
             context.Update.Message?.Entities?.FirstOrDefault()?.Type == MessageEntityType.BotCommand;
 
+        public static bool CallTagRecieved(IUpdateContext context) =>
+            context.Update.Message.Text.Contains('#');
+
         public static bool MembersChanged(IUpdateContext context) =>
-            context.Update.Message?.LeftChatMember != null ||
             context.Update.ChannelPost?.NewChatMembers != null ||
             context.Update.ChannelPost?.LeftChatMember != null
         ;
+
+        public static bool LeftChatMember(IUpdateContext context) =>
+            context.Update.Message?.LeftChatMember != null;
 
         public static bool NewChatMembers(IUpdateContext context) =>
             context.Update.Message?.NewChatMembers != null;
@@ -33,6 +38,9 @@ namespace WinTenBot
 
         public static bool StickerMessage(IUpdateContext context) =>
             context.Update.Message?.Sticker != null;
+
+        public static bool MediaReceived(IUpdateContext context) =>
+            context.Update.Message.Document != null;
 
         public static bool CallbackQuery(IUpdateContext context) =>
             context.Update.CallbackQuery != null;
