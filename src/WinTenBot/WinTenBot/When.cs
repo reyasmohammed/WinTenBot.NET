@@ -24,8 +24,7 @@ namespace WinTenBot
 
         public static bool MembersChanged(IUpdateContext context) =>
             context.Update.ChannelPost?.NewChatMembers != null ||
-            context.Update.ChannelPost?.LeftChatMember != null
-        ;
+            context.Update.ChannelPost?.LeftChatMember != null;
 
         public static bool LeftChatMember(IUpdateContext context) =>
             context.Update.Message?.LeftChatMember != null;
@@ -40,7 +39,8 @@ namespace WinTenBot
             context.Update.Message?.Sticker != null;
 
         public static bool MediaReceived(IUpdateContext context) =>
-            context.Update.Message.Document != null;
+            context.Update.Message?.Document != null ||
+            context.Update.Message?.Photo != null;
 
         public static bool CallbackQuery(IUpdateContext context) =>
             context.Update.CallbackQuery != null;

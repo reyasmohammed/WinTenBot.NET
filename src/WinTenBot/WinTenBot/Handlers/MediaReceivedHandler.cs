@@ -9,8 +9,8 @@ namespace WinTenBot.Handlers
 {
     public class MediaReceivedHandler : IUpdateHandler
     {
-        private MediaFilterService _mediaFilterService;
         private ChatProcessor _chatProcessor;
+        private MediaFilterService _mediaFilterService;
 
         public MediaReceivedHandler()
         {
@@ -31,8 +31,10 @@ namespace WinTenBot.Handlers
             }
 
             ConsoleHelper.WriteLine($"Media isBan: {isBan}");
-//            await _mediaFilterService.UpdateCacheAsync();
-//            var cache = await _mediaFilterService.ReadCacheAsync();
+            await _mediaFilterService.UpdateCacheAsync();
+            ConsoleHelper.WriteLine("Media Filter complete.");
+            
+            await next(context);
         }
     }
 }

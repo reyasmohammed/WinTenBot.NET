@@ -34,10 +34,11 @@ namespace WinTenBot.Services
             var data = await ReadCacheAsync();
             var search = data.AsEnumerable()
                 .Where(row => row.Field<string>(key) == val);
-            var filtered = search.CopyToDataTable();
+            if (!search.Any()) return false;
 
-            ConsoleHelper.WriteLine($"Caches found: {filtered.ToJson()}");
-            return filtered.Rows.Count > 0;
+            var filtered = search.CopyToDataTable();
+            ConsoleHelper.WriteLine($"Media found in Caches: {filtered.ToJson()}");
+            return true;
         }
 
         public async Task SaveAsync(Dictionary<string, object> data)
@@ -49,22 +50,24 @@ namespace WinTenBot.Services
             ConsoleHelper.WriteLine($"SaveFile: {insert}");
         }
 
-        public async Task UpdateCacheAsync()
+        public async Task<DataTable> GetAllMedia()
         {
             var sql = $"SELECT * FROM {baseTable}";
             var data = await _mySqlProvider.ExecQueryAsync(sql);
+            return data;
+        }
 
+        public async Task UpdateCacheAsync()
+        {
+            var data = await GetAllMedia();
             ConsoleHelper.WriteLine($"Updating Media Filter caches to {fileJson}");
-            var json = data.ToJson(true);
-            await json.ToFile(fileJson);
-            ConsoleHelper.WriteLine("Writing success..");
+
+            await data.WriteCacheAsync(fileJson);
         }
 
         public async Task<DataTable> ReadCacheAsync()
         {
-            var json = await File.ReadAllTextAsync(fileJson);
-            var dataTable = json.ToDataTable();
-            ConsoleHelper.WriteLine($"Loaded cache. Rows: {dataTable.Rows.Count}");
+            var dataTable = await fileJson.ReadCacheAsync();
             return dataTable;
         }
     }
