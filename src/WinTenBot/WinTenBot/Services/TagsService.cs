@@ -10,10 +10,17 @@ namespace WinTenBot.Services
     public class TagsService : ITagsService
     {
         private MySqlProvider _mySqlProvider;
+        private string baseTable = "tags";
 
         public TagsService()
         {
             _mySqlProvider = new MySqlProvider();
+        }
+
+        public async Task<bool> IsExist(long chatId, string tagVal)
+        {
+            var data = await GetTagByTag(chatId, tagVal);
+            return data.Rows.Count > 0;
         }
 
         public async Task<DataTable> GetTagsAsync()
@@ -43,6 +50,13 @@ namespace WinTenBot.Services
 
             var insert = await _mySqlProvider.Insert("tags", data);
             ConsoleHelper.WriteLine($"SaveTag: {insert}");
+        }
+
+        public async Task<bool> DeleteTag(long chatId, string tag)
+        {
+            var sql = $"DELETE FROM {baseTable} WHERE id_chat = '{chatId}' AND tag = '{tag}'";
+            var delete = await _mySqlProvider.ExecNonQueryAsync(sql);
+            return delete.ToBool();
         }
     }
 }
