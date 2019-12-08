@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
@@ -11,6 +12,8 @@ namespace WinTenBot.Helpers.Processors
     public class ChatProcessor
     {
         private IUpdateContext _updateContext;
+        private ITelegramBotClient Client { get; set; }
+        private Message Message { get; set; }
         public long ChatId { get; private set; }
         public int SentMessageId { get; private set; }
         public int EditedMessageId { get; private set; }
@@ -20,23 +23,26 @@ namespace WinTenBot.Helpers.Processors
             _updateContext = updateContext;
 
             ChatId = _updateContext.Update.Message.Chat.Id;
+            Client = _updateContext.Bot.Client;
+            Message = _updateContext.Update.Message;
         }
 
-        public async Task SendAsync(string sendText, IReplyMarkup replyMarkup = null, bool replyToReplied=false)
+        public async Task SendAsync(string sendText, IReplyMarkup replyMarkup = null, bool replyToReplied = false)
         {
-            var replyToMsgId = _updateContext.Update.Message.MessageId;
+            var replyToMsgId = Message.MessageId;
             if (replyToReplied)
             {
-                replyToMsgId = _updateContext.Update.Message.ReplyToMessage.MessageId;
+                replyToMsgId = Message.ReplyToMessage.MessageId;
             }
-            var date = _updateContext.Update.Message.Date;
+
+            var date = Message.Date;
 //            ConsoleHelper.WriteLine(date);
 //            sendText += TimeHelper.Delay(_updateContext.Update.Message.Date);
             Message send = null;
             try
             {
-                send = await _updateContext.Bot.Client.SendTextMessageAsync(
-                    _updateContext.Update.Message.Chat,
+                send = await Client.SendTextMessageAsync(
+                    Message.Chat,
                     sendText,
                     ParseMode.Html,
                     replyMarkup: replyMarkup,
@@ -45,12 +51,12 @@ namespace WinTenBot.Helpers.Processors
             }
             catch (ApiRequestException apiRequestException)
             {
-                ConsoleHelper.WriteLine(apiRequestException.Message);
+                ConsoleHelper.WriteLine($"SendMessage: {apiRequestException.Message}");
 
                 try
                 {
-                    send = await _updateContext.Bot.Client.SendTextMessageAsync(
-                        _updateContext.Update.Message.Chat,
+                    send = await Client.SendTextMessageAsync(
+                        Message.Chat,
                         sendText,
                         ParseMode.Html,
                         replyMarkup: replyMarkup
@@ -58,26 +64,27 @@ namespace WinTenBot.Helpers.Processors
                 }
                 catch (ApiRequestException apiRequestException2)
                 {
-                    ConsoleHelper.WriteLine($"{apiRequestException2.ErrorCode}: {apiRequestException2.Message}");
+                    ConsoleHelper.WriteLine(
+                        $"SendMessage: {apiRequestException2.ErrorCode}: {apiRequestException2.Message}");
                 }
             }
 
             //            Console.WriteLine(TextHelper.ToJson(send));
-            SentMessageId = send.MessageId;
+            if (send != null) SentMessageId = send.MessageId;
         }
 
-        public async Task EditAsync(string sendText)
+        public async Task EditAsync(string sendText, InlineKeyboardMarkup replyMarkup = null)
         {
             Message edit = null;
 
-            edit = await _updateContext.Bot.Client.EditMessageTextAsync(
-                _updateContext.Update.Message.Chat,
+            edit = await Client.EditMessageTextAsync(
+                Message.Chat,
                 SentMessageId,
                 sendText,
-                ParseMode.Html
+                ParseMode.Html,
+                replyMarkup: replyMarkup
             );
-                
-            //            Console.WriteLine(TextHelper.ToJson(edit));
+            
             EditedMessageId = edit.MessageId;
         }
 
@@ -88,7 +95,7 @@ namespace WinTenBot.Helpers.Processors
             try
             {
                 ConsoleHelper.WriteLine($"Delete MsgId: {mssgId} on ChatId: {ChatId}");
-                await _updateContext.Bot.Client.DeleteMessageAsync(ChatId, mssgId);
+                await Client.DeleteMessageAsync(ChatId, mssgId);
             }
             catch (ChatNotFoundException chatNotFoundException)
             {
