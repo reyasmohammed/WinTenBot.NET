@@ -14,7 +14,7 @@ namespace WinTenBot.Helpers
         static readonly Regex ColonedRegex;
         static EmojiHelper() {
             // load mentioned json from somewhere
-            var data = JArray.Parse(File.ReadAllText(@"emoji.json"));
+            var data = JArray.Parse(File.ReadAllText(Environment.CurrentDirectory + @"/Storage/Common/emoji.json"));
             ColonedEmojis = data.OfType<JObject>().ToDictionary(
                 // key dictionary by coloned short names
                 c => ":" + ((JValue)c["short_name"]).Value.ToString() + ":",
