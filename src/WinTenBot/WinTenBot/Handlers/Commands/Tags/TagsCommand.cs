@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
@@ -8,7 +7,7 @@ using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
 using WinTenBot.Services;
 
-namespace WinTenBot.Handlers.Commands
+namespace WinTenBot.Handlers.Commands.Tags
 {
     public class TagsCommand : CommandBase
     {
@@ -50,7 +49,7 @@ namespace WinTenBot.Handlers.Commands
 
             await _chatProcessor.EditAsync(sendText);
 
-            var currentSetting = await _settingsService.GetSettingByGrup(msg.Chat.Id);
+            var currentSetting = await _settingsService.GetSettingByGroup(msg.Chat.Id);
 //            var jsonSettings = TextHelper.ToJson(currentSetting);
 //            ConsoleHelper.WriteLine($"CurrentSettings: {jsonSettings}");
             
