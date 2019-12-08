@@ -1,8 +1,10 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
+using WinTenBot.Model;
 using WinTenBot.Services;
 
 namespace WinTenBot.Handlers
@@ -31,9 +33,14 @@ namespace WinTenBot.Handlers
             }
 
             ConsoleHelper.WriteLine($"Media isBan: {isBan}");
-            await _mediaFilterService.UpdateCacheAsync();
+
+            if (Bot.HostingEnvironment.IsProduction())
+                await _mediaFilterService.UpdateCacheAsync();
+            else
+                ConsoleHelper.WriteLine($"Update cache skipped because local Env");
+
             ConsoleHelper.WriteLine("Media Filter complete.");
-            
+
             await next(context);
         }
     }
