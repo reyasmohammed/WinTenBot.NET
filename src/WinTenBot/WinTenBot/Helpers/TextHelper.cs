@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -28,6 +29,7 @@ namespace WinTenBot.Helpers
 
         public static async Task ToFile(this string content, string path)
         {
+            ConsoleHelper.WriteLine($"Writing file to {path}");
             await File.WriteAllTextAsync(path, content);
 
 //            var sw = new StreamWriter(path);
