@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using System.Linq;
+using System.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -59,7 +60,8 @@ namespace WinTenBot
 
             services.AddScoped<CallTagsReceivedHandler>()
                 .AddScoped<TagsCommand>()
-                .AddScoped<TagCommand>();
+                .AddScoped<TagCommand>()
+                .AddScoped<UntagCommand>();
 
 
             services.AddScoped<AdminCommand>();
@@ -75,6 +77,7 @@ namespace WinTenBot
             services.AddScoped<SetWelcomeCommand>();
 
             services.AddScoped<PingCommand>()
+                .AddScoped<DebugCommand>()
                 .AddScoped<StartCommand>()
                 .AddScoped<IdCommand>()
                 .AddScoped<InfoCommand>();
