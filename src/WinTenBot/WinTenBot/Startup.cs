@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,6 +11,8 @@ using WinTenBot.Extensions;
 using WinTenBot.Handlers;
 using WinTenBot.Handlers.Commands;
 using WinTenBot.Handlers.Commands.Core;
+using WinTenBot.Handlers.Commands.Group;
+using WinTenBot.Handlers.Commands.Rules;
 using WinTenBot.Handlers.Commands.Tags;
 using WinTenBot.Handlers.Commands.Welcome;
 using WinTenBot.Handlers.Events;
@@ -66,6 +68,9 @@ namespace WinTenBot
 
             services.AddScoped<PinCommand>();
 
+            services.AddScoped<RulesCommand>()
+                .AddScoped<ReportCommand>();
+
             services.AddScoped<WelcomeCommand>();
             services.AddScoped<SetWelcomeCommand>();
 
@@ -77,83 +82,75 @@ namespace WinTenBot
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            //            if (env.IsDevelopment())
-            //            {
-            app.UseDeveloperExceptionPage();
-
-            // get bot updates from Telegram via long-polling approach during development
-            // this will disable Telegram webhooks
-            app.UseTelegramBotLongPolling<WinTenBot>(ConfigureBot(), startAfter: TimeSpan.FromSeconds(1));
-            //            }
-            //            else
-            //            {
-            //                use Telegram bot webhook middleware in higher environments
-            //                app.UseTelegramBotWebhook<WinTenBot>(ConfigureBot());
-            //                and make sure webhook is enabled
-            //                app.EnsureWebhookSet<WinTenBot>();
-            //            }
-
-            app.Run(async context =>
+            Bot.HostingEnvironment = env;
+            if (env.IsDevelopment())
             {
-                await context.Response.WriteAsync("Hello World!");
-            });
+                app.UseDeveloperExceptionPage();
+
+                // get bot updates from Telegram via long-polling approach during development
+                // this will disable Telegram webhooks
+                app.UseTelegramBotLongPolling<WinTenBot>(ConfigureBot(), startAfter: TimeSpan.FromSeconds(1));
+            }
+            else
+            {
+                // use Telegram bot webhook middleware in higher environments
+                app.UseTelegramBotWebhook<WinTenBot>(ConfigureBot());
+                // and make sure webhook is enabled
+                app.EnsureWebhookSet<WinTenBot>();
+            }
+
+            app.Run(async context => { await context.Response.WriteAsync("Hello World!"); });
         }
 
         private IBotBuilder ConfigureBot()
         {
             return new BotBuilder()
-                .Use<ExceptionHandler>()
-                // .Use<CustomUpdateLogger>()
-                .UseWhen<WebhookLogger>(When.Webhook)
+                    .Use<ExceptionHandler>()
+                    // .Use<CustomUpdateLogger>()
+                    .UseWhen<WebhookLogger>(When.Webhook)
 
-                //.UseWhen<UpdateMembersList>(When.MembersChanged)
+                    //.UseWhen<UpdateMembersList>(When.MembersChanged)
+                    .UseWhen<NewChatMembersEvent>(When.NewChatMembers)
+                    .UseWhen<LeftChatMemberEvent>(When.LeftChatMember)
 
-                .UseWhen<NewChatMembersEvent>(When.NewChatMembers)
-                .UseWhen<LeftChatMemberEvent>(When.LeftChatMember)
+                    //.UseWhen(When.MembersChanged, memberChanged => memberChanged
+                    //    .UseWhen(When.MembersChanged, cmdBranch => cmdBranch
+                    //        .Use<NewChatMembersCommand>()
+                    //        )
+                    //    )
+                    .UseWhen<MediaReceivedHandler>(When.MediaReceived)
+                    .UseWhen(When.NewMessage, msgBranch => msgBranch
+                        .UseWhen(When.NewTextMessage, txtBranch => txtBranch
+                                .UseWhen<CallTagsReceivedHandler>(When.CallTagRecieved)
+                                .UseWhen(When.NewCommand, cmdBranch => cmdBranch
+                                    .UseCommand<AdminCommand>("admin")
+                                    .UseCommand<DebugCommand>("dbg")
+                                    .UseCommand<IdCommand>("id")
+                                    .UseCommand<InfoCommand>("info")
+                                    .UseCommand<MediaFilterCommand>("mfil")
+                                    .UseCommand<MigrateCommand>("migrate")
+                                    .UseCommand<PinCommand>("pin")
+                                    .UseCommand<PingCommand>("ping")
+                                    .UseCommand<ReportCommand>("report")
+                                    .UseCommand<RulesCommand>("rules")
+                                    .UseCommand<SetWelcomeCommand>("setwelcome")
+                                    .UseCommand<StartCommand>("start")
+                                    .UseCommand<TagCommand>("tag")
+                                    .UseCommand<TagsCommand>("tags")
+                                    .UseCommand<UntagCommand>("untag")
+                                    .UseCommand<WelcomeCommand>("welcome")
+                                )
+                                .Use<GenericMessageHandler>()
 
-                //.UseWhen(When.MembersChanged, memberChanged => memberChanged
-                //    .UseWhen(When.MembersChanged, cmdBranch => cmdBranch
-                //        .Use<NewChatMembersCommand>()
-                //        )
-                //    )
-                
-                .UseWhen<MediaReceivedHandler>(When.MediaReceived)
-
-                .UseWhen(When.NewMessage, msgBranch => msgBranch
-                    .UseWhen(When.NewTextMessage, txtBranch => txtBranch
-                        .Use<GenericMessageHandler>()
-                        .UseWhen<CallTagsReceivedHandler>(When.CallTagRecieved)
-                        .UseWhen(When.NewCommand, cmdBranch => cmdBranch
-
-                            .UseCommand<MigrateCommand>("migrate")
-                            .UseCommand<MediaFilterCommand>("mfil")
-                            
-                            .UseCommand<PingCommand>("ping")
-                            .UseCommand<StartCommand>("start")
-
-                            .UseCommand<TagsCommand>("tags")
-                            .UseCommand<TagCommand>("tag")
-                            
-                            .UseCommand<PinCommand>("pin")
-                            
-                            .UseCommand<AdminCommand>("admin")
-
-                            .UseCommand<IdCommand>("id")
-                            .UseCommand<InfoCommand>("info")
-
-                            .UseCommand<WelcomeCommand>("welcome")
-                            .UseCommand<SetWelcomeCommand>("setwelcome")
+                            //.Use<NLP>()
                         )
-                    //.Use<NLP>()
+                        .UseWhen<StickerHandler>(When.StickerMessage)
+                        .UseWhen<WeatherReporter>(When.LocationMessage)
                     )
-                    .UseWhen<StickerHandler>(When.StickerMessage)
-                    .UseWhen<WeatherReporter>(When.LocationMessage)
-                )
+                    .UseWhen<CallbackQueryHandler>(When.CallbackQuery)
 
-                .UseWhen<CallbackQueryHandler>(When.CallbackQuery)
-
-                 //.Use<UnhandledUpdateReporter>()
-                 ;
+                //.Use<UnhandledUpdateReporter>()
+                ;
         }
     }
 }

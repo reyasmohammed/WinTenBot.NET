@@ -84,7 +84,7 @@ namespace WinTenBot.Helpers.Processors
                 ParseMode.Html,
                 replyMarkup: replyMarkup
             );
-            
+
             EditedMessageId = edit.MessageId;
         }
 
@@ -105,6 +105,39 @@ namespace WinTenBot.Helpers.Processors
             {
                 ConsoleHelper.WriteLine($"{ex.Message}");
             }
+        }
+
+        public async Task<bool> IsAdminGroup()
+        {
+            var chatId = Message.Chat.Id;
+            var userId = Message.From.Id;
+            var isAdmin = false;
+
+            var admins = await Client.GetChatAdministratorsAsync(chatId);
+            foreach (var admin in admins)
+            {
+                if (userId == admin.User.Id)
+                {
+                    isAdmin = true;
+                }
+            }
+
+            return isAdmin;
+        }
+
+        public async Task<string> GetMentionAdminsStr()
+        {
+            var admins = await Client.GetChatAdministratorsAsync(Message.Chat.Id);
+            var adminStr = string.Empty;
+            foreach (var admin in admins)
+            {
+                var user = admin.User;
+                var nameLink = MemberHelper.GetNameLink(user.Id, "&#8203;");
+
+                adminStr += $"{nameLink}";
+            }
+
+            return adminStr;
         }
     }
 }
