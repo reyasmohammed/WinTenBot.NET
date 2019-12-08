@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Telegram.Bot.Framework;
 using Telegram.Bot.Framework.Abstractions;
+using WinTenBot.Helpers;
 using WinTenBot.Options;
 using WinTenBot.Providers;
 using WinTenBot.Services;
@@ -31,18 +32,18 @@ namespace WinTenBot.Extensions
             var updateManager = new UpdatePollingManager<TBot>(botBuilder, new BotServiceProvider(app));
 
             Task.Run(async () =>
-            {
-                await Task.Delay(startAfter, cancellationToken);
-                await updateManager.RunAsync(cancellationToken: cancellationToken);
-            }, cancellationToken)
-            .ContinueWith(t =>
-            {
-                // ToDo use logger
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(t.Exception);
-                Console.ResetColor();
-                throw t.Exception;
-            }, TaskContinuationOptions.OnlyOnFaulted);
+                {
+                    await Task.Delay(startAfter, cancellationToken);
+                    await updateManager.RunAsync(cancellationToken: cancellationToken);
+                }, cancellationToken)
+                .ContinueWith(t =>
+                {
+                    // ToDo use logger
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine(t.Exception);
+                    Console.ResetColor();
+                    throw t.Exception;
+                }, TaskContinuationOptions.OnlyOnFaulted);
 
             return app;
         }
@@ -57,9 +58,13 @@ namespace WinTenBot.Extensions
                 var logger = scope.ServiceProvider.GetRequiredService<ILogger<Startup>>();
                 var bot = scope.ServiceProvider.GetRequiredService<TBot>();
                 var options = scope.ServiceProvider.GetRequiredService<IOptions<CustomBotOptions<TBot>>>();
-                var url = new Uri(new Uri(options.Value.WebhookDomain), options.Value.WebhookPath);
+                var botToken = options.Value.ApiToken;
+                var webhookPath = options.Value.WebhookPath;
 
-                logger.LogInformation("Setting webhook for bot \"{0}\" to URL \"{1}\"", typeof(TBot).Name, url);
+                var url = new Uri(new Uri(options.Value.WebhookDomain), $"{webhookPath}/{botToken}/webhook");
+                ConsoleHelper.WriteLine($"Url Webhook: {url}");
+
+                logger.LogInformation($"Setting webhook for bot \"{0}\" to URL \"{1}\"", typeof(TBot).Name, url);
 
                 bot.Client.SetWebhookAsync(url.AbsoluteUri)
                     .GetAwaiter().GetResult();
