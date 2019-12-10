@@ -11,17 +11,17 @@ using Telegram.Bot.Framework;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Extensions;
 using WinTenBot.Handlers;
-using WinTenBot.Handlers.Commands;
+using WinTenBot.Handlers.Commands.Chat;
 using WinTenBot.Handlers.Commands.Core;
 using WinTenBot.Handlers.Commands.Group;
 using WinTenBot.Handlers.Commands.Rules;
+using WinTenBot.Handlers.Commands.Security;
 using WinTenBot.Handlers.Commands.Tags;
 using WinTenBot.Handlers.Commands.Welcome;
 using WinTenBot.Handlers.Events;
 using WinTenBot.Interfaces;
 using WinTenBot.Model;
 using WinTenBot.Options;
-using WinTenBot.Scheduler;
 using WinTenBot.Services;
 
 namespace WinTenBot
@@ -41,7 +41,7 @@ namespace WinTenBot
             Console.WriteLine($"Version: {Configuration["Engines:Version"]}");
 
             Bot.Client = new TelegramBotClient(Configuration["ZiziBetaBot:ApiToken"]);
-            Bot.Client.SendTextMessageAsync("-1001404591750", "Bot started");
+//            Bot.Client.SendTextMessageAsync("-1001404591750", "Bot started");
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -132,7 +132,7 @@ namespace WinTenBot
             app.UseHangfireServer();
             app.UseHangfireDashboard();
             
-            DigestScheduler.SendMessage();
+//            DigestScheduler.SendMessage();
             
             app.Run(async context => { await context.Response.WriteAsync("Hello World!"); });
         }

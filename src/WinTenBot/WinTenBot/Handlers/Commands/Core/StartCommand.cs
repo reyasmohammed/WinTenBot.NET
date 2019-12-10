@@ -2,11 +2,10 @@
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types.ReplyMarkups;
-using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
 using WinTenBot.Model;
 
-namespace WinTenBot.Handlers.Commands
+namespace WinTenBot.Handlers.Commands.Core
 {
     class StartCommand : CommandBase
     {

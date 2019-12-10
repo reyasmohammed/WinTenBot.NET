@@ -5,7 +5,7 @@ using Telegram.Bot.Types.Enums;
 using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
 
-namespace WinTenBot.Handlers.Commands
+namespace WinTenBot.Handlers.Commands.Group
 {
     public class AdminCommand : CommandBase
     {

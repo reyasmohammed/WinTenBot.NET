@@ -1,14 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Telegram.Bot.Framework.Abstractions;
-using Telegram.Bot.Types.Enums;
 using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
 using WinTenBot.Services;
 
-namespace WinTenBot.Handlers.Commands.Core
+namespace WinTenBot.Handlers.Commands.Security
 {
     public class MediaFilterCommand : CommandBase
     {

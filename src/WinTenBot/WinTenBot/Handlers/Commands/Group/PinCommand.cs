@@ -1,11 +1,9 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
-using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
 
-namespace WinTenBot.Handlers.Commands
+namespace WinTenBot.Handlers.Commands.Group
 {
     public class PinCommand : CommandBase
     {

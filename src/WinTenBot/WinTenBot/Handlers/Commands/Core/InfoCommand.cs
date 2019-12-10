@@ -1,12 +1,11 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace WinTenBot.Handlers.Commands
+namespace WinTenBot.Handlers.Commands.Core
 {
     public class InfoCommand : CommandBase
     {

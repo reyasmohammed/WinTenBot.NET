@@ -1,11 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 using WinTenBot.Helpers.Processors;
 
-namespace WinTenBot.Handlers.Commands
+namespace WinTenBot.Handlers.Commands.Chat
 {
     public class IdCommand : CommandBase
     {
