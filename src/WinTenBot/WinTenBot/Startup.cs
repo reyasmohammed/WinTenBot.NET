@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Linq;
-using System.Net;
+using Hangfire;
+using Hangfire.LiteDB;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Telegram.Bot;
 using Telegram.Bot.Framework;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Extensions;
@@ -20,6 +21,7 @@ using WinTenBot.Handlers.Events;
 using WinTenBot.Interfaces;
 using WinTenBot.Model;
 using WinTenBot.Options;
+using WinTenBot.Scheduler;
 using WinTenBot.Services;
 
 namespace WinTenBot
@@ -37,6 +39,9 @@ namespace WinTenBot
 
             Console.WriteLine($"ProductName: {Configuration["Engines:ProductName"]}");
             Console.WriteLine($"Version: {Configuration["Engines:Version"]}");
+
+            Bot.Client = new TelegramBotClient(Configuration["ZiziBetaBot:ApiToken"]);
+            Bot.Client.SendTextMessageAsync("-1001404591750", "Bot started");
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -81,6 +86,28 @@ namespace WinTenBot
                 .AddScoped<StartCommand>()
                 .AddScoped<IdCommand>()
                 .AddScoped<InfoCommand>();
+
+
+//            services.AddDbContext<DataContext>(options => options.UseSqlite(@"Filename=./mydb.db;"));
+
+//            var sqliteOptions = new SQLiteStorageOptions();
+//            services.AddHangfire(configuration => configuration
+//                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+//                .UseSimpleAssemblyNameTypeSerializer()
+//                .UseRecommendedSerializerSettings()
+//                //.UseMemoryStorage(new MemoryStorageOptions { JobExpirationCheckInterval = TimeSpan.FromMinutes(10) })
+//                .UseSQLiteStorage("Filename=psm.db;", sqliteOptions)
+//            );
+            
+            services.AddHangfireServer();
+            services.AddHangfire(t => t.UseLiteDbStorage(Configuration[key: "CommonConfig:HangfireLiteDb"]));
+
+//            services.AddHangfire(x =>
+//                x.UseStorage(new MySqlStorage(Configuration["CommonConfig:ConnectionString"],
+//                    new MySqlStorageOptions() {TablePrefix = "hangfire"}))
+//            );
+//
+//            services.AddMvc();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -102,6 +129,11 @@ namespace WinTenBot
                 app.EnsureWebhookSet<WinTenBot>();
             }
 
+            app.UseHangfireServer();
+            app.UseHangfireDashboard();
+            
+            DigestScheduler.SendMessage();
+            
             app.Run(async context => { await context.Response.WriteAsync("Hello World!"); });
         }
 
