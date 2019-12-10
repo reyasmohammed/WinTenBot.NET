@@ -14,7 +14,7 @@ namespace WinTenBot.Helpers
             foreach (var button in splitWelcomeButton)
             {
                 var buttonLink = button.Split('|').ToList();
-                Console.WriteLine($"Appending keyboard {buttonLink[0].ToString()} -> {buttonLink[1].ToString()}");
+                ConsoleHelper.WriteLine($"Appending keyboard: {buttonLink[0]} -> {buttonLink[1]}");
                 dict.Add(buttonLink[0], buttonLink[1]);
                 
             }
