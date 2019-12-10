@@ -12,7 +12,7 @@ namespace WinTenBot.Helpers.Processors
     public class ChatProcessor
     {
         private IUpdateContext _updateContext;
-        private ITelegramBotClient Client { get; set; }
+        public ITelegramBotClient Client { get; set; }
         private Message Message { get; set; }
         public long ChatId { get; private set; }
         public int SentMessageId { get; private set; }

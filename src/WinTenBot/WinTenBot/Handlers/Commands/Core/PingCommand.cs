@@ -1,35 +1,52 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
-using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
+using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
 
-namespace WinTenBot.Handlers.Commands
+namespace WinTenBot.Handlers.Commands.Core
 {
     internal class PingCommand : CommandBase
     {
         private ChatProcessor _chatProcessor;
 
-        public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args, CancellationToken cancellationToken)
+        public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
+            CancellationToken cancellationToken)
         {
             _chatProcessor = new ChatProcessor(context);
-            Message msg = context.Update.Message;
+            var msg = context.Update.Message;
 
             var keyboard = new InlineKeyboardMarkup(
                 InlineKeyboardButton.WithCallbackData("Ping", "PONG")
             );
-            await _chatProcessor.SendAsync("Pong!!", keyboard);
 
-            //            await context.Bot.Client.SendTextMessageAsync(
-            //                msg.Chat,
-            //                "*PONG*",
-            //                ParseMode.Markdown,
-            //                replyToMessageId: msg.MessageId,
-            //                replyMarkup: new InlineKeyboardMarkup(
-            //                    InlineKeyboardButton.WithCallbackData("Ping", "PONG")
-            //                )
-            //            );
+            var sendText = "Pong!!";
+            var isSudoer = msg.From.Id.IsSudoer();
+
+            if (msg.Chat.Type == ChatType.Private && isSudoer)
+            {
+                sendText += "\n<b>Engine info.</b>";
+                var getWebHookInfo = await _chatProcessor.Client.GetWebhookInfoAsync(cancellationToken);
+                if (getWebHookInfo.Url == "")
+                {
+                    sendText += "\n\n<i>Bot run in Poll mode.</i>";
+                }
+                else
+                {
+                    sendText += "\n\n<i>Bot run in Webhook mode.</i>" +
+                                $"\nUrl WebHook: {getWebHookInfo.Url}" +
+                                $"\nUrl Custom Cert: {getWebHookInfo.HasCustomCertificate}" +
+                                $"\nAllowed Updates: {getWebHookInfo.AllowedUpdates}" +
+                                $"\nPending Count: {getWebHookInfo.PendingUpdateCount}" +
+                                $"\nMaxConnection: {getWebHookInfo.MaxConnections}" +
+                                $"\nLast Error: {getWebHookInfo.LastErrorDate}" +
+                                $"\nError Message: {getWebHookInfo.LastErrorMessage}";
+                }
+            }
+
+            await _chatProcessor.SendAsync(sendText, keyboard);
         }
     }
 }
