@@ -7,8 +7,8 @@ namespace WinTenBot
 {
     public static class When
     {
-        public static bool Webhook(IUpdateContext context)
-            => context.Items.ContainsKey(nameof(HttpContext));
+        public static bool Webhook(IUpdateContext context)  => 
+            context.Items.ContainsKey(nameof(HttpContext));
 
         public static bool NewMessage(IUpdateContext context) =>
             context.Update.Message != null;
@@ -31,6 +31,9 @@ namespace WinTenBot
 
         public static bool NewChatMembers(IUpdateContext context) =>
             context.Update.Message?.NewChatMembers != null;
+
+        public static bool NewPinnedMessage(IUpdateContext context) =>
+            context.Update.Message?.PinnedMessage != null;
 
         public static bool LocationMessage(IUpdateContext context) =>
             context.Update.Message?.Location != null;

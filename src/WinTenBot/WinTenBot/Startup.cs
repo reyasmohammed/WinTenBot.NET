@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Hangfire;
 using Hangfire.LiteDB;
 using Microsoft.AspNetCore.Builder;
@@ -69,14 +69,15 @@ namespace WinTenBot
                 .AddScoped<UntagCommand>();
 
 
-            services.AddScoped<AdminCommand>();
-            services.AddScoped<NewChatMembersEvent>();
-            services.AddScoped<LeftChatMemberEvent>();
-
-            services.AddScoped<PinCommand>();
-
-            services.AddScoped<RulesCommand>()
+            services.AddScoped<AdminCommand>()
+                .AddScoped<PinCommand>()
                 .AddScoped<ReportCommand>();
+
+            services.AddScoped<RulesCommand>();
+            
+            services.AddScoped<NewChatMembersEvent>()
+                .AddScoped<LeftChatMemberEvent>()
+                .AddScoped<PinnedMessageEvent>();
 
             services.AddScoped<WelcomeCommand>();
             services.AddScoped<SetWelcomeCommand>();
@@ -98,7 +99,7 @@ namespace WinTenBot
 //                //.UseMemoryStorage(new MemoryStorageOptions { JobExpirationCheckInterval = TimeSpan.FromMinutes(10) })
 //                .UseSQLiteStorage("Filename=psm.db;", sqliteOptions)
 //            );
-            
+
             services.AddHangfireServer();
             services.AddHangfire(t => t.UseLiteDbStorage(Configuration[key: "CommonConfig:HangfireLiteDb"]));
 
@@ -133,7 +134,7 @@ namespace WinTenBot
             app.UseHangfireDashboard();
             
 //            DigestScheduler.SendMessage();
-            
+
             app.Run(async context => { await context.Response.WriteAsync("Hello World!"); });
         }
 
@@ -153,6 +154,7 @@ namespace WinTenBot
                     //        .Use<NewChatMembersCommand>()
                     //        )
                     //    )
+                    .UseWhen<PinnedMessageEvent>(When.NewPinnedMessage)
                     .UseWhen<MediaReceivedHandler>(When.MediaReceived)
                     .UseWhen(When.NewMessage, msgBranch => msgBranch
                         .UseWhen(When.NewTextMessage, txtBranch => txtBranch
