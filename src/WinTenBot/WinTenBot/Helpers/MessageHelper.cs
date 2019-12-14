@@ -30,5 +30,17 @@ namespace WinTenBot.Helpers
         {
             return GetFileId(message).Substring(0, 17);
         }
+
+        public static string GetTextWithoutCmd(this string message, bool withoutCmd = true)
+        {
+            var partsMsg = message.Split(' ');
+            var text = message;
+            if (withoutCmd && message.StartsWith("/"))
+            {
+                text =  message.TrimStart(partsMsg[0].ToCharArray());
+            }
+
+            return text.Trim();
+        }
     }
 }

@@ -14,6 +14,7 @@ using WinTenBot.Handlers;
 using WinTenBot.Handlers.Commands.Chat;
 using WinTenBot.Handlers.Commands.Core;
 using WinTenBot.Handlers.Commands.Group;
+using WinTenBot.Handlers.Commands.Notes;
 using WinTenBot.Handlers.Commands.Rules;
 using WinTenBot.Handlers.Commands.Security;
 using WinTenBot.Handlers.Commands.Tags;
@@ -68,6 +69,8 @@ namespace WinTenBot
                 .AddScoped<TagCommand>()
                 .AddScoped<UntagCommand>();
 
+            services.AddScoped<NotesCommand>()
+                .AddScoped<AddNotesCommand>();
 
             services.AddScoped<AdminCommand>()
                 .AddScoped<PinCommand>()
@@ -161,11 +164,13 @@ namespace WinTenBot
                                 .UseWhen<CallTagsReceivedHandler>(When.CallTagRecieved)
                                 .UseWhen(When.NewCommand, cmdBranch => cmdBranch
                                     .UseCommand<AdminCommand>("admin")
+                                    .UseCommand<AddNotesCommand>("addfilter")
                                     .UseCommand<DebugCommand>("dbg")
                                     .UseCommand<IdCommand>("id")
                                     .UseCommand<InfoCommand>("info")
                                     .UseCommand<MediaFilterCommand>("mfil")
                                     .UseCommand<MigrateCommand>("migrate")
+                                    .UseCommand<NotesCommand>("filters")
                                     .UseCommand<PinCommand>("pin")
                                     .UseCommand<PingCommand>("ping")
                                     .UseCommand<ReportCommand>("report")
