@@ -26,7 +26,7 @@ namespace WinTenBot.Services
         public async Task<DataTable> GetNotesBySlug(long chatId, string slug)
         {
             var sql = $"SELECT * FROM {baseTable} WHERE chat_id = '{chatId}' " +
-                      $"AND MATCH(content) AGAINST('{slug.SqlEscape()}')";
+                      $"AND MATCH(slug) AGAINST('{slug.SqlEscape()}')";
             var data = await _mySql.ExecQueryAsync(sql);
             return data;
         }
