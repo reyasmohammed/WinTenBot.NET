@@ -73,6 +73,18 @@ namespace WinTenBot.Helpers.Processors
             if (send != null) SentMessageId = send.MessageId;
         }
 
+        public async Task SendMediaAsync(string fileId, string mediaType, string caption = "",
+            IReplyMarkup replyMarkup = null)
+        {
+            switch (mediaType.ToLower())
+            {
+                case "document":
+                    await Client.SendDocumentAsync(Message.Chat.Id, fileId, caption, ParseMode.Html,
+                        replyMarkup: replyMarkup);
+                    break;
+            }
+        }
+
         public async Task EditAsync(string sendText, InlineKeyboardMarkup replyMarkup = null)
         {
             Message edit = null;

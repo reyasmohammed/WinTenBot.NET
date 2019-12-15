@@ -1,19 +1,19 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Helpers;
+using WinTenBot.Helpers.Processors;
 using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Welcome
 {
-    public class WelcomeCommand:CommandBase
+    public class WelcomeCommand : CommandBase
     {
         private readonly SettingsService _settingsService;
+        private ChatProcessor _chatProcessor;
+
         public WelcomeCommand()
         {
             _settingsService = new SettingsService();
@@ -22,42 +22,52 @@ namespace WinTenBot.Handlers.Commands.Welcome
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            Message msg = context.Update.Message;
+            _chatProcessor = new ChatProcessor(context);
+            var msg = context.Update.Message;
 
-            Console.WriteLine($"Args: {string.Join(" ",args)}");
+            ConsoleHelper.WriteLine($"Args: {string.Join(" ", args)}");
             var sendText = "Perintah /welcome hanya untuk grup saja";
-            IReplyMarkup keyboard = new ReplyKeyboardMarkup();
 
             if (msg.Chat.Type != ChatType.Private)
             {
                 var chatTitle = msg.Chat.Title;
-                var settings = await _settingsService.GetSettingByGrup(msg.Chat.Id);
+                var settings = await _settingsService.GetSettingByGroup(msg.Chat.Id);
                 var welcomeMessage = settings.Rows[0]["welcome_message"].ToString();
                 var welcomeButton = settings.Rows[0]["welcome_button"].ToString();
+                var welcomeMedia = settings.Rows[0]["welcome_media"].ToString();
+                var welcomeMediaType = settings.Rows[0]["welcome_media_type"].ToString();
                 var splitWelcomeButton = welcomeButton.Split(',').ToList<string>();
 
-                keyboard = KeyboardHelper.ToReplyMarkup(welcomeButton, 2);
+                var keyboard = welcomeButton.ToReplyMarkup(2);
                 sendText = $"👥 <b>{chatTitle}</b>\n";
                 if (welcomeMessage == "")
                 {
                     sendText += "Tidak ada konfigurasi pesan welcome, pesan default akan di terapkan";
                 }
-
-                if (args[0] == "anu")
+                else
                 {
-                    sendText += " anu";
+                    sendText += welcomeMessage;
                 }
 
-//                sendText += " " + string.Join(", ",args);
-            }
+//                if (args[0] == "anu")
+//                {
+//                    sendText += " anu";
+//                }
 
-            await context.Bot.Client.SendTextMessageAsync(
-                msg.Chat,
-                sendText,
-                ParseMode.Html,
-                replyMarkup: keyboard,
-                replyToMessageId: msg.MessageId,
-                cancellationToken: cancellationToken);
+//                sendText += " " + string.Join(", ",args);
+                if (welcomeMediaType != "")
+                {
+                    await _chatProcessor.SendMediaAsync(welcomeMedia, welcomeMediaType, welcomeMessage, keyboard);
+                }
+                else
+                {
+                    await _chatProcessor.SendAsync(sendText, keyboard);
+                }
+            }
+            else
+            {
+                await _chatProcessor.SendAsync(sendText);
+            }
         }
     }
 }

@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text.RegularExpressions;
-using Newtonsoft.Json;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace WinTenBot.Helpers
 {
@@ -26,7 +25,28 @@ namespace WinTenBot.Helpers
         {
             return text.Split(delimiter).ToList();
         }
+        
+        public static string ResolveVariable(this string input, object parameters) {
+            var type = parameters.GetType();
+            Regex regex = new Regex( "\\{(.*?)\\}" );
+            var sb = new StringBuilder();
+            var pos = 0;
 
+            foreach (Match toReplace in regex.Matches( input )) {
+                var capture = toReplace.Groups[ 0 ];
+                var paramName = toReplace.Groups[ toReplace.Groups.Count - 1 ].Value;
+                var property = type.GetProperty( paramName );
+                if (property == null) continue;
+                sb.Append( input.Substring( pos, capture.Index - pos) );
+                sb.Append( property.GetValue( parameters, null ) );
+                pos = capture.Index + capture.Length;
+            }
+
+            if (input.Length > pos + 1) sb.Append( input.Substring( pos ) );
+
+            return sb.ToString();
+        }
+        
         public static async Task ToFile(this string content, string path)
         {
             ConsoleHelper.WriteLine($"Writing file to {path}");
