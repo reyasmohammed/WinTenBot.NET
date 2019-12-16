@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Telegram.Bot;
 using Telegram.Bot.Framework;
 using Telegram.Bot.Framework.Abstractions;
@@ -114,7 +115,7 @@ namespace WinTenBot
 //            services.AddMvc();
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             Bot.HostingEnvironment = env;
             if (env.IsDevelopment())

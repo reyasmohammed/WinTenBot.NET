@@ -1,8 +1,9 @@
-using System;
+﻿using System;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -36,6 +37,13 @@ namespace WinTenBot.Handlers
             ConsoleHelper.WriteLine(msg.ToJson());
             ConsoleHelper.WriteLine(msg.Text);
 
+
+            if (msg.Text == "ping")
+            {
+                // run /ping?
+                
+            }
+            
             if (Bot.HostingEnvironment.IsProduction())
             {
                 await _casBanProvider.IsCasBan(msg.From.Id);

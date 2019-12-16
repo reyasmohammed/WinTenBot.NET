@@ -11,6 +11,6 @@ namespace WinTenBot.Model
 
         public static IConfiguration GlobalConfiguration { get; set; }
 
-        public static IHostingEnvironment HostingEnvironment { get; set; }
+        public static IWebHostEnvironment HostingEnvironment { get; set; }
     }
 }
