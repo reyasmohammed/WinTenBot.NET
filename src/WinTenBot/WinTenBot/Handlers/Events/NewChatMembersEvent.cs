@@ -1,11 +1,9 @@
-﻿using System;
+﻿using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Internal;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
@@ -45,6 +43,7 @@ namespace WinTenBot.Handlers.Events
             var allNewMember = new StringBuilder();
             var noUsername = new StringBuilder();
             var newBots = new StringBuilder();
+            var lastMember = newMembers.Last();
 
             foreach (var newMember in newMembers)
             {
@@ -52,7 +51,8 @@ namespace WinTenBot.Handlers.Events
 
                 var fullName = (newMember.FirstName + " " + newMember.LastName).Trim();
                 var nameLink = MemberHelper.GetNameLink(newMember.Id, fullName);
-                if (newMembers.IndexOf(newMember) != newMembers.Length - 1)
+                // if (newMembers.IndexOf(newMember) != newMembers.Length - 1)
+                if (newMember != lastMember)
                 {
                     allNewMember.Append(nameLink + ", ");
                 }
@@ -72,7 +72,7 @@ namespace WinTenBot.Handlers.Events
                 }
             }
 
-            var fromName = msg.From.FirstName;
+            // var fromName = msg.From.FirstName;
 
 //            var sendText = $"Hai {newMemberStr}" +
 //                           $"\nSelamat datang di kontrakan <b>{chatTitle}</b>" +
@@ -101,13 +101,6 @@ namespace WinTenBot.Handlers.Events
                 await _chatProcessor.SendAsync(sendText, keyboard);
             }
             
-            // await _chatProcessor.SendAsync(sendText, replyMarkup);
-
-//            await context.Bot.Client.SendTextMessageAsync(
-//                msg.Chat,
-//                sendText,
-//                ParseMode.Html
-//            );
         }
     }
 }
