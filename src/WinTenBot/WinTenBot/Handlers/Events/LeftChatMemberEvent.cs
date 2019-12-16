@@ -2,7 +2,6 @@
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Internal;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -22,20 +21,7 @@ namespace WinTenBot.Handlers.Events
 
             var newMembers = msg.LeftChatMember;
             var leftFullName = newMembers.FirstName;
-//            var newMemberStr = new StringBuilder();
-//            foreach (var newMember in newMembers)
-//            {
-//                var fullName = (newMember.FirstName + newMember.LastName).Trim();
-//                var nameLink = MemberHelper.GetNameLink(newMember.Id, fullName);
-//                if (newMembers.IndexOf(newMember) != newMembers.Length - 1)
-//                {
-//                    newMemberStr.Append(nameLink + ", ");
-//                }
-//                else
-//                {
-//                    newMemberStr.Append(nameLink);
-//                }
-//            }
+
 
             var fromName = msg.From.FirstName;
 
