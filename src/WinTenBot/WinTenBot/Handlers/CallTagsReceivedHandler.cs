@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -57,12 +56,6 @@ namespace WinTenBot.Handlers
             {
                 await chatProcessor.SendAsync("Due performance reason, we limit 5 batch call tags");
             }
-
-            //            await context.Bot.Client.SendTextMessageAsync(
-            //                msg.Chat, "You said:\n" + msg.Text
-            //            );
-
-            //            await next(context);
         }
     }
 }
