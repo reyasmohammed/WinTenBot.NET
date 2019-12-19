@@ -27,6 +27,8 @@ namespace WinTenBot.Helpers
         }
         
         public static string ResolveVariable(this string input, object parameters) {
+            
+            ConsoleHelper.WriteLine("Resolving variable..");
             var type = parameters.GetType();
             Regex regex = new Regex( "\\{(.*?)\\}" );
             var sb = new StringBuilder();
