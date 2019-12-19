@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,11 +21,13 @@ namespace WinTenBot.Handlers
         private ChatProcessor _chatProcessor;
         private NotesService _notesService;
         private IReplyMarkup _replyMarkup;
+        private AfkService _afkService;
 
         public GenericMessageHandler()
         {
             _casBanProvider = new CasBanProvider();
             _notesService = new NotesService();
+            _afkService = new AfkService();
             _replyMarkup = null;
         }
 
@@ -76,7 +78,39 @@ namespace WinTenBot.Handlers
             //                msg.Chat, "You said:\n" + msg.Text
             //            );
 
+            await AfkCheck(msg);
+
             await next(context);
+        }
+
+        private async Task AfkCheck(Message message)
+        {
+            if (message.ReplyToMessage != null)
+            {
+                var repMsg = message.ReplyToMessage;
+                var isAfkReply = await _afkService.IsAfkAsync(repMsg);
+                if (isAfkReply)
+                    await _chatProcessor.SendAsync($"{repMsg.GetFromNameLink()} sedang afk");
+            }
+            
+            var isAfk = await _afkService.IsAfkAsync(message);
+            if (isAfk)
+            {
+                await _chatProcessor.SendAsync($"{message.GetFromNameLink()} sudah tidak afk");
+                
+                var data = new Dictionary<string, object>()
+                {
+                    {"chat_id",message.Chat.Id},
+                    {"user_id", message.From.Id},
+                    {"is_afk", 0},
+                    {"afk_reason",""}
+                };
+
+                await _afkService.SaveAsync(data);
+            }
+
+            await _afkService.UpdateCacheAsync();
+
         }
     }
 }
