@@ -32,7 +32,7 @@ namespace WinTenBot.Handlers.Commands.Group
             };
 
             var sendText = $"{msg.GetFromNameLink()} Sedang afk.";
-
+            
             if (msg.Text.GetTextWithoutCmd() != "")
             {
                 var afkReason = msg.Text.GetTextWithoutCmd();
@@ -41,12 +41,10 @@ namespace WinTenBot.Handlers.Commands.Group
                 sendText += $"\n<i>{afkReason}</i>";
             }
 
+            await _chatProcessor.SendAsync(sendText);
             await _afkService.SaveAsync(data);
-
-
             await _afkService.UpdateCacheAsync();
 
-            await _chatProcessor.SendAsync(sendText);
         }
     }
 }
