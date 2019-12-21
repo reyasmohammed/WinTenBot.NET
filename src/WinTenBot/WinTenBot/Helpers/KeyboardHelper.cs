@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace WinTenBot.Helpers
@@ -39,7 +42,41 @@ namespace WinTenBot.Helpers
 
         public static IReplyMarkup ToReplyMarkup(this string buttonStr, int columns)
         {
-            return CreateInlineKeyboardButton(StringToDict(buttonStr),columns);
+            return CreateInlineKeyboardButton(StringToDict(buttonStr), columns);
+        }
+
+        public static async Task<InlineKeyboardMarkup> JsonToButton(this string jsonPath, int chunk = 2)
+        {
+            ConsoleHelper.WriteLine($"Loading Json: {jsonPath}");
+            var json = await File.ReadAllTextAsync(jsonPath);
+            var replyMarkup = json.ToDataTable();
+            
+            var btnList = new List<InlineKeyboardButton>();
+
+            foreach (DataRow row in replyMarkup.Rows)
+            {
+                var btnText = row["text"].ToString();
+                var data = row["data"].ToString();
+                if (data.CheckUrlValid())
+                {
+                    ConsoleHelper.WriteLine($"Appending Text: '{btnText}', Url: '{data}'.");
+                    btnList.Add(InlineKeyboardButton.WithUrl(btnText, data));
+                }
+                else
+                {
+                    ConsoleHelper.WriteLine($"Appending Text: '{btnText}', Data: '{data}'.");
+                    btnList.Add(InlineKeyboardButton.WithCallbackData(btnText,data));
+                }
+            }
+
+            ConsoleHelper.WriteLine($"Chunk buttons to {chunk}");
+            var chunksBtn = btnList
+                .Select((s, i) => new { Value = s, Index = i })
+                .GroupBy(x => x.Index / 2)
+                .Select(grp => grp.Select(x => x.Value).ToArray())
+                .ToArray();
+            
+            return new InlineKeyboardMarkup(chunksBtn);
         }
     }
 }

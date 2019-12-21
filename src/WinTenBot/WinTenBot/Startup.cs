@@ -60,7 +60,8 @@ namespace WinTenBot
                 .AddScoped<CallbackQueryHandler>()
                 .AddScoped<IWeatherService, WeatherService>();
 
-            services.AddScoped<PingHandler>();
+            services.AddScoped<PingHandler>()
+                .AddScoped<HelpCommand>();
 
             services.AddScoped<MediaReceivedHandler>();
 
@@ -121,6 +122,7 @@ namespace WinTenBot
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             Bot.HostingEnvironment = env;
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -153,7 +155,6 @@ namespace WinTenBot
                     .UseWhen<WebhookLogger>(When.Webhook)
 
                     //.UseWhen<UpdateMembersList>(When.MembersChanged)
-                    .UseWhen<PingHandler>(When.PingReceived)
                     .UseWhen<NewChatMembersEvent>(When.NewChatMembers)
                     .UseWhen<LeftChatMemberEvent>(When.LeftChatMember)
 
@@ -167,11 +168,13 @@ namespace WinTenBot
                     .UseWhen(When.NewMessage, msgBranch => msgBranch
                         .UseWhen(When.NewTextMessage, txtBranch => txtBranch
                                 .UseWhen<CallTagsReceivedHandler>(When.CallTagReceived)
+                                .UseWhen<PingHandler>(When.PingReceived)
                                 .UseWhen(When.NewCommand, cmdBranch => cmdBranch
                                     .UseCommand<AdminCommand>("admin")
                                     .UseCommand<AddNotesCommand>("addfilter")
                                     .UseCommand<AfkCommand>("afk")
                                     .UseCommand<DebugCommand>("dbg")
+                                    .UseCommand<HelpCommand>("help")
                                     .UseCommand<IdCommand>("id")
                                     .UseCommand<InfoCommand>("info")
                                     .UseCommand<MediaFilterCommand>("mfil")

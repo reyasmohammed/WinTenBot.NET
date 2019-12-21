@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace WinTenBot.Helpers
 {
@@ -19,6 +21,11 @@ namespace WinTenBot.Helpers
         public static DataTable ToDataTable(this string data)
         {
             return JsonConvert.DeserializeObject<DataTable>(data);
+        }
+
+        public static JArray ToArray(this string data)
+        {
+            return JArray.Parse(data);
         }
 
         public static List<string> SplitText(this string text, string delimiter)
@@ -106,6 +113,12 @@ namespace WinTenBot.Helpers
                             return "\\" + v;
                     }
                 });
+        }
+        
+        public static bool CheckUrlValid(this string source)
+        {
+            return Uri.TryCreate(source, UriKind.Absolute, out Uri uriResult) 
+                   && uriResult.Scheme == Uri.UriSchemeHttps;
         }
     }
 }

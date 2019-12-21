@@ -11,20 +11,18 @@ namespace WinTenBot.Helpers.Processors
 {
     public class ChatProcessor
     {
-        private IUpdateContext _updateContext;
         public ITelegramBotClient Client { get; set; }
-        private Message Message { get; set; }
-        public long ChatId { get; private set; }
+        public Message Message { get; set; }
         public int SentMessageId { get; private set; }
         public int EditedMessageId { get; private set; }
+        
+        public int CallBackMessageId { get; set; }
 
         public ChatProcessor(IUpdateContext updateContext)
         {
-            _updateContext = updateContext;
-
-            ChatId = _updateContext.Update.Message.Chat.Id;
-            Client = _updateContext.Bot.Client;
-            Message = _updateContext.Update.Message;
+            // ChatId = _updateContext.Update.Message.Chat.Id;
+            Client = updateContext.Bot.Client;
+            Message = updateContext.Update.CallbackQuery != null ? updateContext.Update.CallbackQuery.Message : updateContext.Update.Message;
         }
 
         public async Task SendAsync(string sendText, IReplyMarkup replyMarkup = null, bool replyToReplied = false)
@@ -68,8 +66,7 @@ namespace WinTenBot.Helpers.Processors
                         $"SendMessage: {apiRequestException2.ErrorCode}: {apiRequestException2.Message}");
                 }
             }
-
-            //            Console.WriteLine(TextHelper.ToJson(send));
+            
             if (send != null) SentMessageId = send.MessageId;
         }
 
@@ -100,14 +97,36 @@ namespace WinTenBot.Helpers.Processors
             EditedMessageId = edit.MessageId;
         }
 
+        public async Task EditMessageCallback(string sendText, InlineKeyboardMarkup replyMarkup = null)
+        {
+            
+            Message edit = null;
+            try
+            {
+                ConsoleHelper.WriteLine($"Editing {CallBackMessageId}");
+                edit =await Client.EditMessageTextAsync(
+                    Message.Chat,
+                    CallBackMessageId,
+                    sendText,
+                    ParseMode.Html,
+                    replyMarkup: replyMarkup
+                );
+            }
+            catch (Exception e)
+            {
+                ConsoleHelper.WriteLine(e);
+            }
+            
+        }
+
         public async Task DeleteAsync(int messageId = -1)
         {
             var mssgId = messageId != -1 ? messageId : SentMessageId;
 
             try
             {
-                ConsoleHelper.WriteLine($"Delete MsgId: {mssgId} on ChatId: {ChatId}");
-                await Client.DeleteMessageAsync(ChatId, mssgId);
+                ConsoleHelper.WriteLine($"Delete MsgId: {mssgId} on ChatId: {Message.Chat.Id}");
+                await Client.DeleteMessageAsync(Message.Chat.Id, mssgId);
             }
             catch (ChatNotFoundException chatNotFoundException)
             {
@@ -135,6 +154,11 @@ namespace WinTenBot.Helpers.Processors
             }
 
             return isAdmin;
+        }
+
+        public bool IsPrivateChat()
+        {
+            return Message.Chat.Type == ChatType.Private;
         }
 
         public async Task<string> GetMentionAdminsStr()
