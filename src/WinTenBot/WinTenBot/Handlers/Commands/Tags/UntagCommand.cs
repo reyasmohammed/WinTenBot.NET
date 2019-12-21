@@ -29,11 +29,11 @@ namespace WinTenBot.Handlers.Commands.Tags
             if (isAdmin)
             {
                 await _chatProcessor.SendAsync("Memeriksa..");
-                var isExist = await _tagsService.IsExist(_chatProcessor.ChatId, tagVal);
+                var isExist = await _tagsService.IsExist(_chatProcessor.Message.Chat.Id, tagVal);
                 if (isExist)
                 {
                     ConsoleHelper.WriteLine($"Sedang menghapus tag {tagVal}");
-                    var unTag = await _tagsService.DeleteTag(_chatProcessor.ChatId, tagVal);
+                    var unTag = await _tagsService.DeleteTag(_chatProcessor.Message.Chat.Id, tagVal);
                     if (unTag)
                     {
                         sendText = $"Hapus tag {tagVal} berhasil";

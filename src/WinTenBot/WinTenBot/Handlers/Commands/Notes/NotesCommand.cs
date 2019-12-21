@@ -23,7 +23,7 @@ namespace WinTenBot.Handlers.Commands.Notes
         {
             _chatProcessor = new ChatProcessor(context);
 
-            var notesData = await _notesService.GetNotesByChatId(_chatProcessor.ChatId);
+            var notesData = await _notesService.GetNotesByChatId(_chatProcessor.Message.Chat.Id);
 
             var sendText = "Filters di Obrolan ini.";
 
@@ -41,7 +41,7 @@ namespace WinTenBot.Handlers.Commands.Notes
                            "\nUntuk menambahkannya ketik /addfilter";
             }
 
-            await _notesService.UpdateCache(_chatProcessor.ChatId);
+            await _notesService.UpdateCache(_chatProcessor.Message.Chat.Id);
 
             await _chatProcessor.SendAsync(sendText);
         }
