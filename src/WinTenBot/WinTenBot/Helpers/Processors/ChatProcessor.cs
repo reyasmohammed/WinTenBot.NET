@@ -15,14 +15,15 @@ namespace WinTenBot.Helpers.Processors
         public Message Message { get; set; }
         public int SentMessageId { get; private set; }
         public int EditedMessageId { get; private set; }
-        
         public int CallBackMessageId { get; set; }
 
         public ChatProcessor(IUpdateContext updateContext)
         {
             // ChatId = _updateContext.Update.Message.Chat.Id;
             Client = updateContext.Bot.Client;
-            Message = updateContext.Update.CallbackQuery != null ? updateContext.Update.CallbackQuery.Message : updateContext.Update.Message;
+            Message = updateContext.Update.CallbackQuery != null
+                ? updateContext.Update.CallbackQuery.Message
+                : updateContext.Update.Message;
         }
 
         public async Task SendAsync(string sendText, IReplyMarkup replyMarkup = null, bool replyToReplied = false)
@@ -66,18 +67,26 @@ namespace WinTenBot.Helpers.Processors
                         $"SendMessage: {apiRequestException2.ErrorCode}: {apiRequestException2.Message}");
                 }
             }
-            
+
             if (send != null) SentMessageId = send.MessageId;
         }
 
         public async Task SendMediaAsync(string fileId, string mediaType, string caption = "",
-            IReplyMarkup replyMarkup = null)
+            IReplyMarkup replyMarkup = null, int replyToMsgId = -1)
         {
+            ConsoleHelper.WriteLine($"Sending media: {mediaType}, fileId: {fileId} to {Message.Chat.Id}");
             switch (mediaType.ToLower())
             {
                 case "document":
                     await Client.SendDocumentAsync(Message.Chat.Id, fileId, caption, ParseMode.Html,
-                        replyMarkup: replyMarkup);
+                        replyMarkup: replyMarkup,replyToMessageId:replyToMsgId);
+                    break;
+                case "photo":
+                    await Client.SendPhotoAsync(Message.Chat.Id, fileId, caption, ParseMode.Html,
+                        replyMarkup: replyMarkup,replyToMessageId:replyToMsgId);
+                    break;
+                default:
+                    ConsoleHelper.WriteLine($"Media unknown: {mediaType}");
                     break;
             }
         }
@@ -99,12 +108,11 @@ namespace WinTenBot.Helpers.Processors
 
         public async Task EditMessageCallback(string sendText, InlineKeyboardMarkup replyMarkup = null)
         {
-            
             Message edit = null;
             try
             {
                 ConsoleHelper.WriteLine($"Editing {CallBackMessageId}");
-                edit =await Client.EditMessageTextAsync(
+                edit = await Client.EditMessageTextAsync(
                     Message.Chat,
                     CallBackMessageId,
                     sendText,
@@ -116,7 +124,6 @@ namespace WinTenBot.Helpers.Processors
             {
                 ConsoleHelper.WriteLine(e);
             }
-            
         }
 
         public async Task DeleteAsync(int messageId = -1)
