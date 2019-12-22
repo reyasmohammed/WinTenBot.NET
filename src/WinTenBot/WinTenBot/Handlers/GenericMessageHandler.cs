@@ -105,10 +105,8 @@ namespace WinTenBot.Handlers
                 };
 
                 await _afkService.SaveAsync(data);
+                await _afkService.UpdateCacheAsync();
             }
-
-            await _afkService.UpdateCacheAsync();
-
         }
     }
 }
