@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Hangfire;
 using Hangfire.LiteDB;
 using HangfireBasicAuthenticationFilter;
@@ -13,6 +13,7 @@ using Telegram.Bot.Framework;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Extensions;
 using WinTenBot.Handlers;
+using WinTenBot.Handlers.Commands.Additional;
 using WinTenBot.Handlers.Commands.Chat;
 using WinTenBot.Handlers.Commands.Core;
 using WinTenBot.Handlers.Commands.Group;
@@ -101,6 +102,7 @@ namespace WinTenBot
                 .AddScoped<IdCommand>()
                 .AddScoped<InfoCommand>();
 
+            services.AddScoped<QrCommand>();
 
             //            services.AddDbContext<DataContext>(options => options.UseSqlite(@"Filename=./mydb.db;"));
 
@@ -200,6 +202,7 @@ namespace WinTenBot
                                     .UseCommand<NotesCommand>("filters")
                                     .UseCommand<PinCommand>("pin")
                                     .UseCommand<PingCommand>("ping")
+                                    .UseCommand<QrCommand>("qr")
                                     .UseCommand<ReportCommand>("report")
                                     .UseCommand<RulesCommand>("rules")
                                     .UseCommand<SetWelcomeCommand>("setwelcome")
