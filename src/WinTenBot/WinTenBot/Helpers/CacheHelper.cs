@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.IO;
 using System.Threading.Tasks;
+using Hangfire;
 
 namespace WinTenBot.Helpers
 {
@@ -16,6 +17,12 @@ namespace WinTenBot.Helpers
             var json = dataTable.ToJson(true);
             await json.ToFile(filePath);
             ConsoleHelper.WriteLine("Writing cache success..");
+        }
+
+        public static void BackgroundWriteCache(this DataTable dataTable, string fileJson)
+        {
+            var jobId = BackgroundJob.Enqueue(() => WriteCacheAsync(dataTable, fileJson));
+            ConsoleHelper.WriteLine($"Background Write Cache scheduled with ID: {jobId}");
         }
 
         public static async Task<DataTable> ReadCacheAsync(this string fileJson)
