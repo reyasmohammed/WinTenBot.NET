@@ -14,16 +14,12 @@ namespace WinTenBot.Handlers.Commands.Welcome
         private ChatProcessor _chatProcessor;
         private SettingsService _settingsService;
 
-        public SetWelcomeCommand()
-        {
-            _settingsService = new SettingsService();
-        }
-
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
             _chatProcessor = new ChatProcessor(context);
             var msg = context.Update.Message;
+            _settingsService = new SettingsService(msg.Chat);
 
             if (msg.Chat.Type == ChatType.Private)
             {
@@ -46,8 +42,8 @@ namespace WinTenBot.Handlers.Commands.Welcome
                     {
                         var mediaType = repMsg.Type.ToString().ToLower();
                         await _chatProcessor.SendAsync("Sedang menyimpan Welcome Media..");
-                        await _settingsService.UpdateCell(msg.Chat.Id, "welcome_media", repMsg.GetFileId());
-                        await _settingsService.UpdateCell(msg.Chat.Id, "welcome_media_type", mediaType);
+                        await _settingsService.UpdateCell("welcome_media", repMsg.GetFileId());
+                        await _settingsService.UpdateCell("welcome_media_type", mediaType);
                         ConsoleHelper.WriteLine("Save media success..");
 
                         await _chatProcessor.EditAsync("Welcome Media berhasil di simpan.");
@@ -84,11 +80,7 @@ namespace WinTenBot.Handlers.Commands.Welcome
 
                             await _chatProcessor.SendAsync("Sedang menyimpan Welcome Message..");
 
-                            await _settingsService.UpdateCell(
-                                msg.Chat.Id,
-                                columnTarget,
-                                data
-                            );
+                            await _settingsService.UpdateCell(columnTarget, data);
                             await _chatProcessor.EditAsync($"Welcome {target} berhasil di simpan!");
                         }
                         else

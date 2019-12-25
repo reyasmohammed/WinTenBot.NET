@@ -14,24 +14,21 @@ namespace WinTenBot.Handlers.Commands.Rules
         private ChatProcessor _chatProcessor;
         private SettingsService _settingsService;
 
-        public RulesCommand()
-        {
-            _settingsService = new SettingsService();
-        }
-
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _chatProcessor = new ChatProcessor(context);
             var msg = context.Update.Message;
-            _settingsService.ChatId = msg.Chat.Id;
+
+            _chatProcessor = new ChatProcessor(context);
+            _settingsService = new SettingsService(msg.Chat);
+
 
             var sendText = "Under maintenance";
             if (msg.Chat.Type != ChatType.Private)
             {
                 if (msg.From.Id.IsSudoer())
                 {
-                    var settings = await _settingsService.GetSettingByGroup(msg.Chat.Id);
+                    var settings = await _settingsService.GetSettingByGroup();
                     await _settingsService.UpdateCache();
                     ConsoleHelper.WriteLine(settings.ToJson());
                     var rules = settings.Rows[0]["rules_text"].ToString();

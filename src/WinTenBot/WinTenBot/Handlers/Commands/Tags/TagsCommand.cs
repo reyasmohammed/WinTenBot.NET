@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
@@ -12,23 +12,21 @@ namespace WinTenBot.Handlers.Commands.Tags
     public class TagsCommand : CommandBase
     {
         private readonly TagsService _tagsService;
-        private readonly SettingsService _settingsService;
+        private SettingsService _settingsService;
         private ChatProcessor _chatProcessor;
 
         public TagsCommand()
         {
             _tagsService = new TagsService();
-            _settingsService = new SettingsService();
         }
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _chatProcessor = new ChatProcessor(context);
-
             Message msg = context.Update.Message;
+            _chatProcessor = new ChatProcessor(context);
+            _settingsService = new SettingsService(msg.Chat);
 
-            
             var id = msg.From.Id;
             var sendText = "Under maintenance";
 
@@ -49,7 +47,7 @@ namespace WinTenBot.Handlers.Commands.Tags
 
             await _chatProcessor.EditAsync(sendText);
 
-            var currentSetting = await _settingsService.GetSettingByGroup(msg.Chat.Id);
+            var currentSetting = await _settingsService.GetSettingByGroup();
 //            var jsonSettings = TextHelper.ToJson(currentSetting);
 //            ConsoleHelper.WriteLine($"CurrentSettings: {jsonSettings}");
             
@@ -59,7 +57,7 @@ namespace WinTenBot.Handlers.Commands.Tags
             await _chatProcessor.DeleteAsync(lastTagsMsgId);
 
             ConsoleHelper.WriteLine(_chatProcessor.SentMessageId);
-            await _settingsService.UpdateCell(msg.Chat.Id, "last_tags_message_id", _chatProcessor.SentMessageId);
+            await _settingsService.UpdateCell("last_tags_message_id", _chatProcessor.SentMessageId);
 
 
 //            var json = TextHelper.ToJson(tagsData);

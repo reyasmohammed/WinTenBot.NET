@@ -11,19 +11,16 @@ namespace WinTenBot.Handlers.Commands.Welcome
 {
     public class WelcomeCommand : CommandBase
     {
-        private readonly SettingsService _settingsService;
+        private SettingsService _settingsService;
         private ChatProcessor _chatProcessor;
-
-        public WelcomeCommand()
-        {
-            _settingsService = new SettingsService();
-        }
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
             _chatProcessor = new ChatProcessor(context);
             var msg = context.Update.Message;
+            _settingsService = new SettingsService(msg.Chat);
+
 
             ConsoleHelper.WriteLine($"Args: {string.Join(" ", args)}");
             var sendText = "Perintah /welcome hanya untuk grup saja";
@@ -31,7 +28,7 @@ namespace WinTenBot.Handlers.Commands.Welcome
             if (msg.Chat.Type != ChatType.Private)
             {
                 var chatTitle = msg.Chat.Title;
-                var settings = await _settingsService.GetSettingByGroup(msg.Chat.Id);
+                var settings = await _settingsService.GetSettingByGroup();
                 var welcomeMessage = settings.Rows[0]["welcome_message"].ToString();
                 var welcomeButton = settings.Rows[0]["welcome_button"].ToString();
                 var welcomeMedia = settings.Rows[0]["welcome_media"].ToString();
