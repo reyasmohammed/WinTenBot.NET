@@ -6,6 +6,7 @@ using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
+using WinTenBot.Model;
 
 namespace WinTenBot.Helpers.Processors
 {
@@ -30,7 +31,7 @@ namespace WinTenBot.Helpers.Processors
 
         #region Message
 
-        public async Task SendAsync(string sendText, IReplyMarkup replyMarkup = null, int replyToMsgId = -1)
+        public async Task SendAsync(string sendText, IReplyMarkup replyMarkup = null, int replyToMsgId = -1, long customChatId = -1)
         {
             // var replyToMsgId = Message.MessageId;
             // if (replyToReplied)
@@ -41,11 +42,18 @@ namespace WinTenBot.Helpers.Processors
             var date = Message.Date;
             //            ConsoleHelper.WriteLine(date);
             //            sendText += TimeHelper.Delay(_updateContext.Update.Message.Date);
+
+            var chatTarget = Message.Chat.Id;
+            if (customChatId < -1)
+            {
+                chatTarget = customChatId;
+            }
             Message send = null;
             try
             {
+                ConsoleHelper.WriteLine($"Sending message to {chatTarget}");
                 send = await Client.SendTextMessageAsync(
-                    Message.Chat,
+                    chatTarget,
                     sendText,
                     ParseMode.Html,
                     replyMarkup: replyMarkup,
@@ -58,8 +66,9 @@ namespace WinTenBot.Helpers.Processors
 
                 try
                 {
+                    ConsoleHelper.WriteLine($"Try Sending message to {chatTarget} without reply to Msg Id.");
                     send = await Client.SendTextMessageAsync(
-                        Message.Chat,
+                        chatTarget,
                         sendText,
                         ParseMode.Html,
                         replyMarkup: replyMarkup
@@ -187,6 +196,11 @@ namespace WinTenBot.Helpers.Processors
             return isAdmin;
         }
 
+        public bool IsSudoer()
+        {
+            return Message.From.Id.IsSudoer();
+        }
+
         public bool IsPrivateChat()
         {
             return Message.Chat.Type == ChatType.Private;
@@ -206,6 +220,8 @@ namespace WinTenBot.Helpers.Processors
 
             return adminStr;
         }
+
+        #region Member Exec
 
         public async Task<bool> KickMemberAsync(User user = null)
         {
@@ -247,6 +263,81 @@ namespace WinTenBot.Helpers.Processors
                 ConsoleHelper.WriteLine(ex.StackTrace);
                 await SendAsync(ex.Message);
             }
+        }
+
+        public async Task<RequestResult> PromoteChatMemberAsync(int userId)
+        {
+            var requestResult = new RequestResult();
+            try
+            {
+                await Client.PromoteChatMemberAsync(
+                    Message.Chat.Id,
+                    userId,
+                    canChangeInfo: false,
+                    canPostMessages: false,
+                    canEditMessages: false,
+                    canDeleteMessages: true,
+                    canInviteUsers: true,
+                    canRestrictMembers: true,
+                    canPinMessages: true);
+
+                requestResult.IsSuccess = true;
+            }
+            catch (ApiRequestException apiRequestException)
+            {
+                requestResult.IsSuccess = false;
+                requestResult.ErrorCode = apiRequestException.ErrorCode;
+                requestResult.ErrorMessage = apiRequestException.Message;
+            }
+
+            return requestResult;
+        }
+
+        public async Task<RequestResult> DemoteChatMemberAsync(int userId)
+        {
+            var requestResult = new RequestResult();
+            try
+            {
+                await Client.PromoteChatMemberAsync(
+                    Message.Chat.Id,
+                    userId,
+                    canChangeInfo: false,
+                    canPostMessages: false,
+                    canEditMessages: false,
+                    canDeleteMessages: false,
+                    canInviteUsers: false,
+                    canRestrictMembers: false,
+                    canPinMessages: false);
+
+                requestResult.IsSuccess = true;
+            }
+            catch (ApiRequestException apiRequestException)
+            {
+                requestResult.IsSuccess = false;
+                requestResult.ErrorCode = apiRequestException.ErrorCode;
+                requestResult.ErrorMessage = apiRequestException.Message;
+                ConsoleHelper.WriteLine(apiRequestException.ToString());
+            }
+            catch (Exception ex)
+            {
+                ConsoleHelper.WriteLine(ex.ToString());
+            }
+
+            return requestResult;
+        }
+
+        #endregion
+
+        public async Task LeaveChat(long chatId = 0)
+        {
+            var chatTarget = chatId;
+            if (chatId == 0)
+            {
+                chatTarget = Message.Chat.Id;
+            }
+
+            ConsoleHelper.WriteLine($"Leaving from {chatTarget}");
+            await Client.LeaveChatAsync(chatTarget);
         }
     }
 }

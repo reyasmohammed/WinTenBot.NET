@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Hangfire;
 using Hangfire.LiteDB;
 using HangfireBasicAuthenticationFilter;
@@ -86,6 +86,9 @@ namespace WinTenBot
 
             services.AddScoped<KickCommand>()
                 .AddScoped<BanCommand>();
+
+            services.AddScoped<PromoteCommand>()
+                .AddScoped<DemoteCommand>();
 
             services.AddScoped<RulesCommand>();
 
@@ -193,6 +196,7 @@ namespace WinTenBot
                                     .UseCommand<AfkCommand>("afk")
                                     .UseCommand<BanCommand>("ban")
                                     .UseCommand<DebugCommand>("dbg")
+                                    .UseCommand<DemoteCommand>("demote")
                                     .UseCommand<HelpCommand>("help")
                                     .UseCommand<IdCommand>("id")
                                     .UseCommand<InfoCommand>("info")
@@ -202,6 +206,7 @@ namespace WinTenBot
                                     .UseCommand<NotesCommand>("filters")
                                     .UseCommand<PinCommand>("pin")
                                     .UseCommand<PingCommand>("ping")
+                                    .UseCommand<PromoteCommand>("promote")
                                     .UseCommand<QrCommand>("qr")
                                     .UseCommand<ReportCommand>("report")
                                     .UseCommand<RulesCommand>("rules")
