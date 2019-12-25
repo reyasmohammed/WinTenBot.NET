@@ -11,6 +11,8 @@ namespace WinTenBot.Helpers.Processors
 {
     public class ChatProcessor
     {
+        private IUpdateContext UpdateContext { get; set; }
+        private string AppendText { get; set; }
         public ITelegramBotClient Client { get; set; }
         public Message Message { get; set; }
         public int SentMessageId { get; private set; }
@@ -19,24 +21,26 @@ namespace WinTenBot.Helpers.Processors
 
         public ChatProcessor(IUpdateContext updateContext)
         {
-            // ChatId = _updateContext.Update.Message.Chat.Id;
+            UpdateContext = updateContext;
             Client = updateContext.Bot.Client;
             Message = updateContext.Update.CallbackQuery != null
                 ? updateContext.Update.CallbackQuery.Message
                 : updateContext.Update.Message;
         }
 
-        public async Task SendAsync(string sendText, IReplyMarkup replyMarkup = null, bool replyToReplied = false)
+        #region Message
+
+        public async Task SendAsync(string sendText, IReplyMarkup replyMarkup = null, int replyToMsgId = -1)
         {
-            var replyToMsgId = Message.MessageId;
-            if (replyToReplied)
-            {
-                replyToMsgId = Message.ReplyToMessage.MessageId;
-            }
+            // var replyToMsgId = Message.MessageId;
+            // if (replyToReplied)
+            // {
+            //     replyToMsgId = Message.ReplyToMessage.MessageId;
+            // }
 
             var date = Message.Date;
-//            ConsoleHelper.WriteLine(date);
-//            sendText += TimeHelper.Delay(_updateContext.Update.Message.Date);
+            //            ConsoleHelper.WriteLine(date);
+            //            sendText += TimeHelper.Delay(_updateContext.Update.Message.Date);
             Message send = null;
             try
             {
@@ -79,12 +83,14 @@ namespace WinTenBot.Helpers.Processors
             {
                 case "document":
                     await Client.SendDocumentAsync(Message.Chat.Id, fileId, caption, ParseMode.Html,
-                        replyMarkup: replyMarkup,replyToMessageId:replyToMsgId);
+                        replyMarkup: replyMarkup, replyToMessageId: replyToMsgId);
                     break;
+
                 case "photo":
                     await Client.SendPhotoAsync(Message.Chat.Id, fileId, caption, ParseMode.Html,
-                        replyMarkup: replyMarkup,replyToMessageId:replyToMsgId);
+                        replyMarkup: replyMarkup, replyToMessageId: replyToMsgId);
                     break;
+
                 default:
                     ConsoleHelper.WriteLine($"Media unknown: {mediaType}");
                     break;
@@ -126,6 +132,22 @@ namespace WinTenBot.Helpers.Processors
             }
         }
 
+        public async Task AppendTextAsync(string sendText)
+        {
+            if (string.IsNullOrEmpty(AppendText))
+            {
+                ConsoleHelper.WriteLine("First, sendText");
+                AppendText = sendText;
+                await SendAsync(AppendText);
+            }
+            else
+            {
+                ConsoleHelper.WriteLine("Next, editText");
+                AppendText += $"\n{sendText}";
+                await EditAsync(AppendText);
+            }
+        }
+
         public async Task DeleteAsync(int messageId = -1)
         {
             var mssgId = messageId != -1 ? messageId : SentMessageId;
@@ -144,6 +166,8 @@ namespace WinTenBot.Helpers.Processors
                 ConsoleHelper.WriteLine($"{ex.Message}");
             }
         }
+
+        #endregion Message
 
         public async Task<bool> IsAdminGroup()
         {
@@ -181,6 +205,48 @@ namespace WinTenBot.Helpers.Processors
             }
 
             return adminStr;
+        }
+
+        public async Task<bool> KickMemberAsync(User user = null)
+        {
+            var isKicked = false;
+            var idTarget = user.Id;
+            var fromId = Message.From.Id;
+            //if(id == -1)
+            //{
+            //    idTarget = Message.From.Id;
+            //}
+            ConsoleHelper.WriteLine($"Kick {idTarget} from {Message.Chat.Id}");
+            try
+            {
+                await Client.KickChatMemberAsync(Message.Chat.Id, idTarget, DateTime.Now);
+                isKicked = true;
+            }
+            catch (Exception ex)
+            {
+                ConsoleHelper.WriteLine("KickMember " + ex.Message);
+                ConsoleHelper.WriteLine(ex.StackTrace);
+                // await SendAsync(ex.Message);
+                isKicked = false;
+            }
+
+            return isKicked;
+        }
+
+        public async Task UnbanMemberAsync(User user = null)
+        {
+            var idTarget = user.Id;
+            ConsoleHelper.WriteLine($"Unban {idTarget} from {Message.Chat.Id}");
+            try
+            {
+                await Client.UnbanChatMemberAsync(Message.Chat.Id, idTarget);
+            }
+            catch (Exception ex)
+            {
+                ConsoleHelper.WriteLine(ex.Message);
+                ConsoleHelper.WriteLine(ex.StackTrace);
+                await SendAsync(ex.Message);
+            }
         }
     }
 }

@@ -81,6 +81,9 @@ namespace WinTenBot
                 .AddScoped<ReportCommand>()
                 .AddScoped<AfkCommand>();
 
+            services.AddScoped<KickCommand>()
+                .AddScoped<BanCommand>();
+
             services.AddScoped<RulesCommand>();
             
             services.AddScoped<NewChatMembersEvent>()
@@ -173,10 +176,12 @@ namespace WinTenBot
                                     .UseCommand<AdminCommand>("admin")
                                     .UseCommand<AddNotesCommand>("addfilter")
                                     .UseCommand<AfkCommand>("afk")
+                                    .UseCommand<BanCommand>("ban")
                                     .UseCommand<DebugCommand>("dbg")
                                     .UseCommand<HelpCommand>("help")
                                     .UseCommand<IdCommand>("id")
                                     .UseCommand<InfoCommand>("info")
+                                    .UseCommand<KickCommand>("kick")
                                     .UseCommand<MediaFilterCommand>("mfil")
                                     .UseCommand<MigrateCommand>("migrate")
                                     .UseCommand<NotesCommand>("filters")
