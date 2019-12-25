@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Hangfire;
 using Hangfire.LiteDB;
 using HangfireBasicAuthenticationFilter;
@@ -105,6 +105,8 @@ namespace WinTenBot
                 .AddScoped<IdCommand>()
                 .AddScoped<InfoCommand>();
 
+            services.AddScoped<OutCommand>();
+
             services.AddScoped<QrCommand>();
 
             //            services.AddDbContext<DataContext>(options => options.UseSqlite(@"Filename=./mydb.db;"));
@@ -204,6 +206,7 @@ namespace WinTenBot
                                     .UseCommand<MediaFilterCommand>("mfil")
                                     .UseCommand<MigrateCommand>("migrate")
                                     .UseCommand<NotesCommand>("filters")
+                                    .UseCommand<OutCommand>("out")
                                     .UseCommand<PinCommand>("pin")
                                     .UseCommand<PingCommand>("ping")
                                     .UseCommand<PromoteCommand>("promote")
