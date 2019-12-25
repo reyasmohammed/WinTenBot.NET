@@ -1,6 +1,7 @@
 using System;
 using Hangfire;
 using Hangfire.LiteDB;
+using HangfireBasicAuthenticationFilter;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -21,6 +22,7 @@ using WinTenBot.Handlers.Commands.Security;
 using WinTenBot.Handlers.Commands.Tags;
 using WinTenBot.Handlers.Commands.Welcome;
 using WinTenBot.Handlers.Events;
+using WinTenBot.Helpers;
 using WinTenBot.Interfaces;
 using WinTenBot.Model;
 using WinTenBot.Options;
@@ -43,7 +45,7 @@ namespace WinTenBot
             Console.WriteLine($"Version: {Configuration["Engines:Version"]}");
 
             Bot.Client = new TelegramBotClient(Configuration["ZiziBetaBot:ApiToken"]);
-//            Bot.Client.SendTextMessageAsync("-1001404591750", "Bot started");
+            //            Bot.Client.SendTextMessageAsync("-1001404591750", "Bot started");
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -85,7 +87,7 @@ namespace WinTenBot
                 .AddScoped<BanCommand>();
 
             services.AddScoped<RulesCommand>();
-            
+
             services.AddScoped<NewChatMembersEvent>()
                 .AddScoped<LeftChatMemberEvent>()
                 .AddScoped<PinnedMessageEvent>();
@@ -100,32 +102,43 @@ namespace WinTenBot
                 .AddScoped<InfoCommand>();
 
 
-//            services.AddDbContext<DataContext>(options => options.UseSqlite(@"Filename=./mydb.db;"));
+            //            services.AddDbContext<DataContext>(options => options.UseSqlite(@"Filename=./mydb.db;"));
 
-//            var sqliteOptions = new SQLiteStorageOptions();
-//            services.AddHangfire(configuration => configuration
-//                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-//                .UseSimpleAssemblyNameTypeSerializer()
-//                .UseRecommendedSerializerSettings()
-//                //.UseMemoryStorage(new MemoryStorageOptions { JobExpirationCheckInterval = TimeSpan.FromMinutes(10) })
-//                .UseSQLiteStorage("Filename=psm.db;", sqliteOptions)
-//            );
+            //            var sqliteOptions = new SQLiteStorageOptions();
+            //            services.AddHangfire(configuration => configuration
+            //                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+            //                .UseSimpleAssemblyNameTypeSerializer()
+            //                .UseRecommendedSerializerSettings()
+            //                //.UseMemoryStorage(new MemoryStorageOptions { JobExpirationCheckInterval = TimeSpan.FromMinutes(10) })
+            //                .UseSQLiteStorage("Filename=psm.db;", sqliteOptions)
+            //            );
 
             services.AddHangfireServer();
             services.AddHangfire(t => t.UseLiteDbStorage(Configuration[key: "CommonConfig:HangfireLiteDb"]));
 
-//            services.AddHangfire(x =>
-//                x.UseStorage(new MySqlStorage(Configuration["CommonConfig:ConnectionString"],
-//                    new MySqlStorageOptions() {TablePrefix = "hangfire"}))
-//            );
-//
-//            services.AddMvc();
+            //            services.AddHangfire(x =>
+            //                x.UseStorage(new MySqlStorage(Configuration["CommonConfig:ConnectionString"],
+            //                    new MySqlStorageOptions() {TablePrefix = "hangfire"}))
+            //            );
+            //
+            //            services.AddMvc();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             Bot.HostingEnvironment = env;
-            
+            var hangfireUsername = Configuration["Hangfire:Username"];
+            var hangfirePassword = Configuration["Hangfire:Password"];
+            ConsoleHelper.WriteLine($"Hangfire Auth: {hangfireUsername} | {hangfirePassword}");
+
+            var options = new DashboardOptions
+            {
+                Authorization = new[]
+                {
+                    new HangfireCustomBasicAuthenticationFilter {User = hangfireUsername, Pass = hangfirePassword}
+                }
+            };
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -133,6 +146,7 @@ namespace WinTenBot
                 // get bot updates from Telegram via long-polling approach during development
                 // this will disable Telegram webhooks
                 app.UseTelegramBotLongPolling<WinTenBot>(ConfigureBot(), startAfter: TimeSpan.FromSeconds(1));
+                app.UseHangfireDashboard("/hangfire", options);
             }
             else
             {
@@ -140,12 +154,11 @@ namespace WinTenBot
                 app.UseTelegramBotWebhook<WinTenBot>(ConfigureBot());
                 // and make sure webhook is enabled
                 app.EnsureWebhookSet<WinTenBot>();
+
+                app.UseHangfireDashboard("/wintenbot/hangfire", options);
             }
 
             app.UseHangfireServer();
-            app.UseHangfireDashboard();
-            
-//            DigestScheduler.SendMessage();
 
             app.Run(async context => { await context.Response.WriteAsync("Hello World!"); });
         }
