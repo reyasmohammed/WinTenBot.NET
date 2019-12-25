@@ -3,6 +3,7 @@ using System.Data;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using WinTenBot.Helpers;
+using WinTenBot.Model;
 using WinTenBot.Providers;
 
 namespace WinTenBot.Services
@@ -42,6 +43,22 @@ namespace WinTenBot.Services
             var sql = $"SELECT * FROM {baseTable} WHERE chat_id = '{Chat.Id}'";
             var data = await _mySqlProvider.ExecQueryAsync(sql);
             return data;
+        }
+
+        public async Task<ChatSettings> GetMappedSettingsByGroup()
+        {
+            var chatSettings = new ChatSettings();
+            var settings = await GetSettingByGroup();
+            
+            if (settings.Rows.Count <= 0) return chatSettings;
+            
+            chatSettings.ChatId = Chat.Id;
+            chatSettings.WelcomeMessage = settings.Rows[0]["welcome_message"].ToString(); 
+            chatSettings.WelcomeButton = settings.Rows[0]["welcome_button"].ToString();
+            chatSettings.WelcomeMedia = settings.Rows[0]["welcome_media"].ToString();
+            chatSettings.WelcomeMediaType = settings.Rows[0]["welcome_media_type"].ToString();
+
+            return chatSettings;
         }
 
         public async Task UpdateCell(string key, object value)
