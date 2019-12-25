@@ -2,11 +2,13 @@
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
+using WinTenBot.Model;
 using WinTenBot.Providers;
 using WinTenBot.Services;
 
@@ -21,17 +23,18 @@ namespace WinTenBot.Handlers.Events
         public NewChatMembersEvent()
         {
             _casBanProvider = new CasBanProvider();
-            _settingsService = new SettingsService();
         }
 
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
             Message msg = context.Update.Message;
             _chatProcessor = new ChatProcessor(context);
+            _settingsService = new SettingsService(msg.Chat);
+
 
             ConsoleHelper.WriteLine("New Chat Members...");
 
-            var settings = await _settingsService.GetSettingByGroup(msg.Chat.Id);
+            var settings = await _settingsService.GetSettingByGroup();
             var welcomeMessage = settings.Rows[0]["welcome_message"].ToString();
             var welcomeButton = settings.Rows[0]["welcome_button"].ToString();
             var welcomeMedia = settings.Rows[0]["welcome_media"].ToString();
@@ -40,6 +43,7 @@ namespace WinTenBot.Handlers.Events
             var chatTitle = msg.Chat.Title;
 
             var newMembers = msg.NewChatMembers;
+            var newMemberCount = newMembers.Length;
             var allNewMember = new StringBuilder();
             var noUsername = new StringBuilder();
             var newBots = new StringBuilder();
@@ -47,11 +51,14 @@ namespace WinTenBot.Handlers.Events
 
             foreach (var newMember in newMembers)
             {
-//                var isCasBan = await _casBanProvider.IsCasBan(newMember.Id);
+                if (Bot.HostingEnvironment.IsProduction())
+                {
+                    var isCasBan = await _casBanProvider.IsCasBan(newMember.Id);
+                }
 
                 var fullName = (newMember.FirstName + " " + newMember.LastName).Trim();
                 var nameLink = MemberHelper.GetNameLink(newMember.Id, fullName);
-                // if (newMembers.IndexOf(newMember) != newMembers.Length - 1)
+                
                 if (newMember != lastMember)
                 {
                     allNewMember.Append(nameLink + ", ");
@@ -72,17 +79,16 @@ namespace WinTenBot.Handlers.Events
                 }
             }
 
-            // var fromName = msg.From.FirstName;
-
-//            var sendText = $"Hai {newMemberStr}" +
-//                           $"\nSelamat datang di kontrakan <b>{chatTitle}</b>" +
-//                           $"\nCount: {newMembers.Length}";
-
-//            var sendText = welcomeMessage.Replace("{newMemberStr}", newMemberStr.ToString());
+            if (welcomeMessage == "")
+            {
+                welcomeMessage = $"Hai {allNewMember}" +
+                                 $"\nSelamat datang di kontrakan {chatTitle}";
+            }
 
             var sendText = welcomeMessage.ResolveVariable(new
             {
                 allNewMember,
+                newMemberCount,
                 chatTitle
             });
 
@@ -100,7 +106,6 @@ namespace WinTenBot.Handlers.Events
             {
                 await _chatProcessor.SendAsync(sendText, keyboard);
             }
-            
         }
     }
 }
