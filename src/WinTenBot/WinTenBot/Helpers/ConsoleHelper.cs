@@ -6,7 +6,7 @@ namespace WinTenBot.Helpers
     {
         private static object BuildMsg(object message)
         {
-            var timestamp = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+            var timestamp = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss.fff");
             return $"{timestamp} - {message}";
         }
         public static void WriteLine(object message)
