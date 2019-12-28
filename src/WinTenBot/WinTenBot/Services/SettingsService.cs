@@ -45,6 +45,24 @@ namespace WinTenBot.Services
             return data;
         }
 
+        public async Task SaveSettingsAsync(Dictionary<string, object> data)
+        {
+            var where = new Dictionary<string, object>() {{"chat_id",data["chat_id"]}};
+            var isExist = await IsDataExist(baseTable, where);
+            
+            ConsoleHelper.WriteLine($"Group setting IsExist: {isExist}");
+            if (!isExist)
+            {
+                ConsoleHelper.WriteLine($"Inserting new data for {Chat.Id}");
+                await Insert(baseTable, data);
+            }
+            else
+            {
+                ConsoleHelper.WriteLine($"Updating data for {Chat.Id}");
+                await Update(baseTable, data, where);
+            }
+        }
+
         public async Task<ChatSettings> GetMappedSettingsByGroup()
         {
             var chatSettings = new ChatSettings();

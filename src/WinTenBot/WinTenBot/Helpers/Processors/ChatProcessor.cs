@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
@@ -157,10 +158,11 @@ namespace WinTenBot.Helpers.Processors
             }
         }
 
-        public async Task DeleteAsync(int messageId = -1)
+        public async Task DeleteAsync(int messageId = -1, int delay=0)
         {
             var mssgId = messageId != -1 ? messageId : SentMessageId;
-
+            Thread.Sleep(delay);
+            
             try
             {
                 ConsoleHelper.WriteLine($"Delete MsgId: {mssgId} on ChatId: {Message.Chat.Id}");
@@ -338,6 +340,12 @@ namespace WinTenBot.Helpers.Processors
 
             ConsoleHelper.WriteLine($"Leaving from {chatTarget}");
             await Client.LeaveChatAsync(chatTarget);
+        }
+
+        public async Task<long> GetMemberCount()
+        {
+            var member = await Client.GetChatMembersCountAsync(Message.Chat.Id);
+            return member;
         }
     }
 }

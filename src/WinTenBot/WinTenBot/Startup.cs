@@ -63,6 +63,9 @@ namespace WinTenBot
                 .AddScoped<CallbackQueryHandler>()
                 .AddScoped<IWeatherService, WeatherService>();
 
+            services.AddScoped<GlobalBanCommand>()
+                .AddScoped<DelBanCommand>();
+            
             services.AddScoped<PingHandler>()
                 .AddScoped<HelpCommand>();
 
@@ -198,7 +201,9 @@ namespace WinTenBot
                                     .UseCommand<AfkCommand>("afk")
                                     .UseCommand<BanCommand>("ban")
                                     .UseCommand<DebugCommand>("dbg")
+                                    .UseCommand<DelBanCommand>("dban")
                                     .UseCommand<DemoteCommand>("demote")
+                                    .UseCommand<GlobalBanCommand>("gban")
                                     .UseCommand<HelpCommand>("help")
                                     .UseCommand<IdCommand>("id")
                                     .UseCommand<InfoCommand>("info")

@@ -20,6 +20,7 @@ namespace WinTenBot.Handlers
         private NotesService _notesService;
         private IReplyMarkup _replyMarkup;
         private AfkService _afkService;
+        private ElasticSecurityService _elasticSecurityService;
 
         public GenericMessageHandler()
         {
@@ -32,6 +33,8 @@ namespace WinTenBot.Handlers
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
             _chatProcessor = new ChatProcessor(context);
+            _elasticSecurityService = new ElasticSecurityService(context.Update.Message);
+            
             Message msg = context.Update.Message;
 
             ConsoleHelper.WriteLine(msg.ToJson());
@@ -77,6 +80,7 @@ namespace WinTenBot.Handlers
             //            );
 
             await AfkCheck(msg);
+            await CheckGlobalBanAsync(msg);
 
             await next(context);
         }
@@ -106,6 +110,22 @@ namespace WinTenBot.Handlers
 
                 await _afkService.SaveAsync(data);
                 await _afkService.UpdateCacheAsync();
+            }
+        }
+
+        private async Task CheckGlobalBanAsync(Message message)
+        {
+            var userId = message.From.Id;
+            var user = message.From;
+            var messageId = message.MessageId;
+            
+            var isBan = await _elasticSecurityService.IsExist(userId);
+            ConsoleHelper.WriteLine($"IsBan: {isBan}");
+            if (isBan)
+            {
+                await _chatProcessor.DeleteAsync(messageId);
+                await _chatProcessor.KickMemberAsync(user);
+                await _chatProcessor.UnbanMemberAsync(user);
             }
         }
     }
