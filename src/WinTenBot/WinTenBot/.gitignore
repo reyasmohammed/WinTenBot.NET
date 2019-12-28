@@ -21,6 +21,7 @@ mono_crash.*
 # wintendev
 Storage/Caches/
 appsettings.json
+Hangfire_LiteDb.db
 
 # Build results
 [Dd]ebug/

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using WinTenBot.Model;
 
 namespace WinTenBot
 {
@@ -11,12 +12,14 @@ namespace WinTenBot
             CreateWebHostBuilder(args).Build().Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration((hostBuilder, configBuilder) => configBuilder
-                    .AddJsonFile("appsettings.json", true,  true)
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
+        {
+            return WebHost.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((hostBuilder, configBuilder) => configBuilder
+                    .AddJsonFile("appsettings.json", true, true)
                     .AddJsonFile($"appsettings.{hostBuilder.HostingEnvironment.EnvironmentName}.json", true, true)
                     .AddJsonEnvVar("QUICKSTART_SETTINGS", true)
                 ).UseStartup<Startup>();
+        }
     }
 }

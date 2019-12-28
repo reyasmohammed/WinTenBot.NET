@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Telegram.Bot;
 using Telegram.Bot.Framework;
 using Telegram.Bot.Framework.Abstractions;
+using WinTenBot.Bots;
 using WinTenBot.Extensions;
 using WinTenBot.Handlers;
 using WinTenBot.Handlers.Commands.Additional;
@@ -51,9 +52,13 @@ namespace WinTenBot
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<WinTenBot>()
-                .Configure<BotOptions<WinTenBot>>(Configuration.GetSection("ZiziBetaBot"))
-                .Configure<CustomBotOptions<WinTenBot>>(Configuration.GetSection("ZiziBetaBot"))
+            services.AddTransient<Bots.WinTenBot>()
+                .Configure<BotOptions<Bots.WinTenBot>>(Configuration.GetSection("ZiziBetaBot"))
+                .Configure<CustomBotOptions<Bots.WinTenBot>>(Configuration.GetSection("ZiziBetaBot"))
+                
+                .AddTransient<MacOsBot>()
+                .Configure<BotOptions<MacOsBot>>(Configuration.GetSection("MacOsBot"))
+
                 .AddScoped<GenericMessageHandler>()
                 .AddScoped<WebhookLogger>()
                 .AddScoped<StickerHandler>()
@@ -111,27 +116,11 @@ namespace WinTenBot
             services.AddScoped<OutCommand>();
 
             services.AddScoped<QrCommand>();
-
-            //            services.AddDbContext<DataContext>(options => options.UseSqlite(@"Filename=./mydb.db;"));
-
-            //            var sqliteOptions = new SQLiteStorageOptions();
-            //            services.AddHangfire(configuration => configuration
-            //                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-            //                .UseSimpleAssemblyNameTypeSerializer()
-            //                .UseRecommendedSerializerSettings()
-            //                //.UseMemoryStorage(new MemoryStorageOptions { JobExpirationCheckInterval = TimeSpan.FromMinutes(10) })
-            //                .UseSQLiteStorage("Filename=psm.db;", sqliteOptions)
-            //            );
-
+            
+            
+            // Hangfire
             services.AddHangfireServer();
             services.AddHangfire(t => t.UseLiteDbStorage(Configuration[key: "CommonConfig:HangfireLiteDb"]));
-
-            //            services.AddHangfire(x =>
-            //                x.UseStorage(new MySqlStorage(Configuration["CommonConfig:ConnectionString"],
-            //                    new MySqlStorageOptions() {TablePrefix = "hangfire"}))
-            //            );
-            //
-            //            services.AddMvc();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -149,21 +138,28 @@ namespace WinTenBot
                 }
             };
 
+            var configureBot = ConfigureBot();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
 
                 // get bot updates from Telegram via long-polling approach during development
                 // this will disable Telegram webhooks
-                app.UseTelegramBotLongPolling<WinTenBot>(ConfigureBot(), startAfter: TimeSpan.FromSeconds(1));
+                app.UseTelegramBotLongPolling<Bots.WinTenBot>(configureBot, startAfter: TimeSpan.FromSeconds(1));
+                app.UseTelegramBotLongPolling<MacOsBot>(configureBot, TimeSpan.FromSeconds(1));
+                
                 app.UseHangfireDashboard("/hangfire", options);
             }
             else
             {
                 // use Telegram bot webhook middleware in higher environments
-                app.UseTelegramBotWebhook<WinTenBot>(ConfigureBot());
+                app.UseTelegramBotWebhook<Bots.WinTenBot>(configureBot);
+                app.UseTelegramBotWebhook<MacOsBot>(configureBot);
+                
                 // and make sure webhook is enabled
-                app.EnsureWebhookSet<WinTenBot>();
+                app.EnsureWebhookSet<Bots.WinTenBot>();
+                app.EnsureWebhookSet<MacOsBot>();
 
                 app.UseHangfireDashboard("/wintenbot/hangfire", options);
             }
