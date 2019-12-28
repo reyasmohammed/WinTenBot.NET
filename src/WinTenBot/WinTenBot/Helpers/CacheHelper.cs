@@ -9,19 +9,19 @@ namespace WinTenBot.Helpers
     {
         private static string workingDir = "Storage/Caches";
 
-        public static async Task WriteCacheAsync(this DataTable dataTable, string fileJson)
+        public static async Task WriteCacheAsync(this DataTable dataTable, string fileJson, bool indented = true)
         {
             var filePath = $"{workingDir}/{fileJson}";
             Directory.CreateDirectory(Path.GetDirectoryName(filePath));
 
-            var json = dataTable.ToJson(true);
+            var json = dataTable.ToJson(indented);
             await json.ToFile(filePath);
             ConsoleHelper.WriteLine("Writing cache success..");
         }
 
         public static void BackgroundWriteCache(this DataTable dataTable, string fileJson)
         {
-            var jobId = BackgroundJob.Enqueue(() => WriteCacheAsync(dataTable, fileJson));
+            var jobId = BackgroundJob.Enqueue(() => WriteCacheAsync(dataTable, fileJson, true));
             ConsoleHelper.WriteLine($"Background Write Cache scheduled with ID: {jobId}");
         }
 
