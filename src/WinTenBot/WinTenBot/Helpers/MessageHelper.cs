@@ -42,5 +42,22 @@ namespace WinTenBot.Helpers
 
             return text.Trim();
         }
+
+        public static string GetMessageLink(this Message message)
+        {
+            var chatUsername = message.Chat.Username;
+            var messageId = message.MessageId;
+
+            var messageLink = $"https://t.me/{chatUsername}/{messageId}";
+
+            if (chatUsername == "")
+            {
+                var trimmedChatId = message.Chat.Id.ToString().Substring(4);
+                messageLink = $"https://t.me/c/{trimmedChatId}/{messageId}";
+            }
+            
+            ConsoleHelper.WriteLine($"MessageLink: {messageLink}");
+            return messageLink;
+        }
     }
 }
