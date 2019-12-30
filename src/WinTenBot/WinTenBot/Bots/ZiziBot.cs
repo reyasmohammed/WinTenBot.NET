@@ -3,9 +3,9 @@ using Telegram.Bot.Framework;
 
 namespace WinTenBot.Bots
 {
-    public class WinTenBot : BotBase
+    public class ZiziBot : BotBase
     {
-        public WinTenBot(IOptions<BotOptions<WinTenBot>> options) : base(options.Value)
+        public ZiziBot(IOptions<BotOptions<ZiziBot>> options) : base(options.Value)
         {
         }
     }

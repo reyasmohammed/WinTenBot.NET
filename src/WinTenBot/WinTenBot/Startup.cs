@@ -52,9 +52,9 @@ namespace WinTenBot
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<Bots.WinTenBot>()
-                .Configure<BotOptions<Bots.WinTenBot>>(Configuration.GetSection("ZiziBetaBot"))
-                .Configure<CustomBotOptions<Bots.WinTenBot>>(Configuration.GetSection("ZiziBetaBot"))
+            services.AddTransient<ZiziBot>()
+                .Configure<BotOptions<ZiziBot>>(Configuration.GetSection("ZiziBetaBot"))
+                .Configure<CustomBotOptions<ZiziBot>>(Configuration.GetSection("ZiziBetaBot"))
                 
                 .AddTransient<MacOsBot>()
                 .Configure<BotOptions<MacOsBot>>(Configuration.GetSection("MacOsBot"))
@@ -146,7 +146,7 @@ namespace WinTenBot
 
                 // get bot updates from Telegram via long-polling approach during development
                 // this will disable Telegram webhooks
-                app.UseTelegramBotLongPolling<Bots.WinTenBot>(configureBot, startAfter: TimeSpan.FromSeconds(1));
+                app.UseTelegramBotLongPolling<ZiziBot>(configureBot, startAfter: TimeSpan.FromSeconds(1));
                 app.UseTelegramBotLongPolling<MacOsBot>(configureBot, TimeSpan.FromSeconds(1));
                 
                 app.UseHangfireDashboard("/hangfire", options);
@@ -154,11 +154,11 @@ namespace WinTenBot
             else
             {
                 // use Telegram bot webhook middleware in higher environments
-                app.UseTelegramBotWebhook<Bots.WinTenBot>(configureBot);
+                app.UseTelegramBotWebhook<ZiziBot>(configureBot);
                 app.UseTelegramBotWebhook<MacOsBot>(configureBot);
                 
                 // and make sure webhook is enabled
-                app.EnsureWebhookSet<Bots.WinTenBot>();
+                app.EnsureWebhookSet<ZiziBot>();
                 app.EnsureWebhookSet<MacOsBot>();
 
                 app.UseHangfireDashboard("/wintenbot/hangfire", options);
