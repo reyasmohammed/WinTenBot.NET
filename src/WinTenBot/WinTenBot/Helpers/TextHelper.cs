@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using CodeHollow.FeedReader;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -118,7 +119,31 @@ namespace WinTenBot.Helpers
         public static bool CheckUrlValid(this string source)
         {
             return Uri.TryCreate(source, UriKind.Absolute, out Uri uriResult) 
-                   && uriResult.Scheme == Uri.UriSchemeHttps;
+                   && (uriResult.Scheme == Uri.UriSchemeHttps || uriResult.Scheme == Uri.UriSchemeHttp);
+        }
+
+        public static async Task<string> GetUrlRssFeed(string url)
+        {
+            var urls = await FeedReader.GetFeedUrlsFromUrlAsync(url);
+            
+            string feedUrl = url;
+            if (urls.Count() < 1) // no url - probably the url is already the right feed url
+                feedUrl = url;
+            else if (urls.Count() == 1)
+                feedUrl = urls.First().Url;
+            else if (urls.Count() == 2) // if 2 urls, then its usually a feed and a comments feed, so take the first per default
+                feedUrl = urls.First().Url;
+
+            return feedUrl;
+        }
+
+        public static string MkUrl(this string text, string url)
+        {
+            return $"<a href ='{url}'>{text}</a>";
+        }
+        
+        public static string MkJoin(this ICollection<string> obj, string delim){
+            return String.Join(delim,obj.ToArray());
         }
     }
 }

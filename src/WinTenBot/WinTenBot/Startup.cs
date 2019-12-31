@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Hangfire;
 using Hangfire.LiteDB;
 using HangfireBasicAuthenticationFilter;
@@ -19,6 +19,7 @@ using WinTenBot.Handlers.Commands.Chat;
 using WinTenBot.Handlers.Commands.Core;
 using WinTenBot.Handlers.Commands.Group;
 using WinTenBot.Handlers.Commands.Notes;
+using WinTenBot.Handlers.Commands.Rss;
 using WinTenBot.Handlers.Commands.Rules;
 using WinTenBot.Handlers.Commands.Security;
 using WinTenBot.Handlers.Commands.Tags;
@@ -28,6 +29,7 @@ using WinTenBot.Helpers;
 using WinTenBot.Interfaces;
 using WinTenBot.Model;
 using WinTenBot.Options;
+using WinTenBot.Scheduler;
 using WinTenBot.Services;
 
 namespace WinTenBot
@@ -86,6 +88,8 @@ namespace WinTenBot
 
             services.AddScoped<NotesCommand>()
                 .AddScoped<AddNotesCommand>();
+
+            services.AddScoped<SetRssCommand>();
 
             services.AddScoped<AdminCommand>()
                 .AddScoped<PinCommand>()
@@ -165,6 +169,8 @@ namespace WinTenBot
             }
 
             app.UseHangfireServer();
+            
+            RssScheduler.InitScheduler();
 
             app.Run(async context => { await context.Response.WriteAsync("Hello World!"); });
         }
@@ -214,6 +220,7 @@ namespace WinTenBot
                                     .UseCommand<QrCommand>("qr")
                                     .UseCommand<ReportCommand>("report")
                                     .UseCommand<RulesCommand>("rules")
+                                    .UseCommand<SetRssCommand>("setrss")
                                     .UseCommand<SetWelcomeCommand>("setwelcome")
                                     .UseCommand<StartCommand>("start")
                                     .UseCommand<TagCommand>("tag")

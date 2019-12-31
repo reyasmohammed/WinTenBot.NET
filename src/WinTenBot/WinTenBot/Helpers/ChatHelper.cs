@@ -42,7 +42,7 @@ namespace WinTenBot.Helpers
 
         #region Message
 
-        public static async Task SendAsync(string sendText, InlineKeyboardMarkup replyMarkup = null,
+        public static async Task SendTextAsync(this string sendText, InlineKeyboardMarkup replyMarkup = null,
             int replyToMsgId = -1, long customChatId = -1)
         {
             // var replyToMsgId = Message.MessageId;
@@ -119,7 +119,7 @@ namespace WinTenBot.Helpers
             }
         }
 
-        public static async Task EditAsync(string sendText, InlineKeyboardMarkup replyMarkup = null)
+        public static async Task EditAsync(this string sendText, InlineKeyboardMarkup replyMarkup = null)
         {
             Message edit = null;
 
@@ -160,7 +160,7 @@ namespace WinTenBot.Helpers
             {
                 ConsoleHelper.WriteLine("Sending new message");
                 AppendText = sendText;
-                await SendAsync(AppendText, replyMarkup);
+                await SendTextAsync(AppendText, replyMarkup);
             }
             else
             {
@@ -275,7 +275,7 @@ namespace WinTenBot.Helpers
             {
                 ConsoleHelper.WriteLine(ex.Message);
                 ConsoleHelper.WriteLine(ex.StackTrace);
-                await SendAsync(ex.Message);
+                await SendTextAsync(ex.Message);
             }
         }
 
