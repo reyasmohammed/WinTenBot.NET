@@ -63,7 +63,7 @@ namespace WinTenBot.Scheduler
                                 {"url", rssFeed.Link},
                                 {"chat_id", chatId},
                                 {"title", rssFeed.Title},
-                                {"publish_date", rssFeed.PublishingDate},
+                                {"publish_date", rssFeed.PublishingDate.ToString()},
                                 {"author", rssFeed.Author}
                             };
 
