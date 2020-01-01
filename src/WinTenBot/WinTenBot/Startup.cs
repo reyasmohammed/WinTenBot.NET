@@ -53,13 +53,15 @@ namespace WinTenBot
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<ZiziBot>()
-                .Configure<BotOptions<ZiziBot>>(Configuration.GetSection("ZiziBetaBot"))
-                .Configure<CustomBotOptions<ZiziBot>>(Configuration.GetSection("ZiziBetaBot"))
+            services
+                .AddTransient<ZiziBot>()
+                .Configure<BotOptions<ZiziBot>>(Configuration.GetSection("ZiziBot"))
+                .Configure<CustomBotOptions<ZiziBot>>(Configuration.GetSection("ZiziBot"))
                 
                 .AddTransient<MacOsBot>()
                 .Configure<BotOptions<MacOsBot>>(Configuration.GetSection("MacOsBot"))
-
+                .Configure<CustomBotOptions<MacOsBot>>(Configuration.GetSection("MacOsBot"))
+                
                 .AddScoped<GenericMessageHandler>()
                 .AddScoped<WebhookLogger>()
                 .AddScoped<StickerHandler>()
@@ -131,8 +133,11 @@ namespace WinTenBot
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             Bot.HostingEnvironment = env;
+            
+            var hangfireBaseUrl = Configuration["Hangfire:BaseUrl"];
             var hangfireUsername = Configuration["Hangfire:Username"];
             var hangfirePassword = Configuration["Hangfire:Password"];
+            
             ConsoleHelper.WriteLine($"Hangfire Auth: {hangfireUsername} | {hangfirePassword}");
 
             var options = new DashboardOptions
@@ -166,12 +171,10 @@ namespace WinTenBot
                 app.EnsureWebhookSet<ZiziBot>();
                 app.EnsureWebhookSet<MacOsBot>();
 
-                app.UseHangfireDashboard("/wintenbot/hangfire", options);
+                app.UseHangfireDashboard(hangfireBaseUrl, options);
             }
 
             app.UseHangfireServer();
-            
-            RssScheduler.InitScheduler();
 
             app.Run(async context => { await context.Response.WriteAsync("Hello World!"); });
             
