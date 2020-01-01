@@ -69,9 +69,15 @@ namespace WinTenBot.Services
             // return await Insert(baseTable, data);
         }
 
-        public async Task<DataTable> GetRssSettingsAsync()
+        public async Task<DataTable> GetRssSettingsAsync(string chatId)
         {
-            var sql = $"SELECT * FROM {rssSettingTable}";
+            var sql = $"SELECT * FROM {rssSettingTable} WHERE chat_id = '{chatId}'";
+            return await _mySqlProvider.ExecQueryAsync(sql);
+        }
+
+        public async Task<DataTable> GetListChatIdAsync()
+        {
+            var sql = $"SELECT distinct chat_id FROM {rssSettingTable};";
             return await _mySqlProvider.ExecQueryAsync(sql);
         }
     }

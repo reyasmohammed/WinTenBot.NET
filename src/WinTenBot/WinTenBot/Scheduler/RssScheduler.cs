@@ -13,26 +13,39 @@ namespace WinTenBot.Scheduler
 {
     public static class RssScheduler
     {
-        public static void InitScheduler()
+        public static async Task InitScheduler()
         {
-            var recurringId = "rss-scheduler";
-
-            RecurringJob.RemoveIfExists(recurringId);
-            RecurringJob.AddOrUpdate(recurringId, () => ExecScheduler(), "*/5 * * * *");
+            ConsoleHelper.WriteLine("Initializing RSS Scheduler.");
+            
+            var baseId = "rss-scheduler";
+            var rssService = new RssService();
+            
+            ConsoleHelper.WriteLine("Getting list Chat ID");
+            var listChatId = await rssService.GetListChatIdAsync();
+            foreach (DataRow row in listChatId.Rows)
+            {
+                var chatId = row["chat_id"].ToString();
+                var recurringId = $"{chatId}-{baseId}";
+                
+                ConsoleHelper.WriteLine($"Creating Jobs for {chatId}");
+                
+                RecurringJob.RemoveIfExists(recurringId);
+                RecurringJob.AddOrUpdate(recurringId, () => ExecScheduler(chatId), "*/5 * * * *");
+            }
         }
 
-        public static async Task ExecScheduler()
+        public static async Task ExecScheduler(string chatId)
         {
             ConsoleHelper.WriteLine("Starting RSS Scheduler.");
 
             var rssService = new RssService();
 
             ConsoleHelper.WriteLine("Getting RSS settings..");
-            var rssSettings = await rssService.GetRssSettingsAsync();
+            var rssSettings = await rssService.GetRssSettingsAsync(chatId);
             foreach (DataRow rssSetting in rssSettings.Rows)
             {
                 var rssUrl = rssSetting["url_feed"].ToString();
-                var chatId = rssSetting["chat_id"].ToString();
+                // var chatId = rssSetting["chat_id"].ToString();
 
                 ConsoleHelper.WriteLine($"Processing {rssUrl} for {chatId}.");
                 var rssFeeds = await FeedReader.ReadAsync(rssUrl);
@@ -54,6 +67,8 @@ namespace WinTenBot.Scheduler
                     var isExist = await rssService.IsExistInHistory(where);
                     if (!isExist)
                     {
+                        ConsoleHelper.WriteLine($"Sending feed to {chatId}");
+
                         try
                         {
                             await Bot.Client.SendTextMessageAsync(chatId, sendText, ParseMode.Html);
@@ -74,6 +89,10 @@ namespace WinTenBot.Scheduler
                         {
                             ConsoleHelper.WriteLine($"May Bot not added in {chatId}.");
                         }
+                    }
+                    else
+                    {
+                        ConsoleHelper.WriteLine($"This feed has sent to {chatId}");
                     }
                 }
             }
