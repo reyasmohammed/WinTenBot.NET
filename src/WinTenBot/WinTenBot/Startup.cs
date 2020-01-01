@@ -48,8 +48,7 @@ namespace WinTenBot
             Console.WriteLine($"ProductName: {Configuration["Engines:ProductName"]}");
             Console.WriteLine($"Version: {Configuration["Engines:Version"]}");
 
-            Bot.Client = new TelegramBotClient(Configuration["ZiziBetaBot:ApiToken"]);
-            //            Bot.Client.SendTextMessageAsync("-1001404591750", "Bot started");
+            Bot.Client = new TelegramBotClient(Configuration["ZiziBot:ApiToken"]);
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -89,7 +88,9 @@ namespace WinTenBot
             services.AddScoped<NotesCommand>()
                 .AddScoped<AddNotesCommand>();
 
-            services.AddScoped<SetRssCommand>();
+            services.AddScoped<SetRssCommand>()
+                .AddScoped<RssInfoCommand>()
+                .AddScoped<RssPullCommand>();
 
             services.AddScoped<AdminCommand>()
                 .AddScoped<PinCommand>()
@@ -173,6 +174,8 @@ namespace WinTenBot
             RssScheduler.InitScheduler();
 
             app.Run(async context => { await context.Response.WriteAsync("Hello World!"); });
+            
+            RssScheduler.InitScheduler();
         }
 
         private IBotBuilder ConfigureBot()
@@ -219,6 +222,8 @@ namespace WinTenBot
                                     .UseCommand<PromoteCommand>("promote")
                                     .UseCommand<QrCommand>("qr")
                                     .UseCommand<ReportCommand>("report")
+                                    .UseCommand<RssInfoCommand>("rssinfo")
+                                    .UseCommand<RssPullCommand>("rsspull")
                                     .UseCommand<RulesCommand>("rules")
                                     .UseCommand<SetRssCommand>("setrss")
                                     .UseCommand<SetWelcomeCommand>("setwelcome")

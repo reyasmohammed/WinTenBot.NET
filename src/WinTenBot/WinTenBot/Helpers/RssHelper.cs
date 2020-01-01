@@ -2,43 +2,19 @@
 using System.Data;
 using System.Threading.Tasks;
 using CodeHollow.FeedReader;
-using Hangfire;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types.Enums;
-using WinTenBot.Helpers;
 using WinTenBot.Model;
 using WinTenBot.Services;
 
-namespace WinTenBot.Scheduler
+namespace WinTenBot.Helpers
 {
-    public static class RssScheduler
+    public static class RssHelper
     {
-        public static async Task InitScheduler()
-        {
-            ConsoleHelper.WriteLine("Initializing RSS Scheduler.");
-            
-            var baseId = "rss-scheduler";
-            var rssService = new RssService();
-            
-            ConsoleHelper.WriteLine("Getting list Chat ID");
-            var listChatId = await rssService.GetListChatIdAsync();
-            foreach (DataRow row in listChatId.Rows)
-            {
-                var chatId = row["chat_id"].ToString();
-                var recurringId = $"{chatId}-{baseId}";
-                
-                ConsoleHelper.WriteLine($"Creating Jobs for {chatId}");
-                
-                RecurringJob.RemoveIfExists(recurringId);
-                RecurringJob.AddOrUpdate(recurringId, () => ExecScheduler(chatId), "*/5 * * * *");
-            }
-            
-            ConsoleHelper.WriteLine("Registering RSS Scheduler complete.");
-        }
-
-        public static async Task ExecScheduler(string chatId)
+        public static async Task<int> ExecSchedulerAsync(string chatId)
         {
             ConsoleHelper.WriteLine("Starting RSS Scheduler.");
+            int newRssCount = 0;
 
             var rssService = new RssService();
 
@@ -89,8 +65,11 @@ namespace WinTenBot.Scheduler
                         }
                         catch (ChatNotFoundException chatNotFoundException)
                         {
-                            ConsoleHelper.WriteLine($"May Bot not added in {chatId}.");
+                            ConsoleHelper.WriteLine($"May Bot not added in {chatId}." +
+                                                    $"\n{chatNotFoundException.Message}");
                         }
+
+                        newRssCount++;
                     }
                     else
                     {
@@ -100,6 +79,8 @@ namespace WinTenBot.Scheduler
             }
 
             ConsoleHelper.WriteLine("RSS Scheduler finished.");
+            
+            return newRssCount;
         }
     }
 }
