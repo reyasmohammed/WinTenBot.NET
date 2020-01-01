@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Net;
 using Flurl;
 
 namespace WinTenBot.Helpers
@@ -18,5 +19,15 @@ namespace WinTenBot.Helpers
         {
             return $"https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data={Url.Encode(data)}";
         }
+
+        public static void SaveUrlTo(this string remoteFileUrl, string localFileName)
+        {
+            var webClient = new WebClient();
+
+            ConsoleHelper.WriteLine($"Saving {remoteFileUrl} to {localFileName}");
+            webClient.DownloadFile(remoteFileUrl, localFileName);
+            webClient.Dispose();
+        }
+
     }
 }

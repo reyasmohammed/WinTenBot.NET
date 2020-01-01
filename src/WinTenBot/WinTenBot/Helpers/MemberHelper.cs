@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -35,6 +37,29 @@ namespace WinTenBot.Helpers
             }
 
             return isAdmin;
+        }
+        
+        public static async Task<bool> IsBanInCache(this User user)
+        {
+            var filtered = new DataTable(null);
+            var data = await "fban_user.json".ReadCacheAsync();
+            var userId = user.Id;
+            
+            ConsoleHelper.WriteLine($"Checking {user} in Global Ban Cache");
+            var search = data.AsEnumerable()
+                .Where(row => row.Field<string>("user_id") == userId.ToString());
+            if (search.Any())
+            {
+                filtered = search.CopyToDataTable();
+            }
+
+            ConsoleHelper.WriteLine($"Caches found: {filtered.ToJson()}");
+            return filtered.Rows.Count > 0;
+        }
+
+        public static bool IsNoUsername(this User user)
+        {
+            return user.Username == null;
         }
     }
 }
