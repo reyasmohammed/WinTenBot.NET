@@ -5,48 +5,59 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
+using WinTenBot.Model;
 
 namespace WinTenBot.Handlers.Commands.Core
 {
     internal class PingCommand : CommandBase
     {
-        private ChatProcessor _chatProcessor;
+        // private ChatProcessor _chatProcessor;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _chatProcessor = new ChatProcessor(context);
+            // _chatProcessor = new ChatProcessor(context);
+            ChatHelper.Init(context);
+
             var msg = context.Update.Message;
 
             var keyboard = new InlineKeyboardMarkup(
                 InlineKeyboardButton.WithCallbackData("Ping", "PONG")
             );
 
-            var sendText = "Pong!!";
+            await "ℹ️ Pong!!".AppendTextAsync();
             var isSudoer = msg.From.Id.IsSudoer();
 
             if (msg.Chat.Type == ChatType.Private && isSudoer)
             {
-                sendText += "\n<b>Engine info.</b>";
-                var getWebHookInfo = await _chatProcessor.Client.GetWebhookInfoAsync(cancellationToken);
+                // await "\n<b>Engine info.</b>".AppendTextAsync();
+                await "🎛 <b>Engine info.</b>".AppendTextAsync();
+
+                // var getWebHookInfo = await _chatProcessor.Client.GetWebhookInfoAsync(cancellationToken);
+                var getWebHookInfo = await Bot.Client.GetWebhookInfoAsync(cancellationToken);
                 if (getWebHookInfo.Url == "")
                 {
-                    sendText += "\n\n<i>Bot run in Poll mode.</i>";
+                    // sendText += "\n\n<i>Bot run in Poll mode.</i>";
+                    await "\n<i>Bot run in Poll mode.</i>".AppendTextAsync(keyboard);
                 }
                 else
                 {
-                    sendText += "\n\n<i>Bot run in Webhook mode.</i>" +
-                                $"\nUrl WebHook: {getWebHookInfo.Url}" +
-                                $"\nUrl Custom Cert: {getWebHookInfo.HasCustomCertificate}" +
-                                $"\nAllowed Updates: {getWebHookInfo.AllowedUpdates}" +
-                                $"\nPending Count: {getWebHookInfo.PendingUpdateCount}" +
-                                $"\nMaxConnection: {getWebHookInfo.MaxConnections}" +
-                                $"\nLast Error: {getWebHookInfo.LastErrorDate}" +
-                                $"\nError Message: {getWebHookInfo.LastErrorMessage}";
+                    var hookInfo = "\n<i>Bot run in Webhook mode.</i>" +
+                                   $"\nUrl WebHook: {getWebHookInfo.Url}" +
+                                   $"\nUrl Custom Cert: {getWebHookInfo.HasCustomCertificate}" +
+                                   $"\nAllowed Updates: {getWebHookInfo.AllowedUpdates}" +
+                                   $"\nPending Count: {getWebHookInfo.PendingUpdateCount}" +
+                                   $"\nMaxConnection: {getWebHookInfo.MaxConnections}" +
+                                   $"\nLast Error: {getWebHookInfo.LastErrorDate}" +
+                                   $"\nError Message: {getWebHookInfo.LastErrorMessage}";
+                    
+                    await hookInfo.AppendTextAsync(keyboard);
                 }
             }
 
-            await _chatProcessor.SendAsync(sendText, keyboard);
+            // await sendText.AppendTextAsync(keyboard);
+
+            ChatHelper.Close();
         }
     }
 }

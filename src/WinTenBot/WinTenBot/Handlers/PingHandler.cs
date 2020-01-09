@@ -10,24 +10,25 @@ namespace WinTenBot.Handlers
 {
     internal class PingHandler : IUpdateHandler
     {
-        private ChatProcessor _chatProcessor;
+        // private ChatProcessor _chatProcessor;
 
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
-            _chatProcessor = new ChatProcessor(context);
+            // _chatProcessor = new ChatProcessor(context);
+            ChatHelper.Init(context);
             var msg = context.Update.Message;
             
             var keyboard = new InlineKeyboardMarkup(
                 InlineKeyboardButton.WithCallbackData("Ping", "PONG")
             );
             
-            var sendText = "Pong!!";
+            var sendText = "ℹ️ Pong!!";
             var isSudoer = msg.From.Id.IsSudoer();
             
             if (msg.Chat.Type == ChatType.Private && isSudoer)
             {
-                sendText += "\n<b>Engine info.</b>";
-                var getWebHookInfo = await _chatProcessor.Client.GetWebhookInfoAsync(cancellationToken);
+                sendText += "\n🎛 <b>Engine info.</b>";
+                var getWebHookInfo = await ChatHelper.Client.GetWebhookInfoAsync(cancellationToken);
                 if (getWebHookInfo.Url == "")
                 {
                     sendText += "\n\n<i>Bot run in Poll mode.</i>";
@@ -45,7 +46,9 @@ namespace WinTenBot.Handlers
                 }
             }
             
-            await _chatProcessor.SendAsync(sendText, keyboard);
+            await sendText.SendTextAsync(keyboard);
+            
+            ChatHelper.Close();
         }
     }
 }
