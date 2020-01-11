@@ -8,9 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MySql.Data.MySqlClient;
-using SqlKata.Compilers;
-using SqlKata.Execution;
 using Telegram.Bot;
 using Telegram.Bot.Framework;
 using Telegram.Bot.Framework.Abstractions;
@@ -52,9 +49,6 @@ namespace WinTenBot
             Console.WriteLine($"Version: {Configuration["Engines:Version"]}");
 
             Bot.Client = new TelegramBotClient(Configuration["ZiziBot:ApiToken"]);
-
-            var connection = new MySqlConnection(Bot.DbConnectionString);
-            Bot.SqlKataFactory = new QueryFactory(connection, new MySqlCompiler());
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -79,9 +73,10 @@ namespace WinTenBot
 
             services.AddScoped<GlobalBanCommand>()
                 .AddScoped<DelBanCommand>();
-            
+
             services.AddScoped<PingHandler>()
-                .AddScoped<HelpCommand>();
+                .AddScoped<HelpCommand>()
+                .AddScoped<TestCommand>();
 
             services.AddScoped<MediaReceivedHandler>();
 
@@ -162,9 +157,9 @@ namespace WinTenBot
 
                 // get bot updates from Telegram via long-polling approach during development
                 // this will disable Telegram webhooks
-                app.UseTelegramBotLongPolling<ZiziBot>(configureBot, startAfter: TimeSpan.FromSeconds(1));
+                app.UseTelegramBotLongPolling<ZiziBot>(configureBot, TimeSpan.FromSeconds(1));
                 app.UseTelegramBotLongPolling<MacOsBot>(configureBot, TimeSpan.FromSeconds(1));
-                
+
                 app.UseHangfireDashboard("/hangfire", options);
             }
             else
@@ -183,7 +178,7 @@ namespace WinTenBot
             app.UseHangfireServer();
 
             app.Run(async context => { await context.Response.WriteAsync("Hello World!"); });
-            
+
             RssScheduler.InitScheduler();
             // HangfireHelper.DeleteAllJobs();
 
@@ -242,6 +237,7 @@ namespace WinTenBot
                                     .UseCommand<StartCommand>("start")
                                     .UseCommand<TagCommand>("tag")
                                     .UseCommand<TagsCommand>("tags")
+                                    .UseCommand<TestCommand>("test")
                                     .UseCommand<UntagCommand>("untag")
                                     .UseCommand<WelcomeCommand>("welcome")
                                 )
