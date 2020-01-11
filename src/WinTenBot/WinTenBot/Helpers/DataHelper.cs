@@ -5,6 +5,9 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using Flurl;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace WinTenBot.Helpers
 {
@@ -57,6 +60,11 @@ namespace WinTenBot.Helpers
             }
 
             return dt;
+        }
+
+        public static T MapObject<T>(this string json)
+        {
+            return JsonSerializer.Deserialize<T>(json);
         }
     }
 }
