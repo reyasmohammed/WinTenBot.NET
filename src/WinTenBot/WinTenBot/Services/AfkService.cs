@@ -2,28 +2,28 @@
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using SqlKata;
+using SqlKata.Execution;
 using Telegram.Bot.Types;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
 
 namespace WinTenBot.Services
 {
-    public class AfkService : Query
+    public class AfkService
     {
-        private readonly MySqlProvider _mySqlProvider;
         private const string BaseTable = "afk";
         private const string FileJson = "afk.json";
 
-        public AfkService()
-        {
-            _mySqlProvider = new MySqlProvider();
-        }
-
         public async Task<bool> IsExist(string key, string value)
         {
-            var sql = $"SELECT * FROM {BaseTable} WHERE {key} = '{value}'";
-            var data = await _mySqlProvider.ExecQueryAsync(sql);
-            return data.Rows.Count > 0;
+            var data = await new Query(BaseTable)
+                .Where(key, value)
+                .ExecForMysql()
+                .GetAsync();
+            
+            ConsoleHelper.WriteLine($"Check AFK Exist: {data.Count().ToBool()}");
+            return data.Any();
         }
 
         public async Task<bool> IsExistInCache(string key, string val)
@@ -61,35 +61,40 @@ namespace WinTenBot.Services
                 {"user_id", data["user_id"]}
             };
 
-            var insert = false;
-            var isExist = await IsDataExist(BaseTable, where);
+            var insert =0;
+            
+            var checkExist = await new Query(BaseTable)
+                .Where(where)
+                .ExecForMysql()
+                .GetAsync();
+
+            var isExist = checkExist.Any();
+            
             if (isExist)
             {
-                insert = await Update(BaseTable, data, where);
+                insert = await new Query(BaseTable)
+                    .Where(where)
+                    .ExecForMysql()
+                    .UpdateAsync(data);
             }
             else
             {
-                insert = await _mySqlProvider.Insert(BaseTable, data);
+                insert = await new Query(BaseTable)
+                    .ExecForMysql()
+                    .InsertAsync(data);
             }
 
             ConsoleHelper.WriteLine($"SaveAfk: {insert}");
         }
 
-        public async Task UpdateCell(Message message, string key, object value)
-        {
-            var sql = $"UPDATE {BaseTable} " +
-                      $"SET {key} = '{value}' " +
-                      $"WHERE chat_id = '{message.Chat.Id}' " +
-                      $"AND user_id ='{message.From.Id}'";
-
-            await _mySqlProvider.ExecNonQueryAsync(sql);
-        }
-
         public async Task<DataTable> GetAllAfk()
         {
-            var sql = $"SELECT * FROM {BaseTable}";
-            var data = await _mySqlProvider.ExecQueryAsync(sql);
-            return data;
+            var data = await new Query(BaseTable)
+                .ExecForMysql()
+                .GetAsync();
+
+            var dataTable = data.ToJson().ToDataTable();
+            return dataTable;
         }
 
         public async Task UpdateCacheAsync()
