@@ -6,6 +6,7 @@ using SqlKata;
 using SqlKata.Execution;
 using Telegram.Bot.Types;
 using WinTenBot.Helpers;
+using WinTenBot.Model;
 using WinTenBot.Providers;
 
 namespace WinTenBot.Services
@@ -68,28 +69,36 @@ namespace WinTenBot.Services
             return insert.ToBool();
         }
 
-        public async Task<DataTable> GetRssSettingsAsync(string chatId)
+        public async Task<List<RssSetting>> GetRssSettingsAsync(string chatId)
         {
             var data =  await new Query(rssSettingTable)
                 .Where("chat_id", chatId)
                 .ExecForMysql()
                 .GetAsync();
+
+            var mapped = data.ToJson().MapObject<List<RssSetting>>();
+            // ConsoleHelper.WriteLine(mapped.ToJson());
             
             ConsoleHelper.WriteLine($"Get RSS Settings: {data.Count()}");
-
-            return data.ToJson().ToDataTable();
+            return mapped;
+            
+            // return data.ToJson().ToDataTable();
         }
 
-        public async Task<DataTable> GetListChatIdAsync()
+        public async Task<List<RssSetting>> GetListChatIdAsync()
         {
             var data = await new Query(rssSettingTable)
                 .Select("chat_id")
+                .Distinct()
                 .ExecForMysql()
                 .GetAsync();
+
+            var mapped = data.ToJson().MapObject<List<RssSetting>>();
             
             ConsoleHelper.WriteLine($"Get List ChatID: {data.Count()}");
-
-            return data.ToJson().ToDataTable();
+            return mapped;
+            
+            // return data.ToJson().ToDataTable();
         }
     }
 }

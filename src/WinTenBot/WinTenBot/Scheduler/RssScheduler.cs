@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using CodeHollow.FeedReader;
@@ -26,15 +25,17 @@ namespace WinTenBot.Scheduler
 
                 ConsoleHelper.WriteLine("Getting list Chat ID");
                 var listChatId = await rssService.GetListChatIdAsync();
-                foreach (DataRow row in listChatId.Rows)
+                foreach (RssSetting row in listChatId)
                 {
-                    var chatId = row["chat_id"].ToString();
+                    // var chatId = row["chat_id"].ToString();
+
+                    var chatId = row.ChatId;
                     var recurringId = $"{chatId}-{baseId}";
 
                     ConsoleHelper.WriteLine($"Creating Jobs for {chatId}");
 
                     RecurringJob.RemoveIfExists(recurringId);
-                    RecurringJob.AddOrUpdate(recurringId, () => RssHelper.ExecBroadcasterAsync(chatId), "*/5 * * * *");
+                    RecurringJob.AddOrUpdate(recurringId, () => RssHelper.ExecBroadcasterAsync(chatId), "*/10 * * * *");
                 }
 
                 ConsoleHelper.WriteLine("Registering RSS Scheduler complete.");
@@ -50,24 +51,25 @@ namespace WinTenBot.Scheduler
 
             ConsoleHelper.WriteLine("Getting RSS settings..");
             var rssSettings = await rssService.GetRssSettingsAsync(chatId);
-            foreach (DataRow rssSetting in rssSettings.Rows)
+            foreach (RssSetting rssSetting in rssSettings)
             {
-                var rssUrl = rssSetting["url_feed"].ToString();
+                var rssUrl = rssSetting.UrlFeed;
+                // var rssUrl = rssSetting["url_feed"].ToString();
                 // var chatId = rssSetting["chat_id"].ToString();
 
                 ConsoleHelper.WriteLine($"Processing {rssUrl} for {chatId}.");
                 var rssFeeds = await FeedReader.ReadAsync(rssUrl);
                 var rssTitle = rssFeeds.Title;
-                
+
                 var rssLimit = 3;
                 var rssStep = 1;
-                
+
                 foreach (var rssFeed in rssFeeds.Items.Take(rssLimit))
                 {
                     // if (rssStep == rssLimit)
                     // {
-                        // ConsoleHelper.WriteLine($"RSS Limit to {rssLimit} in first time.");
-                        // break;
+                    // ConsoleHelper.WriteLine($"RSS Limit to {rssLimit} in first time.");
+                    // break;
                     // }
 
                     var titleLink = $"{rssTitle} - {rssFeed.Title}".MkUrl(rssFeed.Link);

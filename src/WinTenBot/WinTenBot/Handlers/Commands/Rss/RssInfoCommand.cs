@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
+using WinTenBot.Model;
 using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Rss
@@ -21,15 +22,15 @@ namespace WinTenBot.Handlers.Commands.Rss
             
             if (isAdmin || ChatHelper.IsPrivateChat())
             {
-                await "Sedang meload data..".SendTextAsync();
+                await "🔄 Sedang meload data..".SendTextAsync();
                 var rssData = await _rssService.GetRssSettingsAsync(chatId);
                 
-                var sendText = $"List RSS {rssData.Rows.Count} items.";
+                var sendText = $"📚 <b>List RSS</b>: {rssData.Count} Items.";
                 int num = 1;
-                foreach (DataRow rss in rssData.Rows)
+                foreach (RssSetting rss in rssData)
                 {
-                    var urlFeed = rss["url_feed"].ToString();
-                    sendText += $"\n{num++}. {urlFeed}";
+                    // var urlFeed = rss["url_feed"].ToString();
+                    sendText += $"\n{num++}. {rss.UrlFeed}";
                 }
 
                 await sendText.EditAsync();

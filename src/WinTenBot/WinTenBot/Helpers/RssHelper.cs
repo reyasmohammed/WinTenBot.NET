@@ -22,9 +22,11 @@ namespace WinTenBot.Helpers
 
             ConsoleHelper.WriteLine("Getting RSS settings..");
             var rssSettings = await rssService.GetRssSettingsAsync(chatId);
-            foreach (DataRow rssSetting in rssSettings.Rows)
+            foreach (RssSetting rssSetting in rssSettings)
             {
-                var rssUrl = rssSetting["url_feed"].ToString();
+                var rssUrl = rssSetting.UrlFeed;
+                
+                // var rssUrl = rssSetting["url_feed"].ToString();
                 // var chatId = rssSetting["chat_id"].ToString();
 
                 ConsoleHelper.WriteLine($"Processing {rssUrl} for {chatId}.");
