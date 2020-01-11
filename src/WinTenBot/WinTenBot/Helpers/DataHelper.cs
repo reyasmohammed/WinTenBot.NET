@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Net;
+using System.Reflection;
 using Flurl;
 
 namespace WinTenBot.Helpers
@@ -29,5 +32,31 @@ namespace WinTenBot.Helpers
             webClient.Dispose();
         }
 
+        public static DataTable ToDataTable<T>(this IEnumerable<T> ts) where T : class
+        {
+            var dt = new DataTable();
+            //Get Enumerable Type
+            Type tT = typeof(T);
+
+            //Get Collection of NoVirtual properties
+            var props = tT.GetProperties().Where(p => !p.GetGetMethod().IsVirtual).ToArray();
+
+            //Fill Schema
+            foreach (PropertyInfo p in props)
+                dt.Columns.Add(p.Name, p.GetMethod.ReturnParameter.ParameterType.BaseType);
+
+            //Fill Data
+            foreach (T t in ts)
+            {
+                DataRow row = dt.NewRow();
+
+                foreach (PropertyInfo p in props)
+                    row[p.Name] = p.GetValue(t);
+
+                dt.Rows.Add(row);
+            }
+
+            return dt;
+        }
     }
 }

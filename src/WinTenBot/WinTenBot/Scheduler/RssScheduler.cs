@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using CodeHollow.FeedReader;
 using Hangfire;
@@ -13,29 +15,33 @@ namespace WinTenBot.Scheduler
 {
     public static class RssScheduler
     {
-        public static async Task InitScheduler()
+        public static void InitScheduler()
         {
-            ConsoleHelper.WriteLine("Initializing RSS Scheduler.");
-            
-            var baseId = "rss-scheduler";
-            var rssService = new RssService();
-            
-            ConsoleHelper.WriteLine("Getting list Chat ID");
-            var listChatId = await rssService.GetListChatIdAsync();
-            foreach (DataRow row in listChatId.Rows)
+            Task.Run(async () =>
             {
-                var chatId = row["chat_id"].ToString();
-                var recurringId = $"{chatId}-{baseId}";
-                
-                ConsoleHelper.WriteLine($"Creating Jobs for {chatId}");
-                
-                RecurringJob.RemoveIfExists(recurringId);
-                RecurringJob.AddOrUpdate(recurringId, () => ExecScheduler(chatId), "*/5 * * * *");
-            }
-            
-            ConsoleHelper.WriteLine("Registering RSS Scheduler complete.");
+                ConsoleHelper.WriteLine("Initializing RSS Scheduler.");
+
+                var baseId = "rss-scheduler";
+                var rssService = new RssService();
+
+                ConsoleHelper.WriteLine("Getting list Chat ID");
+                var listChatId = await rssService.GetListChatIdAsync();
+                foreach (DataRow row in listChatId.Rows)
+                {
+                    var chatId = row["chat_id"].ToString();
+                    var recurringId = $"{chatId}-{baseId}";
+
+                    ConsoleHelper.WriteLine($"Creating Jobs for {chatId}");
+
+                    RecurringJob.RemoveIfExists(recurringId);
+                    RecurringJob.AddOrUpdate(recurringId, () => RssHelper.ExecBroadcasterAsync(chatId), "*/5 * * * *");
+                }
+
+                ConsoleHelper.WriteLine("Registering RSS Scheduler complete.");
+            });
         }
 
+        [Obsolete("This function is deprecated. Please use RssHelper")]
         public static async Task ExecScheduler(string chatId)
         {
             ConsoleHelper.WriteLine("Starting RSS Scheduler.");
@@ -52,9 +58,18 @@ namespace WinTenBot.Scheduler
                 ConsoleHelper.WriteLine($"Processing {rssUrl} for {chatId}.");
                 var rssFeeds = await FeedReader.ReadAsync(rssUrl);
                 var rssTitle = rssFeeds.Title;
-
-                foreach (var rssFeed in rssFeeds.Items)
+                
+                var rssLimit = 3;
+                var rssStep = 1;
+                
+                foreach (var rssFeed in rssFeeds.Items.Take(rssLimit))
                 {
+                    // if (rssStep == rssLimit)
+                    // {
+                        // ConsoleHelper.WriteLine($"RSS Limit to {rssLimit} in first time.");
+                        // break;
+                    // }
+
                     var titleLink = $"{rssTitle} - {rssFeed.Title}".MkUrl(rssFeed.Link);
                     var category = rssFeed.Categories.MkJoin(", ");
                     var sendText = $"{titleLink}" +
@@ -79,17 +94,19 @@ namespace WinTenBot.Scheduler
                             {
                                 {"url", rssFeed.Link},
                                 {"chat_id", chatId},
-                                {"title", rssFeed.Title},
                                 {"publish_date", rssFeed.PublishingDate.ToString()},
                                 {"author", rssFeed.Author}
                             };
 
                             ConsoleHelper.WriteLine($"Writing to RSS History");
                             await rssService.SaveRssAsync(data);
+
+                            rssStep++;
                         }
                         catch (ChatNotFoundException chatNotFoundException)
                         {
-                            ConsoleHelper.WriteLine($"May Bot not added in {chatId}.");
+                            ConsoleHelper.WriteLine($"May Bot not added in {chatId}." +
+                                                    $"\nMessage: {chatNotFoundException.Message}");
                         }
                     }
                     else

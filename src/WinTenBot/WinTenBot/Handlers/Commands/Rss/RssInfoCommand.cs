@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
-using MySqlX.XDevAPI.Relational;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Services;

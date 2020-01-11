@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using CodeHollow.FeedReader;
 using Telegram.Bot.Exceptions;
@@ -11,7 +13,7 @@ namespace WinTenBot.Helpers
 {
     public static class RssHelper
     {
-        public static async Task<int> ExecSchedulerAsync(string chatId)
+        public static async Task<int> ExecBroadcasterAsync(string chatId)
         {
             ConsoleHelper.WriteLine("Starting RSS Scheduler.");
             int newRssCount = 0;
@@ -26,60 +28,80 @@ namespace WinTenBot.Helpers
                 // var chatId = rssSetting["chat_id"].ToString();
 
                 ConsoleHelper.WriteLine($"Processing {rssUrl} for {chatId}.");
-                var rssFeeds = await FeedReader.ReadAsync(rssUrl);
-                var rssTitle = rssFeeds.Title;
-
-                foreach (var rssFeed in rssFeeds.Items)
+                try
                 {
-                    var titleLink = $"{rssTitle} - {rssFeed.Title}".MkUrl(rssFeed.Link);
-                    var category = rssFeed.Categories.MkJoin(", ");
-                    var sendText = $"{titleLink}" +
-                                   $"\nTags: {category}";
+                    var rssFeeds = await FeedReader.ReadAsync(rssUrl);
+                    var rssTitle = rssFeeds.Title;
 
-                    var where = new Dictionary<string, object>()
+                    var castLimit = 3;
+                    var castStep = 0;
+
+                    foreach (var rssFeed in rssFeeds.Items)
                     {
-                        {"chat_id", chatId},
-                        {"url", rssFeed.Link}
-                    };
-
-                    var isExist = await rssService.IsExistInHistory(where);
-                    if (!isExist)
-                    {
-                        ConsoleHelper.WriteLine($"Sending feed to {chatId}");
-
-                        try
+                        // Prevent flood in first time;
+                        if (castLimit == castStep)
                         {
-                            await Bot.Client.SendTextMessageAsync(chatId, sendText, ParseMode.Html);
+                            ConsoleHelper.WriteLine($"Send stopped due limit {castLimit} for prevent flooding in first time");
+                            break;
+                        }
 
-                            var data = new Dictionary<string, object>()
+                        var titleLink = $"{rssTitle} - {rssFeed.Title}".MkUrl(rssFeed.Link);
+                        var category = rssFeed.Categories.MkJoin(", ");
+                        var sendText = $"{titleLink}" +
+                                       $"\nTags: {category}";
+
+                        var where = new Dictionary<string, object>()
+                        {
+                            {"chat_id", chatId},
+                            {"url", rssFeed.Link}
+                        };
+
+                        var isExist = await rssService.IsExistInHistory(where);
+                        if (!isExist)
+                        {
+                            ConsoleHelper.WriteLine($"Sending feed to {chatId}");
+
+                            try
                             {
-                                {"url", rssFeed.Link},
-                                {"chat_id", chatId},
-                                {"title", rssFeed.Title},
-                                {"publish_date", rssFeed.PublishingDate.ToString()},
-                                {"author", rssFeed.Author}
-                            };
+                                await Bot.Client.SendTextMessageAsync(chatId, sendText, ParseMode.Html);
 
-                            ConsoleHelper.WriteLine($"Writing to RSS History");
-                            await rssService.SaveRssAsync(data);
+                                var data = new Dictionary<string, object>()
+                                {
+                                    {"url", rssFeed.Link},
+                                    {"rss_source", rssUrl},
+                                    {"chat_id", chatId},
+                                    {"title", rssFeed.Title},
+                                    {"publish_date", rssFeed.PublishingDate.ToString()},
+                                    {"author", rssFeed.Author}
+                                };
+
+                                ConsoleHelper.WriteLine($"Writing to RSS History");
+                                await rssService.SaveRssAsync(data);
+
+                                castStep++;
+                                newRssCount++;
+                            }
+                            catch (ChatNotFoundException chatNotFoundException)
+                            {
+                                ConsoleHelper.WriteLine($"May Bot not added in {chatId}." +
+                                                        $"\n{chatNotFoundException.Message}");
+                            }
                         }
-                        catch (ChatNotFoundException chatNotFoundException)
+                        else
                         {
-                            ConsoleHelper.WriteLine($"May Bot not added in {chatId}." +
-                                                    $"\n{chatNotFoundException.Message}");
+                            ConsoleHelper.WriteLine($"This feed has sent to {chatId}");
                         }
-
-                        newRssCount++;
                     }
-                    else
-                    {
-                        ConsoleHelper.WriteLine($"This feed has sent to {chatId}");
-                    }
+                }
+                catch (Exception ex)
+                {
+                    ConsoleHelper.WriteLine(ex.Message);
+                    ConsoleHelper.WriteLine(ex.ToString());
                 }
             }
 
-            ConsoleHelper.WriteLine("RSS Scheduler finished.");
-            
+            ConsoleHelper.WriteLine($"RSS Scheduler finished. New RSS Count: {newRssCount}");
+
             return newRssCount;
         }
     }

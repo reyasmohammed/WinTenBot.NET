@@ -129,21 +129,21 @@ namespace WinTenBot
             services.AddScoped<OutCommand>();
 
             services.AddScoped<QrCommand>();
-            
-            
+
+
             // Hangfire
             services.AddHangfireServer();
-            services.AddHangfire(t => t.UseLiteDbStorage(Configuration[key: "CommonConfig:HangfireLiteDb"]));
+            services.AddHangfire(t => t.UseLiteDbStorage(Configuration["CommonConfig:HangfireLiteDb"]));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             Bot.HostingEnvironment = env;
-            
+
             var hangfireBaseUrl = Configuration["Hangfire:BaseUrl"];
             var hangfireUsername = Configuration["Hangfire:Username"];
             var hangfirePassword = Configuration["Hangfire:Password"];
-            
+
             ConsoleHelper.WriteLine($"Hangfire Auth: {hangfireUsername} | {hangfirePassword}");
 
             var options = new DashboardOptions
@@ -172,7 +172,7 @@ namespace WinTenBot
                 // use Telegram bot webhook middleware in higher environments
                 app.UseTelegramBotWebhook<ZiziBot>(configureBot);
                 app.UseTelegramBotWebhook<MacOsBot>(configureBot);
-                
+
                 // and make sure webhook is enabled
                 app.EnsureWebhookSet<ZiziBot>();
                 app.EnsureWebhookSet<MacOsBot>();
@@ -185,6 +185,9 @@ namespace WinTenBot
             app.Run(async context => { await context.Response.WriteAsync("Hello World!"); });
             
             RssScheduler.InitScheduler();
+            // HangfireHelper.DeleteAllJobs();
+
+            ConsoleHelper.WriteLine("App is ready.");
         }
 
         private IBotBuilder ConfigureBot()

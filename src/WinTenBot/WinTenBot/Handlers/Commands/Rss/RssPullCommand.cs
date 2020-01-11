@@ -16,9 +16,9 @@ namespace WinTenBot.Handlers.Commands.Rss
 
             if (isAdmin || ChatHelper.IsPrivateChat())
             {
-                await "Sedang mengambil feed..".SendTextAsync();
+                await "Sedang memeriksa RSS feed baru..".SendTextAsync();
                 
-                var newRssCount = await RssHelper.ExecSchedulerAsync(chatId);
+                var newRssCount = await RssHelper.ExecBroadcasterAsync(chatId);
                 if (newRssCount == 0)
                 {
                     await "Tampaknya tidak ada RSS baru saat ini".EditAsync();
