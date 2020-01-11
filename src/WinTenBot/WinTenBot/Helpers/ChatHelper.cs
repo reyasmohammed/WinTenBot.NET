@@ -38,6 +38,7 @@ namespace WinTenBot.Helpers
             SentMessageId = -1;
             EditedMessageId = -1;
             CallBackMessageId = -1;
+            AppendText = "";
         }
 
         #region Message

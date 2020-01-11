@@ -115,6 +115,11 @@ namespace WinTenBot.Helpers
                     }
                 });
         }
+
+        public static string NewSqlEscape(this object obj)
+        {
+            return obj.ToString().Replace("'", "''");
+        }
         
         public static bool CheckUrlValid(this string source)
         {
