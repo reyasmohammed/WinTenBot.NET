@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MySql.Data.MySqlClient;
+using SqlKata.Compilers;
+using SqlKata.Execution;
 using Telegram.Bot;
 using Telegram.Bot.Framework;
 using Telegram.Bot.Framework.Abstractions;
@@ -49,6 +52,9 @@ namespace WinTenBot
             Console.WriteLine($"Version: {Configuration["Engines:Version"]}");
 
             Bot.Client = new TelegramBotClient(Configuration["ZiziBot:ApiToken"]);
+
+            var connection = new MySqlConnection(Bot.DbConnectionString);
+            Bot.SqlKataFactory = new QueryFactory(connection, new MySqlCompiler());
         }
 
         public void ConfigureServices(IServiceCollection services)
