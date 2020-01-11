@@ -199,12 +199,16 @@ namespace WinTenBot.Helpers
             var userId = Message.From.Id;
             var isAdmin = false;
 
-            var admins = await Client.GetChatAdministratorsAsync(chatId);
-            foreach (var admin in admins)
+            if (!IsPrivateChat())
             {
-                if (userId == admin.User.Id)
+
+                var admins = await Client.GetChatAdministratorsAsync(chatId);
+                foreach (var admin in admins)
                 {
-                    isAdmin = true;
+                    if (userId == admin.User.Id)
+                    {
+                        isAdmin = true;
+                    }
                 }
             }
 
