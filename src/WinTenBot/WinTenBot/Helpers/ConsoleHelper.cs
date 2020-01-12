@@ -2,13 +2,19 @@
 
 namespace WinTenBot.Helpers
 {
-    public class ConsoleHelper
+    public static class ConsoleHelper
     {
         private static object BuildMsg(object message)
         {
             var timestamp = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss.fff");
             return $"{timestamp} - {message}";
         }
+
+        public static void ToConsoleStamp(this object obj)
+        {
+            WriteLine(obj);
+        }
+        
         public static void WriteLine(object message)
         {
             if (message == null) return;

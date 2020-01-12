@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Hangfire;
 using Hangfire.LiteDB;
 using HangfireBasicAuthenticationFilter;
@@ -62,6 +62,7 @@ namespace WinTenBot
                 .Configure<BotOptions<MacOsBot>>(Configuration.GetSection("MacOsBot"))
                 .Configure<CustomBotOptions<MacOsBot>>(Configuration.GetSection("MacOsBot"))
                 
+                .AddScoped<NewUpdateHandler>()
                 .AddScoped<GenericMessageHandler>()
                 .AddScoped<WebhookLogger>()
                 .AddScoped<StickerHandler>()
@@ -191,7 +192,9 @@ namespace WinTenBot
                     .Use<ExceptionHandler>()
                     // .Use<CustomUpdateLogger>()
                     .UseWhen<WebhookLogger>(When.Webhook)
-
+                    
+                    .UseWhen<NewUpdateHandler>(When.NewUpdate)
+                    
                     //.UseWhen<UpdateMembersList>(When.MembersChanged)
                     .UseWhen<NewChatMembersEvent>(When.NewChatMembers)
                     .UseWhen<LeftChatMemberEvent>(When.LeftChatMember)
@@ -245,7 +248,7 @@ namespace WinTenBot
 
                             //.Use<NLP>()
                         )
-                        .UseWhen<StickerHandler>(When.StickerMessage)
+                        // .UseWhen<StickerHandler>(When.StickerMessage)
                         .UseWhen<WeatherReporter>(When.LocationMessage)
                     )
                     .UseWhen<CallbackQueryHandler>(When.CallbackQuery)

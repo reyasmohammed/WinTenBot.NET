@@ -79,8 +79,9 @@ namespace WinTenBot.Handlers
             //                msg.Chat, "You said:\n" + msg.Text
             //            );
 
-            await AfkCheck(msg);
-            await CheckGlobalBanAsync(msg);
+            // await AfkCheck(msg);
+            // await CheckGlobalBanAsync(msg);
+            // CheckUsername(msg);
 
             await next(context);
         }
@@ -119,7 +120,8 @@ namespace WinTenBot.Handlers
             var user = message.From;
             var messageId = message.MessageId;
             
-            var isBan = await _elasticSecurityService.IsExist(userId);
+            // var isBan = await _elasticSecurityService.IsExist(userId);
+            var isBan = await user.IsBanInCache();
             ConsoleHelper.WriteLine($"IsBan: {isBan}");
             if (isBan)
             {
@@ -127,6 +129,13 @@ namespace WinTenBot.Handlers
                 await _chatProcessor.KickMemberAsync(user);
                 await _chatProcessor.UnbanMemberAsync(user);
             }
+        }
+
+        private void CheckUsername(Message message)
+        {
+            var fromUser = message.From;
+            var noUsername = fromUser.IsNoUsername();
+            ConsoleHelper.WriteLine($"{fromUser} IsNoUsername: {noUsername}");
         }
     }
 }

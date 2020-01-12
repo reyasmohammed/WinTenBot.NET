@@ -10,6 +10,9 @@ namespace WinTenBot
         public static bool Webhook(IUpdateContext context)  => 
             context.Items.ContainsKey(nameof(HttpContext));
 
+        public static bool NewUpdate(IUpdateContext context) =>
+            context.Update != null;
+        
         public static bool NewMessage(IUpdateContext context) =>
             context.Update.Message != null;
 
