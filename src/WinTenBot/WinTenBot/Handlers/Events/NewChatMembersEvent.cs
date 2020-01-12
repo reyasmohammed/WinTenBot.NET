@@ -39,6 +39,28 @@ namespace WinTenBot.Handlers.Events
             ConsoleHelper.WriteLine("New Chat Members...");
 
             var newMembers = msg.NewChatMembers;
+            var isBootAdded = await newMembers.IsBotAdded();
+            if (isBootAdded)
+            {
+                var botName = Bot.GlobalConfiguration["Engines:ProductName"];
+                var sendText = $"Hai, perkenalkan saya {botName}" +
+                               $"\nFYI saya di bangun ulang menggunakan .NET Core, tepatnya ASP .NET Core." +
+                               $"\n\nAku adalah bot pendebug dan grup manajemen yang di lengkapi dengan alat keamanan. " +
+                               $"Agar saya berfungsi penuh, jadikan saya admin dengan level standard. " +
+                               $"\n\nAku akan menerapkan konfigurasi standard jika aku baru pertama kali masuk kesini. " +
+                               $"\n\nUntuk melihat daftar perintah bisa ketikkan /help";
+                
+                await _chatProcessor.SendAsync(sendText);
+                
+                await _settingsService.SaveSettingsAsync(new Dictionary<string, object>()
+                {
+                    {"chat_id", msg.Chat.Id},
+                    {"chat_title", msg.Chat.Title}
+                });
+                
+                if (newMembers.Length == 1) return;
+            }
+            
             var parsedNewMember = await ParseMemberCategory(newMembers);
             var allNewMember = parsedNewMember.AllNewMember;
             var allNoUsername = parsedNewMember.AllNoUsername;
