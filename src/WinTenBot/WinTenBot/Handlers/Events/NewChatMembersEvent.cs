@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -79,7 +79,8 @@ namespace WinTenBot.Handlers.Events
                 if (chatSettings.WelcomeMessage == "")
                 {
                     chatSettings.WelcomeMessage = $"Hai {allNewMember}" +
-                                                  $"\nSelamat datang di kontrakan {chatTitle}";
+                                                  $"\nSelamat datang di kontrakan {chatTitle}" +
+                                                  $"\nKamu adalah anggota ke-{memberCount}";
                 }
 
                 var sendText = chatSettings.WelcomeMessage.ResolveVariable(new
