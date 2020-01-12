@@ -18,10 +18,38 @@ namespace WinTenBot.Handlers.Commands.Rss
             var url = ChatHelper.Message.Text.GetTextWithoutCmd();
             if (url != null)
             {
+                await $"Sedang memeriksa {url}".AppendTextAsync();
                 if (url.CheckUrlValid())
                 {
+                    await $"Sedang memvalidasi {url}".AppendTextAsync();
+                    var isValid = await url.IsValidUrlFeed();
+                    if (!isValid)
+                    {
+                        await "Sedang mencari kemungkinan RSS yang valid".AppendTextAsync();
+                        var foundUrl = await url.GetBaseUrl().FindUrlFeed();
+                        ConsoleHelper.WriteLine($"Found URL Feed: {foundUrl}");
+                        
+                        if (foundUrl != "")
+                        {
+                            url = foundUrl;
+                        }
+                        else
+                        {
+                            var notfoundRss = $"Kami tidak dapat memvalidasi {url} adalah Link RSS yang valid, " +
+                                              $"dan mencoba mencari di {url.GetBaseUrl()} tetap tidak dapat menemukan.";
+                            
+                            await notfoundRss.EditAsync();
+                            
+                            ChatHelper.Close();
+                            return;
+                        }
+
+                    }
+                    
                     var isFeedExist = await _rssService.IsExistRssAsync(url);
+
                     ConsoleHelper.WriteLine($"Is Url Exist: {isFeedExist}");
+                    
                     if (!isFeedExist)
                     {
                         await $"Sedang menyimpan..".SendTextAsync();
@@ -52,6 +80,6 @@ namespace WinTenBot.Handlers.Commands.Rss
             }
 
             ChatHelper.Close();
-        }
     }
 }
+        }

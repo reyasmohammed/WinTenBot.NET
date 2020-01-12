@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using CodeHollow.FeedReader;
@@ -25,7 +24,7 @@ namespace WinTenBot.Helpers
             foreach (RssSetting rssSetting in rssSettings)
             {
                 var rssUrl = rssSetting.UrlFeed;
-                
+
                 // var rssUrl = rssSetting["url_feed"].ToString();
                 // var chatId = rssSetting["chat_id"].ToString();
 
@@ -43,7 +42,8 @@ namespace WinTenBot.Helpers
                         // Prevent flood in first time;
                         if (castLimit == castStep)
                         {
-                            ConsoleHelper.WriteLine($"Send stopped due limit {castLimit} for prevent flooding in first time");
+                            ConsoleHelper.WriteLine(
+                                $"Send stopped due limit {castLimit} for prevent flooding in first time");
                             break;
                         }
 
@@ -105,6 +105,45 @@ namespace WinTenBot.Helpers
             ConsoleHelper.WriteLine($"RSS Scheduler finished. New RSS Count: {newRssCount}");
 
             return newRssCount;
+        }
+
+        public static async Task<string> FindUrlFeed(this string url)
+        {
+            ConsoleHelper.WriteLine($"Scanning {url} ..");
+            var urls = await FeedReader.GetFeedUrlsFromUrlAsync(url);
+            ConsoleHelper.WriteLine($"UrlFeeds: {urls.ToJson()}");
+
+            string feedUrl = "";
+
+            if (urls.Count() == 1) // no url - probably the url is already the right feed url
+                feedUrl = url;
+            else if (urls.Count() == 1)
+                feedUrl = urls.First().Url;
+            else if (urls.Count() == 2
+            ) // if 2 urls, then its usually a feed and a comments feed, so take the first per default
+                feedUrl = urls.First().Url;
+
+            return feedUrl;
+        }
+
+        public static async Task<bool> IsValidUrlFeed(this string url)
+        {
+            bool isValid = false;
+            try
+            {
+                var feed = await FeedReader.ReadAsync(url);
+                ConsoleHelper.WriteLine(feed.ToJson());
+                isValid = true;
+            }
+            catch (Exception ex)
+            {
+                ConsoleHelper.WriteLine(ex.Message);
+                // ConsoleHelper.WriteLine(ex.ToString());
+            }
+
+            ConsoleHelper.WriteLine($"{url} IsValidUrlFeed: {isValid}");
+
+            return isValid;
         }
     }
 }

@@ -127,6 +127,12 @@ namespace WinTenBot.Helpers
                    && (uriResult.Scheme == Uri.UriSchemeHttps || uriResult.Scheme == Uri.UriSchemeHttp);
         }
 
+        public static string GetBaseUrl(this string url)
+        {
+            var uri = new Uri(url);
+            return uri.Host;
+        }
+
         public static async Task<string> GetUrlRssFeed(string url)
         {
             var urls = await FeedReader.GetFeedUrlsFromUrlAsync(url);
