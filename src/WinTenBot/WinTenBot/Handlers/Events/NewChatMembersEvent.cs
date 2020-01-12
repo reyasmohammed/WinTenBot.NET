@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -46,7 +46,7 @@ namespace WinTenBot.Handlers.Events
             
             if (allNewMember.Length > 0)
             {
-                var chatSettings = await _settingsService.GetMappedSettingsByGroup();
+                var chatSettings = await _settingsService.GetSettingByGroup();
 
                 var chatTitle = msg.Chat.Title;
                 var memberCount = await _chatProcessor.GetMemberCount();

@@ -29,10 +29,10 @@ namespace WinTenBot.Handlers.Commands.Welcome
             {
                 var chatTitle = msg.Chat.Title;
                 var settings = await _settingsService.GetSettingByGroup();
-                var welcomeMessage = settings.Rows[0]["welcome_message"].ToString();
-                var welcomeButton = settings.Rows[0]["welcome_button"].ToString();
-                var welcomeMedia = settings.Rows[0]["welcome_media"].ToString();
-                var welcomeMediaType = settings.Rows[0]["welcome_media_type"].ToString();
+                var welcomeMessage = settings.WelcomeMessage;
+                var welcomeButton = settings.WelcomeButton;
+                var welcomeMedia = settings.WelcomeMedia;
+                var welcomeMediaType = settings.WelcomeMediaType;
                 var splitWelcomeButton = welcomeButton.Split(',').ToList<string>();
 
                 var keyboard = welcomeButton.ToReplyMarkup(2);

@@ -31,7 +31,8 @@ namespace WinTenBot.Handlers.Commands.Rules
                     var settings = await _settingsService.GetSettingByGroup();
                     await _settingsService.UpdateCache();
                     ConsoleHelper.WriteLine(settings.ToJson());
-                    var rules = settings.Rows[0]["rules_text"].ToString();
+                    // var rules = settings.Rows[0]["rules_text"].ToString();
+                    var rules = settings.RulesText;
                     ConsoleHelper.WriteLine(rules);
                     sendText = rules;
                 }

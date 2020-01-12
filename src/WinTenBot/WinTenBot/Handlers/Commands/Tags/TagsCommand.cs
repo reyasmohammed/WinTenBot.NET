@@ -1,6 +1,7 @@
-using System.Data;
+﻿using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
+using Hangfire.LiteDB;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 using WinTenBot.Helpers;
@@ -46,15 +47,19 @@ namespace WinTenBot.Handlers.Commands.Tags
                        $"\n{tagsStr}";
 
             await _chatProcessor.EditAsync(sendText);
+            
+            //            var jsonSettings = TextHelper.ToJson(currentSetting);
+            //            ConsoleHelper.WriteLine($"CurrentSettings: {jsonSettings}");
+
+            // var lastTagsMsgId = int.Parse(currentSetting.Rows[0]["last_tags_message_id"].ToString());
 
             var currentSetting = await _settingsService.GetSettingByGroup();
-//            var jsonSettings = TextHelper.ToJson(currentSetting);
-//            ConsoleHelper.WriteLine($"CurrentSettings: {jsonSettings}");
-            
-            var lastTagsMsgId = int.Parse(currentSetting.Rows[0]["last_tags_message_id"].ToString());
+            var lastTagsMsgId = currentSetting.LastTagsMessageId;
             ConsoleHelper.WriteLine($"LastTagsMsgId: {lastTagsMsgId}");
 
-            await _chatProcessor.DeleteAsync(lastTagsMsgId);
+            await _chatProcessor.DeleteAsync(lastTagsMsgId.ToInt());
+
+            await _tagsService.UpdateCacheAsync(msg);
 
             ConsoleHelper.WriteLine(_chatProcessor.SentMessageId);
             await _settingsService.UpdateCell("last_tags_message_id", _chatProcessor.SentMessageId);

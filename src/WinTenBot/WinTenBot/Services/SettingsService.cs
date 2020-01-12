@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
+using SqlKata;
+using SqlKata.Execution;
 using Telegram.Bot.Types;
 using WinTenBot.Helpers;
 using WinTenBot.Model;
@@ -8,84 +10,89 @@ using WinTenBot.Providers;
 
 namespace WinTenBot.Services
 {
-    public class SettingsService : Query
+    public class SettingsService
     {
-        private readonly MySqlProvider _mySqlProvider;
         private string baseTable = "group_settings";
         private Chat Chat { get; set; }
 
         public SettingsService(Chat chat)
         {
-            _mySqlProvider = new MySqlProvider();
             Chat = chat;
         }
 
-        public async Task<DataTable> GetSettingByGroup()
+        public async Task<bool> IsSettingExist()
+        {
+            var where = new Dictionary<string, object>() {{"chat_id", Chat.Id}};
+            
+            var data = await new Query(baseTable)
+                .Where(where)
+                .ExecForMysql()
+                .GetAsync();
+            var isExist = data.Any();
+            
+            ConsoleHelper.WriteLine($"Group setting IsExist: {isExist}");
+            return isExist;
+        }
+
+        public async Task<ChatSetting> GetSettingByGroup()
         {
             var where = new Dictionary<string, object>()
             {
-                {"chat_id",Chat.Id}
+                {"chat_id", Chat.Id}
             };
 
-            var isExist = await IsDataExist(baseTable, where);
-            ConsoleHelper.WriteLine($"Group setting IsExist: {isExist}");
-            if (!isExist)
-            {
-                ConsoleHelper.WriteLine($"Inserting new data for {Chat.Id}");
-                var insert = new Dictionary<string, object>()
-                {
-                    {"chat_id", Chat.Id},
-                    {"chat_title",Chat.Title}
-                };
-                await Insert(baseTable, insert);
-            }
+            var data = await new Query(baseTable)
+                .Where(where)
+                .ExecForMysql()
+                .GetAsync();
 
-            var sql = $"SELECT * FROM {baseTable} WHERE chat_id = '{Chat.Id}'";
-            var data = await _mySqlProvider.ExecQueryAsync(sql);
-            return data;
+            var mapped = data.ToJson().MapObject<List<ChatSetting>>();
+
+            return mapped.FirstOrDefault();
         }
 
         public async Task SaveSettingsAsync(Dictionary<string, object> data)
         {
-            var where = new Dictionary<string, object>() {{"chat_id",data["chat_id"]}};
-            var isExist = await IsDataExist(baseTable, where);
+            var where = new Dictionary<string, object>() {{"chat_id", data["chat_id"]}};
+            // var isExist = await IsDataExist(baseTable, where);
+            
+            var check = await new Query(baseTable)
+                .Where(where)
+                .ExecForMysql()
+                .GetAsync();
+            var isExist = check.Any();
             
             ConsoleHelper.WriteLine($"Group setting IsExist: {isExist}");
             if (!isExist)
             {
                 ConsoleHelper.WriteLine($"Inserting new data for {Chat.Id}");
-                await Insert(baseTable, data);
+                // await Insert(baseTable, data);
+                
+                var insert = await new Query(baseTable)
+                    .ExecForMysql()
+                    .InsertAsync(data);
             }
             else
             {
                 ConsoleHelper.WriteLine($"Updating data for {Chat.Id}");
-                await Update(baseTable, data, where);
+                // await Update(baseTable, data, where);
+                
+                var insert = await new Query(baseTable)
+                    .Where(where)
+                    .ExecForMysql()
+                    .UpdateAsync(data);
             }
-        }
-
-        public async Task<ChatSettings> GetMappedSettingsByGroup()
-        {
-            var chatSettings = new ChatSettings();
-            var settings = await GetSettingByGroup();
-            
-            if (settings.Rows.Count <= 0) return chatSettings;
-            
-            chatSettings.ChatId = Chat.Id;
-            chatSettings.WelcomeMessage = settings.Rows[0]["welcome_message"].ToString(); 
-            chatSettings.WelcomeButton = settings.Rows[0]["welcome_button"].ToString();
-            chatSettings.WelcomeMedia = settings.Rows[0]["welcome_media"].ToString();
-            chatSettings.WelcomeMediaType = settings.Rows[0]["welcome_media_type"].ToString();
-
-            return chatSettings;
         }
 
         public async Task UpdateCell(string key, object value)
         {
-            var sql = $"UPDATE {baseTable} " +
-                      $"SET {key} = '{value}' " +
-                      $"WHERE chat_id = '{Chat.Id}'";
-
-            await _mySqlProvider.ExecNonQueryAsync(sql);
+            var where = new Dictionary<string, object>() {{"chat_id", Chat.Id}};
+            var data = new Dictionary<string, object>() {{key, value}};
+            
+            await new Query(baseTable)
+                .Where(where)
+                .ExecForMysql()
+                .UpdateAsync(data);
         }
 
         public async Task UpdateCache()
