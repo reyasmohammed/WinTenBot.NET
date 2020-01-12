@@ -20,6 +20,8 @@ namespace WinTenBot.Helpers
         public static int SentMessageId { get; private set; }
         public static int EditedMessageId { get; private set; }
         public static int CallBackMessageId { get; set; }
+        private static string TimeInit { get; set; }
+        private static string TimeProc { get; set; }
 
         public static void Init(IUpdateContext updateContext)
         {
@@ -28,6 +30,7 @@ namespace WinTenBot.Helpers
             Message = updateContext.Update.CallbackQuery != null
                 ? updateContext.Update.CallbackQuery.Message
                 : updateContext.Update.Message;
+            TimeInit = Message.Date.GetDelay();
         }
 
         public static void Close()
@@ -51,10 +54,13 @@ namespace WinTenBot.Helpers
             // {
             //     replyToMsgId = Message.ReplyToMessage.MessageId;
             // }
+            
+            TimeProc = Message.Date.GetDelay();
 
-            var date = Message.Date;
-            //            ConsoleHelper.WriteLine(date);
-            //            sendText += TimeHelper.Delay(_updateContext.Update.Message.Date);
+            if (sendText != "")
+            {
+                sendText += $"\n\n⏱ <code>{TimeInit} s</code> | ⌛️ <code>{TimeProc} s</code>";
+            }
 
             var chatTarget = Message.Chat.Id;
             if (customChatId < -1)
@@ -122,9 +128,14 @@ namespace WinTenBot.Helpers
 
         public static async Task EditAsync(this string sendText, InlineKeyboardMarkup replyMarkup = null)
         {
-            Message edit = null;
+            TimeProc = Message.Date.GetDelay();
 
-            edit = await Client.EditMessageTextAsync(
+            if (sendText != "")
+            {
+                sendText += $"\n\n⏱ <code>{TimeInit} s</code> | ⌛️ <code>{TimeProc} s</code>";
+            }
+
+            var edit = await Client.EditMessageTextAsync(
                 Message.Chat,
                 SentMessageId,
                 sendText,
