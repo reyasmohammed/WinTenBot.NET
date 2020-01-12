@@ -21,6 +21,7 @@ namespace WinTenBot.Scheduler
                 ConsoleHelper.WriteLine("Initializing RSS Scheduler.");
 
                 var baseId = "rss-scheduler";
+                var cronInMinute = 10;
                 var rssService = new RssService();
 
                 ConsoleHelper.WriteLine("Getting list Chat ID");
@@ -35,7 +36,8 @@ namespace WinTenBot.Scheduler
                     ConsoleHelper.WriteLine($"Creating Jobs for {chatId}");
 
                     RecurringJob.RemoveIfExists(recurringId);
-                    RecurringJob.AddOrUpdate(recurringId, () => RssHelper.ExecBroadcasterAsync(chatId), "*/10 * * * *");
+                    RecurringJob.AddOrUpdate(recurringId, ()
+                        => RssHelper.ExecBroadcasterAsync(chatId), $"*/{cronInMinute} * * * *");
                 }
 
                 ConsoleHelper.WriteLine("Registering RSS Scheduler complete.");
