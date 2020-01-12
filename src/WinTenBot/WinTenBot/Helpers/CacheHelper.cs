@@ -9,7 +9,7 @@ namespace WinTenBot.Helpers
     {
         private static string workingDir = "Storage/Caches";
 
-        public static async Task WriteCacheAsync(this DataTable dataTable, string fileJson, bool indented = true)
+        public static async Task WriteCacheAsync(this object dataTable, string fileJson, bool indented = true)
         {
             var filePath = $"{workingDir}/{fileJson}";
             Directory.CreateDirectory(Path.GetDirectoryName(filePath));

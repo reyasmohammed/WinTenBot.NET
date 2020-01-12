@@ -215,6 +215,14 @@ namespace WinTenBot.Helpers
             return isAdmin;
         }
 
+        public static async Task<bool> IsAdminOrPrivateChat()
+        {
+            var isAdmin = await IsAdminGroup();
+            var isPrivateChat = IsPrivateChat();
+            
+            return isAdmin || isPrivateChat;
+        }
+
         public static bool IsSudoer()
         {
             return Message.From.Id.IsSudoer();
