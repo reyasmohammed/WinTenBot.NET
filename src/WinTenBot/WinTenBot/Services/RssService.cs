@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ namespace WinTenBot.Services
     {
         private string baseTable = "rss_history";
         private string rssSettingTable = "rss_settings";
-        
+
         private Message _message;
 
         public RssService()
@@ -28,7 +29,8 @@ namespace WinTenBot.Services
             _message = message;
             // _mySqlProvider = new MySqlProvider();
         }
-        public async Task<bool> IsExistInHistory(Dictionary<string,object> where)
+
+        public async Task<bool> IsExistInHistory(Dictionary<string, object> where)
         {
             var data = await new Query(baseTable)
                 .Where(where)
@@ -42,25 +44,25 @@ namespace WinTenBot.Services
         public async Task<bool> IsExistRssAsync(string urlFeed)
         {
             var data = await new Query(rssSettingTable)
-                .Where("chat_id",_message.Chat.Id)
-                .Where("url_feed",urlFeed)
+                .Where("chat_id", _message.Chat.Id)
+                .Where("url_feed", urlFeed)
                 .ExecForMysql()
                 .GetAsync();
-            
+
             ConsoleHelper.WriteLine($"Check RSS Setting: {data.Count().ToBool()}");
 
             return data.Any();
         }
 
-        public async Task<bool> SaveRssSettingAsync(Dictionary<string,object> data)
+        public async Task<bool> SaveRssSettingAsync(Dictionary<string, object> data)
         {
             var insert = await new Query(rssSettingTable)
                 .ExecForMysql()
                 .InsertAsync(data);
             return insert.ToBool();
         }
-        
-        public async Task<bool> SaveRssAsync(Dictionary<string,object> data)
+
+        public async Task<bool> SaveRssAsync(Dictionary<string, object> data)
         {
             var insert = await new Query(baseTable)
                 .ExecForMysql()
@@ -71,17 +73,17 @@ namespace WinTenBot.Services
 
         public async Task<List<RssSetting>> GetRssSettingsAsync(string chatId)
         {
-            var data =  await new Query(rssSettingTable)
+            var data = await new Query(rssSettingTable)
                 .Where("chat_id", chatId)
                 .ExecForMysql()
                 .GetAsync();
 
             var mapped = data.ToJson().MapObject<List<RssSetting>>();
             // ConsoleHelper.WriteLine(mapped.ToJson());
-            
+
             ConsoleHelper.WriteLine($"Get RSS Settings: {data.Count()}");
             return mapped;
-            
+
             // return data.ToJson().ToDataTable();
         }
 
@@ -94,11 +96,24 @@ namespace WinTenBot.Services
                 .GetAsync();
 
             var mapped = data.ToJson().MapObject<List<RssSetting>>();
-            
+
             ConsoleHelper.WriteLine($"Get List ChatID: {data.Count()}");
             return mapped;
-            
+
             // return data.ToJson().ToDataTable();
+        }
+
+        public async Task<bool> DeleteRssAsync(string urlFeed)
+        {
+            var delete = await new Query(rssSettingTable)
+                .Where("chat_id", _message.Chat.Id)
+                .Where("url_feed", urlFeed)
+                .ExecForMysql()
+                .DeleteAsync();
+            
+            $"Delete {urlFeed} status: {delete.ToBool()}".ToConsoleStamp();
+
+            return delete.ToBool();
         }
     }
 }

@@ -93,6 +93,7 @@ namespace WinTenBot
                 .AddScoped<AddNotesCommand>();
 
             services.AddScoped<SetRssCommand>()
+                .AddScoped<DelRssCommand>()
                 .AddScoped<RssInfoCommand>()
                 .AddScoped<RssPullCommand>();
 
@@ -217,6 +218,7 @@ namespace WinTenBot
                                     .UseCommand<BanCommand>("ban")
                                     .UseCommand<DebugCommand>("dbg")
                                     .UseCommand<DelBanCommand>("dban")
+                                    .UseCommand<DelRssCommand>("delrss")
                                     .UseCommand<DemoteCommand>("demote")
                                     .UseCommand<GlobalBanCommand>("gban")
                                     .UseCommand<HelpCommand>("help")
