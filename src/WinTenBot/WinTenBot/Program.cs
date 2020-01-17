@@ -11,6 +11,7 @@ namespace WinTenBot
         public static void Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Verbose()
                 .WriteTo.Console()
                 .WriteTo.File("Storage/Logs/Logs-.txt", 
                     rollingInterval: RollingInterval.Day,

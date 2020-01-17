@@ -42,6 +42,10 @@ namespace WinTenBot
         {
             Configuration = configuration;
 
+            GlobalConfiguration.Configuration
+                .UseSerilogLogProvider()
+                .UseColouredConsoleLogProvider();
+
             Bot.GlobalConfiguration = Configuration;
             Bot.DbConnectionString = Configuration["CommonConfig:ConnectionString"];
 
