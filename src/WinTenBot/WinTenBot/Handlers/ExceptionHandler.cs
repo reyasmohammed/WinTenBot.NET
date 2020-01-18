@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 
@@ -18,10 +19,11 @@ namespace WinTenBot.Handlers
             }
             catch (Exception e)
             {
-                Console.BackgroundColor = ConsoleColor.Black;
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("An error occured in handling update {0}.{1}{2}", u.Id, Environment.NewLine, e);
-                Console.ResetColor();
+                Log.Error(e,"Exception Handler");
+                // Console.BackgroundColor = ConsoleColor.Black;
+                // Console.ForegroundColor = ConsoleColor.Red;
+                Log.Error("An error occured in handling update {0}.{1}{2}", u.Id, Environment.NewLine, e);
+                // Console.ResetColor();
             }
         }
     }
