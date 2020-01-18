@@ -5,6 +5,7 @@ using SqlKata;
 using SqlKata.Execution;
 using Telegram.Bot.Types;
 using WinTenBot.Helpers;
+using WinTenBot.Migration;
 using WinTenBot.Model;
 using WinTenBot.Providers;
 
@@ -24,6 +25,9 @@ namespace WinTenBot.Services
 
         public async Task<bool> IsExistInHistory(Dictionary<string, object> where)
         {
+            var isExist = await baseTable.IfTableExistAsync();
+            await isExist.MigrateRssHistory();
+            
             var data = await new Query(baseTable)
                 .Where(where)
                 .ExecForSqLite(true)
@@ -56,6 +60,9 @@ namespace WinTenBot.Services
 
         public async Task<bool> SaveRssHistoryAsync(Dictionary<string, object> data)
         {
+            var isExist = await baseTable.IfTableExistAsync();
+            await isExist.MigrateRssHistory();
+            
             var insert = await new Query(baseTable)
                 .ExecForSqLite(true)
                 .InsertAsync(data);
