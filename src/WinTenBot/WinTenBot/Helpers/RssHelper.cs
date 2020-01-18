@@ -23,8 +23,11 @@ namespace WinTenBot.Helpers
 
             Log.Information("Getting RSS settings..");
             var rssSettings = await rssService.GetRssSettingsAsync(chatId);
-            foreach (RssSetting rssSetting in rssSettings)
+            
+            var tasks = rssSettings.Select(async rssSetting =>
             {
+            // foreach (RssSetting rssSetting in rssSettings)
+            // {
                 var rssUrl = rssSetting.UrlFeed;
 
                 // var rssUrl = rssSetting["url_feed"].ToString();
@@ -87,9 +90,9 @@ namespace WinTenBot.Helpers
                             catch (ChatNotFoundException chatNotFoundException)
                             {
                                 Log.Information($"May Bot not added in {chatId}.");
-                                Log.Error(chatNotFoundException,"Chat Not Found");
+                                Log.Error(chatNotFoundException, "Chat Not Found");
                                 // ConsoleHelper.WriteLine($"May Bot not added in {chatId}." +
-                                                        // $"\n{chatNotFoundException.Message}");
+                                // $"\n{chatNotFoundException.Message}");
                             }
                         }
                         else
@@ -100,14 +103,17 @@ namespace WinTenBot.Helpers
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(ex,"Broadcasting RSS Feed.");
+                    Log.Error(ex, "Broadcasting RSS Feed.");
                     Thread.Sleep(4000);
-                    
+
                     // ConsoleHelper.WriteLine(ex.Message);
                     // ConsoleHelper.WriteLine(ex.ToString());
                 }
-            }
+            // }
+            });
 
+            await Task.WhenAll(tasks);
+            
             Log.Information($"RSS Scheduler finished. New RSS Count: {newRssCount}");
 
             return newRssCount;
@@ -143,7 +149,7 @@ namespace WinTenBot.Helpers
             }
             catch (Exception ex)
             {
-                Log.Error(ex,"Validating RSS Feed");
+                Log.Error(ex, "Validating RSS Feed");
                 // ConsoleHelper.WriteLine(ex.Message);
                 // ConsoleHelper.WriteLine(ex.ToString());
             }
