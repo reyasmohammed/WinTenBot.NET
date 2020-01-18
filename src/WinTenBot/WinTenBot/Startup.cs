@@ -134,7 +134,7 @@ namespace WinTenBot
 
             // Hangfire
             services.AddHangfireServer();
-            services.AddHangfire(t => t.UseLiteDbStorage(Configuration["CommonConfig:HangfireLiteDb"]));
+            services.AddHangfire(t => t.UseLiteDbStorage(Configuration["Hangfire:LiteDb"]));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
