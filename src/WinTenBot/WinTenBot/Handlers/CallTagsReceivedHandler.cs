@@ -24,6 +24,7 @@ namespace WinTenBot.Handlers
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
             chatProcessor = new ChatProcessor(context);
+            
             Message msg = context.Update.Message;
             ConsoleHelper.WriteLine("Tags Received..");
             var partsText = msg.Text.Split(new char[] { ' ', '\n', ',' })
@@ -36,12 +37,15 @@ namespace WinTenBot.Handlers
             {
                 ConsoleHelper.WriteLine("Processing : " + split.TrimStart('#'));
                 //                await chatProcessor.SendAsync($"This is tag of {split}");
-                var tagData = tagsService.GetTagByTag(msg.Chat.Id, split.TrimStart('#'));
-                var json = tagData.Result.ToJson();
+                var tagData = await tagsService.GetTagByTag(msg.Chat.Id, split.TrimStart('#'));
+                var json = tagData.ToJson();
                 Console.WriteLine(json);
 
-                var content = tagData.Result.Rows[0]["content"].ToString();
-                var buttonStr = tagData.Result.Rows[0]["btn_data"].ToString();
+                // var content = tagData.Result.Rows[0]["content"].ToString();
+                // var buttonStr = tagData.Result.Rows[0]["btn_data"].ToString();
+                
+                var content = tagData[0].Content;
+                var buttonStr = tagData[0].BtnData;
 
                 IReplyMarkup buttonMarkup = null;
                 if (buttonStr != "")

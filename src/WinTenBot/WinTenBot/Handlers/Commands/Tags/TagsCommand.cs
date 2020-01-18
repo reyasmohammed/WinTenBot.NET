@@ -38,12 +38,12 @@ namespace WinTenBot.Handlers.Commands.Tags
             var tagsData = await _tagsService.GetTagsByGroupAsync("*", msg.Chat.Id);
             var tagsStr = string.Empty;
 
-            foreach (DataRow tag in tagsData.Rows)
+            foreach (var tag in tagsData)
             {
-                tagsStr += $"#{tag["tag"]} ";
+                tagsStr += $"#{tag.Tag} ";
             }
 
-            sendText = $"#️⃣<b>{tagsData.Rows.Count} Tags</b>\n" +
+            sendText = $"#️⃣<b> {tagsData.Count} Tags</b>\n" +
                        $"\n{tagsStr}";
 
             await _chatProcessor.EditAsync(sendText);

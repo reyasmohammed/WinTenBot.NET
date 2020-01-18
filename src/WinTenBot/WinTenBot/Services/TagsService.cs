@@ -1,62 +1,108 @@
 ﻿using System.Collections.Generic;
-using System.Data;
 using System.Threading.Tasks;
+using Serilog;
+using SqlKata;
+using SqlKata.Execution;
+using Telegram.Bot.Types;
 using WinTenBot.Helpers;
 using WinTenBot.Interfaces;
+using WinTenBot.Model;
 using WinTenBot.Providers;
 
 namespace WinTenBot.Services
 {
     public class TagsService : ITagsService
     {
-        private MySqlProvider _mySqlProvider;
         private string baseTable = "tags";
-
-        public TagsService()
-        {
-            _mySqlProvider = new MySqlProvider();
-        }
+        private string jsonCache = "tags.json";
 
         public async Task<bool> IsExist(long chatId, string tagVal)
         {
             var data = await GetTagByTag(chatId, tagVal);
-            return data.Rows.Count > 0;
+            return data.Count > 0;
         }
 
-        public async Task<DataTable> GetTagsAsync()
+        public async Task<List<CloudTag>> GetTagsAsync()
         {
-            var data = await _mySqlProvider.ExecQueryAsync("SELECT * FROM tags");
-            return data;
+            var query = await new Query("tags")
+                .GetAsync();
+
+            var mapped = query.ToJson().MapObject<List<CloudTag>>();
+            return mapped;
+
+            // var data = await _mySqlProvider.ExecQueryAsync("SELECT * FROM tags");
+            // return data;
         }
 
-        public async Task<DataTable> GetTagsByGroupAsync(string column, long chatId)
+        public async Task<List<CloudTag>> GetTagsByGroupAsync(string column, long chatId)
         {
-            var sql = $"SELECT {column} FROM tags WHERE id_chat = '{chatId}' ORDER BY tag";
-            var data = await _mySqlProvider.ExecQueryAsync(sql);
-            return data;
+            var query = await new Query("tags")
+                .Where("id_chat", chatId)
+                .OrderBy("tag")
+                .ExecForMysql()
+                .GetAsync();
+
+            var mapped = query.ToJson().MapObject<List<CloudTag>>();
+
+            Log.Debug(mapped.ToJson(true));
+            return mapped;
+
+            // Log.Debug($"tags: {query.ToJson(true)}");
+
+            // var sql = $"SELECT {column} FROM tags WHERE id_chat = '{chatId}' ORDER BY tag";
+            // var data = await _mySqlProvider.ExecQueryAsync(sql);
+            // return data;
         }
 
-        public async Task<DataTable> GetTagByTag(long chatId, string tag)
+        public async Task<List<CloudTag>> GetTagByTag(long chatId, string tag)
         {
-            var sql = $"SELECT * FROM tags WHERE id_chat = '{chatId}' AND tag = '{tag}' ORDER BY tag";
-            var data = await _mySqlProvider.ExecQueryAsync(sql);
-            return data;
+            var query = await new Query("tags")
+                .Where("id_chat", chatId)
+                .Where("tag", tag)
+                .OrderBy("tag")
+                .ExecForMysql()
+                .GetAsync();
+
+            var mapped = query.ToJson().MapObject<List<CloudTag>>();
+
+            Log.Debug(mapped.ToJson(true));
+            return mapped;
+
+            // var sql = $"SELECT * FROM tags WHERE id_chat = '{chatId}' AND tag = '{tag}' ORDER BY tag";
+            // var data = await _mySqlProvider.ExecQueryAsync(sql);
+            // return data;
         }
 
         public async Task SaveTag(Dictionary<string, object> data)
         {
             var json = TextHelper.ToJson(data);
             ConsoleHelper.WriteLine(json);
+            var insert = await new Query("tags")
+                .ExecForMysql()
+                .InsertAsync(data);
 
-            var insert = await _mySqlProvider.Insert("tags", data);
+                // var insert = await _mySqlProvider.Insert("tags", data);
             ConsoleHelper.WriteLine($"SaveTag: {insert}");
         }
 
         public async Task<bool> DeleteTag(long chatId, string tag)
         {
-            var sql = $"DELETE FROM {baseTable} WHERE id_chat = '{chatId}' AND tag = '{tag}'";
-            var delete = await _mySqlProvider.ExecNonQueryAsync(sql);
-            return delete.ToBool();
+            var delete = await new Query("tags")
+                .ExecForMysql()
+                .Where("id_chat",chatId)
+                .Where("tag",tag)
+                .DeleteAsync();
+            
+            // var sql = $"DELETE FROM {baseTable} WHERE id_chat = '{chatId}' AND tag = '{tag}'";
+            // var delete = await _mySqlProvider.ExecNonQueryAsync(sql);
+            return delete > 0;
+        }
+
+        public async Task UpdateCacheAsync(Message message)
+        {
+            var chatId = message.Chat.Id;
+            var data = await GetTagsByGroupAsync("*", chatId);
+            data.BackgroundWriteCache($"{chatId}/{jsonCache}");
         }
     }
 }
