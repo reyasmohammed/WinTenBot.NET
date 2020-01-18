@@ -20,6 +20,8 @@ mono_crash.*
 
 # wintendev
 Storage/Caches/
+Storage/Logs/
+
 appsettings.json
 Hangfire_LiteDb.db
 
@@ -357,4 +359,3 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
-
