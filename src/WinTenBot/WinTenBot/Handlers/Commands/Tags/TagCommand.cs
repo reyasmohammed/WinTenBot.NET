@@ -72,6 +72,8 @@ namespace WinTenBot.Handlers.Commands.Tags
 //                        );
 
                         await _chatProcessor.EditAsync("✅ Tag berhasil di simpan..");
+
+                        await _tagsService.UpdateCacheAsync(msg);
                         return;
                     }
 
