@@ -19,7 +19,7 @@ namespace WinTenBot.Helpers
             ConsoleHelper.WriteLine("Writing cache success..");
         }
 
-        public static void BackgroundWriteCache(this DataTable dataTable, string fileJson)
+        public static void BackgroundWriteCache(this object dataTable, string fileJson)
         {
             var jobId = BackgroundJob.Enqueue(() => WriteCacheAsync(dataTable, fileJson, true));
             ConsoleHelper.WriteLine($"Background Write Cache scheduled with ID: {jobId}");
