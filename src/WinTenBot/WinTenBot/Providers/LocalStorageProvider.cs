@@ -1,5 +1,8 @@
 ﻿using System.Data.SQLite;
 using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Serilog;
 using SqlKata;
 using SqlKata.Compilers;
@@ -31,6 +34,32 @@ namespace WinTenBot.Providers
             if (printSql) factory.Logger = sqlResult => { Log.Debug($"SQLiteExec: {sqlResult}"); };
 
             return factory.FromQuery(query);
+        }
+
+        public static async Task<int> ExecForSqLite(this string sql, bool printSql = false, object param = null)
+        {
+            var connection = InitSqLite();
+            
+            var factory = new QueryFactory(connection, new SqliteCompiler());
+
+            if (printSql) factory.Logger = sqlResult => { Log.Debug($"SQLiteExec: {sqlResult}"); };
+
+            return await factory.StatementAsync(sql, param);
+        }
+
+        public static async Task<bool> IfTableExistAsync(this string tableName)
+        {
+            var query = await new Query("sqlite_master")
+                .Where("type","table")
+                .Where("name",tableName)
+                .ExecForSqLite(true)
+                .GetAsync();
+            
+            var isExist = query.Any();
+            
+            Log.Debug($"Is {tableName} exist: {isExist}");
+            
+            return isExist;
         }
     }
 }
