@@ -1,8 +1,10 @@
-﻿using MySql.Data.MySqlClient;
+﻿using System.Data.SQLite;
+using System.IO;
+using MySql.Data.MySqlClient;
+using Serilog;
 using SqlKata;
 using SqlKata.Compilers;
 using SqlKata.Execution;
-using WinTenBot.Helpers;
 using WinTenBot.Model;
 
 namespace WinTenBot.Providers
@@ -15,7 +17,11 @@ namespace WinTenBot.Providers
 
             var factory = new QueryFactory(connection, new MySqlCompiler())
             {
-                Logger = result => { ConsoleHelper.WriteLine($"MySqlExec: {result}"); }
+                Logger = result =>
+                {
+                    // ConsoleHelper.WriteLine($"MySqlExec: {result}"); 
+                    Log.Debug($"MySqlExec: {result}");
+                }
             };
 
             return factory;
@@ -27,10 +33,15 @@ namespace WinTenBot.Providers
 
             var factory = new QueryFactory(connection, new MySqlCompiler())
             {
-                Logger = sql => { ConsoleHelper.WriteLine($"MySqlExec: {sql}"); }
+                Logger = sql =>
+                {
+                    Log.Debug($"MySqlExec: {sql}");
+                    // ConsoleHelper.WriteLine($"MySqlExec: {sql}");
+                }
             };
 
             return factory.FromQuery(query);
         }
+
     }
 }

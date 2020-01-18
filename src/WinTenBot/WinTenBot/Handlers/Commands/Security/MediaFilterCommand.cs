@@ -62,7 +62,7 @@ namespace WinTenBot.Handlers.Commands.Security
                     "terima kasih atas laporan nya.";
             }
 
-            await _chatProcessor.SendAsync(sendText, replyToReplied: true);
+            await _chatProcessor.SendAsync(sendText);
         }
     }
 }

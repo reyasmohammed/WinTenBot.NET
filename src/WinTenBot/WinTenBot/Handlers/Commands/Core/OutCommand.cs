@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Hangfire.LiteDB;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
