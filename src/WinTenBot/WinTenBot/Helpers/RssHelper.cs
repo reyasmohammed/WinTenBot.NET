@@ -16,12 +16,12 @@ namespace WinTenBot.Helpers
     {
         public static async Task<int> ExecBroadcasterAsync(string chatId)
         {
-            ConsoleHelper.WriteLine("Starting RSS Scheduler.");
+            Log.Information("Starting RSS Scheduler.");
             int newRssCount = 0;
 
             var rssService = new RssService();
 
-            ConsoleHelper.WriteLine("Getting RSS settings..");
+            Log.Information("Getting RSS settings..");
             var rssSettings = await rssService.GetRssSettingsAsync(chatId);
             foreach (RssSetting rssSetting in rssSettings)
             {
@@ -44,8 +44,7 @@ namespace WinTenBot.Helpers
                         // Prevent flood in first time;
                         if (castLimit == castStep)
                         {
-                            ConsoleHelper.WriteLine(
-                                $"Send stopped due limit {castLimit} for prevent flooding in first time");
+                            Log.Information($"Send stopped due limit {castLimit} for prevent flooding in first time");
                             break;
                         }
 
@@ -63,7 +62,7 @@ namespace WinTenBot.Helpers
                         var isExist = await rssService.IsExistInHistory(where);
                         if (!isExist)
                         {
-                            ConsoleHelper.WriteLine($"Sending feed to {chatId}");
+                            Log.Information($"Sending feed to {chatId}");
 
                             try
                             {
@@ -79,21 +78,23 @@ namespace WinTenBot.Helpers
                                     {"author", rssFeed.Author}
                                 };
 
-                                ConsoleHelper.WriteLine($"Writing to RSS History");
-                                await rssService.SaveRssAsync(data);
+                                Log.Information($"Writing to RSS History");
+                                await rssService.SaveRssHistoryAsync(data);
 
                                 castStep++;
                                 newRssCount++;
                             }
                             catch (ChatNotFoundException chatNotFoundException)
                             {
-                                ConsoleHelper.WriteLine($"May Bot not added in {chatId}." +
-                                                        $"\n{chatNotFoundException.Message}");
+                                Log.Information($"May Bot not added in {chatId}.");
+                                Log.Error(chatNotFoundException,"Chat Not Found");
+                                // ConsoleHelper.WriteLine($"May Bot not added in {chatId}." +
+                                                        // $"\n{chatNotFoundException.Message}");
                             }
                         }
                         else
                         {
-                            ConsoleHelper.WriteLine($"This feed has sent to {chatId}");
+                            Log.Information($"This feed has sent to {chatId}");
                         }
                     }
                 }
@@ -107,16 +108,16 @@ namespace WinTenBot.Helpers
                 }
             }
 
-            ConsoleHelper.WriteLine($"RSS Scheduler finished. New RSS Count: {newRssCount}");
+            Log.Information($"RSS Scheduler finished. New RSS Count: {newRssCount}");
 
             return newRssCount;
         }
 
         public static async Task<string> FindUrlFeed(this string url)
         {
-            ConsoleHelper.WriteLine($"Scanning {url} ..");
+            Log.Information($"Scanning {url} ..");
             var urls = await FeedReader.GetFeedUrlsFromUrlAsync(url);
-            ConsoleHelper.WriteLine($"UrlFeeds: {urls.ToJson()}");
+            Log.Information($"UrlFeeds: {urls.ToJson()}");
 
             string feedUrl = "";
 
@@ -147,7 +148,7 @@ namespace WinTenBot.Helpers
                 // ConsoleHelper.WriteLine(ex.ToString());
             }
 
-            ConsoleHelper.WriteLine($"{url} IsValidUrlFeed: {isValid}");
+            Log.Debug($"{url} IsValidUrlFeed: {isValid}");
 
             return isValid;
         }
