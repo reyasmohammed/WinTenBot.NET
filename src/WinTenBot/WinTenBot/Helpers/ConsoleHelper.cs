@@ -1,4 +1,5 @@
 ﻿using System;
+using Serilog;
 
 namespace WinTenBot.Helpers
 {
@@ -18,8 +19,11 @@ namespace WinTenBot.Helpers
         public static void WriteLine(object message)
         {
             if (message == null) return;
-            var forConsole = BuildMsg(message);
-            Console.WriteLine(forConsole);
+            
+            Log.Information(message.ToString());
+            
+            // var forConsole = BuildMsg(message);
+            // Console.WriteLine(forConsole);
         }
 
         public static void Write(object message)

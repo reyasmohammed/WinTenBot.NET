@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Framework.Abstractions;
@@ -54,7 +55,7 @@ namespace WinTenBot.Helpers
             // {
             //     replyToMsgId = Message.ReplyToMessage.MessageId;
             // }
-            
+
             TimeProc = Message.Date.GetDelay();
 
             if (sendText != "")
@@ -82,8 +83,8 @@ namespace WinTenBot.Helpers
             }
             catch (ApiRequestException apiRequestException)
             {
-                ConsoleHelper.WriteLine($"SendMessage: {apiRequestException.Message}");
-
+                // ConsoleHelper.WriteLine($"SendMessage: {apiRequestException.Message}");
+Log.Error(apiRequestException,"Send Message with reply (default) Exception.");
                 try
                 {
                     ConsoleHelper.WriteLine($"Try Sending message to {chatTarget} without reply to Msg Id.");
@@ -96,8 +97,8 @@ namespace WinTenBot.Helpers
                 }
                 catch (ApiRequestException apiRequestException2)
                 {
-                    ConsoleHelper.WriteLine(
-                        $"SendMessage: {apiRequestException2.ErrorCode}: {apiRequestException2.Message}");
+                    // ConsoleHelper.WriteLine($"SendMessage: {apiRequestException2.ErrorCode}: {apiRequestException2.Message}");
+                    Log.Error(apiRequestException2,"Send Message without reply Exception.");
                 }
             }
 
@@ -129,21 +130,30 @@ namespace WinTenBot.Helpers
         public static async Task EditAsync(this string sendText, InlineKeyboardMarkup replyMarkup = null)
         {
             TimeProc = Message.Date.GetDelay();
+            Telegram.Bot.Types.Message edit = null;
 
             if (sendText != "")
             {
                 sendText += $"\n\n⏱ <code>{TimeInit} s</code> | ⌛️ <code>{TimeProc} s</code>";
             }
 
-            var edit = await Client.EditMessageTextAsync(
-                Message.Chat,
-                SentMessageId,
-                sendText,
-                ParseMode.Html,
-                replyMarkup: replyMarkup
-            );
+            try
+            {
+                edit = await Client.EditMessageTextAsync(
+                    Message.Chat,
+                    SentMessageId,
+                    sendText,
+                    ParseMode.Html,
+                    replyMarkup: replyMarkup
+                );
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex,"Send Message without reply Exception.");
 
-            EditedMessageId = edit.MessageId;
+            }
+
+            if (edit != null) EditedMessageId = edit.MessageId;
         }
 
         public static async Task EditMessageCallback(string sendText, InlineKeyboardMarkup replyMarkup = null)
@@ -162,7 +172,9 @@ namespace WinTenBot.Helpers
             }
             catch (Exception e)
             {
-                ConsoleHelper.WriteLine(e);
+                // ConsoleHelper.WriteLine(e);
+                Log.Error(e,"Edit Message Callback.");
+
             }
         }
 
@@ -170,13 +182,13 @@ namespace WinTenBot.Helpers
         {
             if (string.IsNullOrEmpty(AppendText))
             {
-                ConsoleHelper.WriteLine("Sending new message");
+                Log.Information("First, Sending new message");
                 AppendText = sendText;
                 await SendTextAsync(AppendText, replyMarkup);
             }
             else
             {
-                ConsoleHelper.WriteLine("Next, edit existing message");
+                Log.Information("Next, edit existing message");
                 AppendText += $"\n{sendText}";
                 await EditAsync(AppendText, replyMarkup);
             }
@@ -212,7 +224,6 @@ namespace WinTenBot.Helpers
 
             if (!IsPrivateChat())
             {
-
                 var admins = await Client.GetChatAdministratorsAsync(chatId);
                 foreach (var admin in admins)
                 {
@@ -230,7 +241,7 @@ namespace WinTenBot.Helpers
         {
             var isAdmin = await IsAdminGroup();
             var isPrivateChat = IsPrivateChat();
-            
+
             return isAdmin || isPrivateChat;
         }
 
@@ -382,6 +393,24 @@ namespace WinTenBot.Helpers
         {
             var member = await Client.GetChatMembersCountAsync(Message.Chat.Id);
             return member;
+        }
+
+        public static async Task LogToChannel(this string logs)
+        {
+            var channelTarget = Bot.GlobalConfiguration["CommonConfig:ChannelLogs"].ToInt64();
+
+            channelTarget.ToConsoleStamp();
+            var chatTitle = Message.Chat.Title;
+            var chatId = Message.Chat.Id;
+
+            var fromId = Message.From.Id;
+            var fromNameLink = Message.GetFromNameLink();
+
+            var forLogs = $"<b>Chat</b>: {chatTitle} ({chatId})" +
+                          $"\n<b>From</b>: {fromId} - {fromNameLink}" +
+                          $"\n\n{logs}";
+
+            await SendTextAsync(forLogs, customChatId: channelTarget);
         }
 
         public static async Task<Chat> GetChat()

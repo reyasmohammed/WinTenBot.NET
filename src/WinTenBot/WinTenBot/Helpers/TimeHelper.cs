@@ -8,7 +8,7 @@ namespace WinTenBot.Helpers
         {
             var date1 = DateTime.Now.ToUniversalTime();
             var date2 = time;
-            Console.WriteLine($"Date1: {date1}, Date2: {date2}");
+            // Console.WriteLine($"Date1: {date1}, Date2: {date2}");
 
             var timeSpan = (date1 - date2);
 

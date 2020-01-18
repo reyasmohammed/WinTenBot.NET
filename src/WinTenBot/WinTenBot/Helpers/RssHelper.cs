@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using CodeHollow.FeedReader;
+using Serilog;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types.Enums;
 using WinTenBot.Model;
@@ -97,8 +99,11 @@ namespace WinTenBot.Helpers
                 }
                 catch (Exception ex)
                 {
-                    ConsoleHelper.WriteLine(ex.Message);
-                    ConsoleHelper.WriteLine(ex.ToString());
+                    Log.Error(ex,"Broadcasting RSS Feed.");
+                    Thread.Sleep(4000);
+                    
+                    // ConsoleHelper.WriteLine(ex.Message);
+                    // ConsoleHelper.WriteLine(ex.ToString());
                 }
             }
 
@@ -132,12 +137,13 @@ namespace WinTenBot.Helpers
             try
             {
                 var feed = await FeedReader.ReadAsync(url);
-                ConsoleHelper.WriteLine(feed.ToJson());
+                // ConsoleHelper.WriteLine(feed.ToJson());
                 isValid = true;
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine(ex.Message);
+                Log.Error(ex,"Validating RSS Feed");
+                // ConsoleHelper.WriteLine(ex.Message);
                 // ConsoleHelper.WriteLine(ex.ToString());
             }
 
