@@ -14,5 +14,10 @@ namespace WinTenBot.Helpers
         {
             return Convert.ToInt32(obj);
         }
+        
+        public static long ToInt64(this object obj)
+        {
+            return Convert.ToInt64(obj);
+        }
     }
 }
