@@ -1,10 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Hangfire;
-using Microsoft.Extensions.Hosting.Internal;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
-using WinTenBot.Providers;
 
 namespace WinTenBot.Handlers.Commands.Rss
 {
@@ -22,17 +19,20 @@ namespace WinTenBot.Handlers.Commands.Rss
 
             if (isAdmin || ChatHelper.IsPrivateChat())
             {
+                
+#pragma warning disable 4014
                 Task.Run(async () =>
+#pragma warning restore 4014
                 {
                     Thread.CurrentThread.IsBackground = true;
 
                     // await "Sedang memeriksa RSS feed baru..".SendTextAsync();
-                    await ChatHelper.SendTextAsync("Sedang memeriksa RSS feed baru..");
+                    await "Sedang memeriksa RSS feed baru..".SendTextAsync();
 
-                    var newRssCount = RssHelper.ExecBroadcasterAsync(chatId).Result;
+                    var newRssCount = await RssHelper.ExecBroadcasterAsync(chatId);
                     if (newRssCount == 0)
                     {
-                        await ChatHelper.EditAsync("Tampaknya tidak ada RSS baru saat ini");
+                        await "Tampaknya tidak ada RSS baru saat ini".EditAsync();
                     }
                     
                     ChatHelper.Close();
