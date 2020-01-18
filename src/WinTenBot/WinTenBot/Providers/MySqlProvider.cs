@@ -8,6 +8,7 @@ using WinTenBot.Model;
 
 namespace WinTenBot.Providers
 {
+    [Obsolete("This class soon replaced by SQLKata.")]
     public class MySqlProvider
     {
         private MySqlConnection _mySqlConnection;
