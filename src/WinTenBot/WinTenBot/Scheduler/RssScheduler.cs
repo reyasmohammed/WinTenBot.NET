@@ -103,7 +103,7 @@ namespace WinTenBot.Scheduler
                             };
 
                             ConsoleHelper.WriteLine($"Writing to RSS History");
-                            await rssService.SaveRssAsync(data);
+                            await rssService.SaveRssHistoryAsync(data);
 
                             rssStep++;
                         }

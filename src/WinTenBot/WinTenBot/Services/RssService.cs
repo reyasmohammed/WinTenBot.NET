@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SqlKata;
@@ -19,22 +17,16 @@ namespace WinTenBot.Services
 
         private Message _message;
 
-        public RssService()
-        {
-            // _mySqlProvider = new MySqlProvider();
-        }
-
-        public RssService(Message message)
+        public RssService(Message message = null)
         {
             _message = message;
-            // _mySqlProvider = new MySqlProvider();
         }
 
         public async Task<bool> IsExistInHistory(Dictionary<string, object> where)
         {
             var data = await new Query(baseTable)
                 .Where(where)
-                .ExecForMysql()
+                .ExecForSqLite(true)
                 .GetAsync();
 
             ConsoleHelper.WriteLine($"Check RSS History: {data.Count().ToBool()}");
@@ -62,10 +54,10 @@ namespace WinTenBot.Services
             return insert.ToBool();
         }
 
-        public async Task<bool> SaveRssAsync(Dictionary<string, object> data)
+        public async Task<bool> SaveRssHistoryAsync(Dictionary<string, object> data)
         {
             var insert = await new Query(baseTable)
-                .ExecForMysql()
+                .ExecForSqLite(true)
                 .InsertAsync(data);
 
             return insert.ToBool();
