@@ -27,21 +27,21 @@ namespace WinTenBot.Providers
             return factory;
         }
 
-        public static Query ExecForMysql(this Query query)
+        public static Query ExecForMysql(this Query query, bool printSql = false)
         {
             var connection = new MySqlConnection(Bot.DbConnectionString);
 
-            var factory = new QueryFactory(connection, new MySqlCompiler())
+            var factory = new QueryFactory(connection, new MySqlCompiler());
+            if (printSql)
             {
-                Logger = sql =>
+                factory.Logger = sql =>
                 {
                     Log.Debug($"MySqlExec: {sql}");
                     // ConsoleHelper.WriteLine($"MySqlExec: {sql}");
-                }
-            };
+                };
+            }
 
             return factory.FromQuery(query);
         }
-
     }
 }

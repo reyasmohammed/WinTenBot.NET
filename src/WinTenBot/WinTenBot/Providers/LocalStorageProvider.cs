@@ -47,19 +47,29 @@ namespace WinTenBot.Providers
             return await factory.StatementAsync(sql, param);
         }
 
-        public static async Task<bool> IfTableExistAsync(this string tableName)
+        public static bool IfTableExist(this string tableName)
         {
-            var query = await new Query("sqlite_master")
+            var query = new Query("sqlite_master")
                 .Where("type","table")
                 .Where("name",tableName)
                 .ExecForSqLite(true)
-                .GetAsync();
+                .Get();
             
             var isExist = query.Any();
             
             Log.Debug($"Is {tableName} exist: {isExist}");
             
             return isExist;
+        }
+
+        public static async Task<bool> ExecuteFileForSqLite(this string filePath)
+        {
+            if (!File.Exists(filePath)) return false;
+            
+            var sql = File.ReadAllText(filePath);
+            await sql.ExecForSqLite(true);
+
+            return true;
         }
     }
 }
