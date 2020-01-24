@@ -14,7 +14,7 @@ namespace WinTenBot.Handlers.Commands.Core
         {
             _chatProcessor = new ChatProcessor(context);
 
-            var sendText = "Untuk mendapatkan bantuan klik tombol diatas ini";
+            var sendText = "Untuk mendapatkan bantuan klik tombol dibawah ini";
             var urlStart = await "help".GetUrlStart();
             var keyboard = new InlineKeyboardMarkup(
                 InlineKeyboardButton.WithUrl("Dapatkan bantuan", urlStart)
