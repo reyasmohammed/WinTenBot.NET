@@ -33,6 +33,13 @@ namespace WinTenBot.Handlers.Commands.Rss
                     sendText += $"\n{num++}. {rss.UrlFeed}";
                 }
 
+                if (rssData.Count == 0)
+                {
+                    sendText += "\n\nSepertinya kamu belum menambahkan RSS disini. " +
+                                "Kamu dapat menambahkan RSS dengan jumlah tidak terbatas!" +
+                                "\nGunakan <code>/setrss https://link_rss_nya</code> untuk menambahkan.";
+                }
+
                 await sendText.EditAsync();
             }
             else
