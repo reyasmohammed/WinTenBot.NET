@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Hangfire;
 using Hangfire.LiteDB;
 using HangfireBasicAuthenticationFilter;
@@ -78,6 +78,8 @@ namespace WinTenBot
 
             services.AddScoped<GlobalBanCommand>()
                 .AddScoped<DelBanCommand>();
+
+            services.AddScoped<WordFilterCommand>();
 
             services.AddScoped<PingHandler>()
                 .AddScoped<HelpCommand>()
@@ -249,6 +251,7 @@ namespace WinTenBot
                                     .UseCommand<TestCommand>("test")
                                     .UseCommand<UntagCommand>("untag")
                                     .UseCommand<WelcomeCommand>("welcome")
+                                    .UseCommand<WordFilterCommand>("wfil")
                                 )
                                 .Use<GenericMessageHandler>()
 

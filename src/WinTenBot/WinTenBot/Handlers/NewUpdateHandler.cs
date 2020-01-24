@@ -6,6 +6,7 @@ using SqlKata;
 using SqlKata.Execution;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
 using WinTenBot.Services;
@@ -15,15 +16,20 @@ namespace WinTenBot.Handlers
     public class NewUpdateHandler : IUpdateHandler
     {
         private readonly AfkService _afkService;
+        private NotesService _notesService;
+        private RequestProvider _requestProvider;
 
         public NewUpdateHandler()
         {
             _afkService = new AfkService();
+            _notesService = new NotesService();
         }
 
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
-            ChatHelper.Init(context);
+            // ChatHelper.Init(context);
+            _requestProvider = new RequestProvider(context);
+
 
             Log.Information("New Update");
             // if (EnvironmentHelper.IsDev())
@@ -35,15 +41,24 @@ namespace WinTenBot.Handlers
 
 #pragma warning disable 4014
 
-            AfkCheck(message);
-            CheckUsername(message);
+            Parallel.Invoke(
+                () => AfkCheck(message),
+                () => CheckUsername(message),
+                () => FindNotesAsync(message),
+                () => HitActivity(message),
+                () => CheckMessage(message));
 
-            if (!ChatHelper.IsPrivateChat())
+            // AfkCheck(message);
+            // CheckUsername(message);
+
+            if (!_requestProvider.IsPrivateChat())
             {
-                CheckGlobalBanAsync(message);
+                Parallel.Invoke(() => CheckGlobalBanAsync(message));
             }
 
-            HitActivity(message);
+            // FindNotesAsync(message);
+
+            // HitActivity(message);
 #pragma warning restore 4014
 
             ChatHelper.Close();
@@ -90,9 +105,9 @@ namespace WinTenBot.Handlers
             ConsoleHelper.WriteLine($"IsBan: {isBan}");
             if (isBan)
             {
-                await ChatHelper.DeleteAsync(messageId);
-                await ChatHelper.KickMemberAsync(user);
-                await ChatHelper.UnbanMemberAsync(user);
+                await _requestProvider.DeleteAsync(messageId);
+                await _requestProvider.KickMemberAsync(user);
+                await _requestProvider.UnbanMemberAsync(user);
             }
         }
 
@@ -129,6 +144,43 @@ namespace WinTenBot.Handlers
                 .ExecForMysql()
                 .InsertAsync(data);
             ConsoleHelper.WriteLine($"Insert Hit: {insertHit}");
+        }
+
+        private async Task FindNotesAsync(Message msg)
+        {
+            InlineKeyboardMarkup _replyMarkup = null;
+
+            var selectedNotes = await _notesService.GetNotesBySlug(msg.Chat.Id, msg.Text);
+            if (selectedNotes.Count > 0)
+            {
+                var content = selectedNotes[0].Content;
+                var btnData = selectedNotes[0].BtnData;
+                if (btnData != "")
+                {
+                    _replyMarkup = btnData.ToReplyMarkup(2);
+                }
+
+                await _requestProvider.SendTextAsync(content, _replyMarkup);
+                _replyMarkup = null;
+
+                foreach (var note in selectedNotes)
+                {
+                    Log.Debug(note.ToJson());
+                }
+            }
+            else
+            {
+                Log.Debug("No rows result set in Notes");
+            }
+        }
+        
+        private async Task CheckMessage(Message message)
+        {
+            var text = message.Text;
+            var isMustDelete = await MessageHelper.IsMustDelete(text);
+            Log.Debug($"Message {message.MessageId} IsMustDelete: {isMustDelete}");
+
+            if (isMustDelete) await _requestProvider.DeleteAsync(message.MessageId);
         }
     }
 }

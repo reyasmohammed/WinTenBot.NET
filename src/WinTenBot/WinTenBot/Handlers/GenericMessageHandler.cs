@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
@@ -51,29 +51,31 @@ namespace WinTenBot.Handlers
             {
                 await _casBanProvider.IsCasBan(msg.From.Id);
             }
-            
-            var selectedNotes = await _notesService.GetNotesBySlug(msg.Chat.Id, msg.Text);
-            if (selectedNotes.Rows.Count > 0)
-            {
-                var content = selectedNotes.Rows[0]["content"].ToString();
-                var btnData = selectedNotes.Rows[0]["btn_data"].ToString();
-                if (btnData != "")
-                {
-                    _replyMarkup = btnData.ToReplyMarkup(2);
-                }
-                
-                await _chatProcessor.SendAsync(content,_replyMarkup);
-                _replyMarkup = null;
 
-                foreach (var note in selectedNotes.Rows)
-                {
-                    ConsoleHelper.WriteLine(note.ToJson());
-                }
-            }
-            else
-            {
-                ConsoleHelper.WriteLine("No rows result set in Notes");
-            }
+            // Parallel.Invoke(async () => await CheckMessage(msg));
+            
+            // var selectedNotes = await _notesService.GetNotesBySlug(msg.Chat.Id, msg.Text);
+            // if (selectedNotes.Rows.Count > 0)
+            // {
+            //     var content = selectedNotes.Rows[0]["content"].ToString();
+            //     var btnData = selectedNotes.Rows[0]["btn_data"].ToString();
+            //     if (btnData != "")
+            //     {
+            //         _replyMarkup = btnData.ToReplyMarkup(2);
+            //     }
+            //     
+            //     await _chatProcessor.SendAsync(content,_replyMarkup);
+            //     _replyMarkup = null;
+            //
+            //     foreach (var note in selectedNotes.Rows)
+            //     {
+            //         ConsoleHelper.WriteLine(note.ToJson());
+            //     }
+            // }
+            // else
+            // {
+            //     ConsoleHelper.WriteLine("No rows result set in Notes");
+            // }
 
             //            await context.Bot.Client.SendTextMessageAsync(
             //                msg.Chat, "You said:\n" + msg.Text

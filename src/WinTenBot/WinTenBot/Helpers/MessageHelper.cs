@@ -1,5 +1,12 @@
-﻿using Telegram.Bot.Types;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Serilog;
+using SqlKata;
+using SqlKata.Execution;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using WinTenBot.Model;
+using WinTenBot.Providers;
 
 namespace WinTenBot.Helpers
 {
@@ -58,6 +65,37 @@ namespace WinTenBot.Helpers
             
             ConsoleHelper.WriteLine($"MessageLink: {messageLink}");
             return messageLink;
+        }
+        
+        public static async Task<bool> IsMustDelete(string words)
+        {
+            var isMust = false;
+            var query = await new Query("word_filter")
+                .ExecForSqLite(true)
+                .GetAsync();
+
+            var mapped = query.ToJson().MapObject<List<WordFilter>>();
+
+            var partedWord = words.Split(" ");
+            foreach (var word in partedWord)
+            {
+                foreach (WordFilter wordFilter in mapped)
+                {
+                    var forFilter = wordFilter.Word;
+                    var isGlobal = wordFilter.IsGlobal;
+                    
+                    if (forFilter == word.ToLower())
+                    {
+                        isMust = true;
+                    }
+                    
+                    Log.Debug($"Is ({isGlobal}) '{word}' == '{forFilter}' ? {isMust}");
+                    
+                    if(isMust) break;
+                }
+            }
+
+            return isMust;
         }
     }
 }
