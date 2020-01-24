@@ -27,5 +27,11 @@ namespace WinTenBot.Model
         
         [JsonPropertyName("last_tags_message_id")]
         public string LastTagsMessageId { get; set; }
+        
+        [JsonPropertyName("enable_word_filter_per_group")]
+        public bool? EnableWordFilterPerGroup { get; set; }
+        
+        [JsonPropertyName("enable_word_filter_group_wide")]
+        public bool? EnableWordFilterGroupWide { get; set; }
     }
 }
