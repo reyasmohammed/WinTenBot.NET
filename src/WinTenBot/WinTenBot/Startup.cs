@@ -1,5 +1,7 @@
 using System;
 using Hangfire;
+using Hangfire.Heartbeat;
+using Hangfire.Heartbeat.Server;
 using Hangfire.LiteDB;
 using HangfireBasicAuthenticationFilter;
 using Microsoft.AspNetCore.Builder;
@@ -136,8 +138,18 @@ namespace WinTenBot
 
 
             // Hangfire
+            var hangfireOptions = new LiteDbStorageOptions
+            {
+                QueuePollInterval = TimeSpan.FromSeconds(5)
+            };
+
             services.AddHangfireServer();
-            services.AddHangfire(t => t.UseLiteDbStorage(Configuration["Hangfire:LiteDb"]));
+            services.AddHangfire(t =>
+            {
+                t.UseLiteDbStorage(Configuration["Hangfire:LiteDb"], hangfireOptions);
+                t.UseHeartbeatPage(checkInterval: TimeSpan.FromSeconds(1));
+                t.UseSerilogLogProvider();
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -184,7 +196,10 @@ namespace WinTenBot
                 app.UseHangfireDashboard(hangfireBaseUrl, options);
             }
 
-            app.UseHangfireServer();
+            app.UseHangfireServer(additionalProcesses: new[]
+            {
+                new ProcessMonitor(checkInterval: TimeSpan.FromSeconds(1))
+            });
 
             app.Run(async context => { await context.Response.WriteAsync("Hello World!"); });
 
