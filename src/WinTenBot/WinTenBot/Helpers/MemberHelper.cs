@@ -24,11 +24,12 @@ namespace WinTenBot.Helpers
             return $"<a href='tg://user?id={message.From.Id}'>{(firstName + " " + lastName).Trim()}</a>";
         }
 
-        public static async Task<bool> IsAdminGroup(ITelegramBotClient client, Message message)
+        public static async Task<bool> IsAdminGroup(this RequestProvider requestProvider, Message message)
         {
             var chatId = message.Chat.Id;
             var userId = message.From.Id;
             var isAdmin = false;
+            var client = requestProvider.Client;
 
             var admins = await client.GetChatAdministratorsAsync(chatId);
             foreach (var admin in admins)
@@ -63,6 +64,11 @@ namespace WinTenBot.Helpers
         public static bool IsNoUsername(this User user)
         {
             return user.Username == null;
+        }
+        public static bool IsSudoer(this RequestProvider requestProvider)
+        {
+            var message = requestProvider.Message;
+            return message.From.Id.IsSudoer();
         }
 
         public static async Task CheckUsername(this RequestProvider requestProvider, Message message)
