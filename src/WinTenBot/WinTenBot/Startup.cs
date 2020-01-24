@@ -101,7 +101,8 @@ namespace WinTenBot
             services.AddScoped<SetRssCommand>()
                 .AddScoped<DelRssCommand>()
                 .AddScoped<RssInfoCommand>()
-                .AddScoped<RssPullCommand>();
+                .AddScoped<RssPullCommand>()
+                .AddScoped<RssCtlCommand>();
 
             services.AddScoped<AdminCommand>()
                 .AddScoped<PinCommand>()
@@ -187,9 +188,6 @@ namespace WinTenBot
 
             app.Run(async context => { await context.Response.WriteAsync("Hello World!"); });
 
-            RssScheduler.InitScheduler();
-            // HangfireHelper.DeleteAllJobs();
-
             ConsoleHelper.WriteLine("App is ready.");
         }
 
@@ -240,6 +238,7 @@ namespace WinTenBot
                                     .UseCommand<PromoteCommand>("promote")
                                     .UseCommand<QrCommand>("qr")
                                     .UseCommand<ReportCommand>("report")
+                                    .UseCommand<RssCtlCommand>("rssctl")
                                     .UseCommand<RssInfoCommand>("rssinfo")
                                     .UseCommand<RssPullCommand>("rsspull")
                                     .UseCommand<RulesCommand>("rules")
