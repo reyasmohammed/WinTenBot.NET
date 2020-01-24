@@ -21,13 +21,17 @@ namespace WinTenBot.Services
         public RssService(Message message = null)
         {
             _message = message;
+
+            // RssMigration.MigrateRssHistory();
         }
 
         public async Task<bool> IsExistInHistory(Dictionary<string, object> where)
         {
-            var isExist = await baseTable.IfTableExistAsync();
-            await isExist.MigrateRssHistory();
-            
+            // var isExist = await baseTable.IfTableExistAsync();
+            // await isExist.MigrateRssHistory();
+            // await baseTable.MigrateLocalStorage();
+
+
             var data = await new Query(baseTable)
                 .Where(where)
                 .ExecForSqLite(true)
@@ -60,9 +64,10 @@ namespace WinTenBot.Services
 
         public async Task<bool> SaveRssHistoryAsync(Dictionary<string, object> data)
         {
-            var isExist = await baseTable.IfTableExistAsync();
-            await isExist.MigrateRssHistory();
-            
+            // var isExist = await baseTable.IfTableExistAsync();
+            // await isExist.MigrateRssHistory();
+            // await baseTable.MigrateLocalStorage();
+
             var insert = await new Query(baseTable)
                 .ExecForSqLite(true)
                 .InsertAsync(data);
@@ -109,7 +114,7 @@ namespace WinTenBot.Services
                 .Where("url_feed", urlFeed)
                 .ExecForMysql()
                 .DeleteAsync();
-            
+
             $"Delete {urlFeed} status: {delete.ToBool()}".ToConsoleStamp();
 
             return delete.ToBool();
