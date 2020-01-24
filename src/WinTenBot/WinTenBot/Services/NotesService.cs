@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
+using SqlKata;
+using SqlKata.Execution;
 using WinTenBot.Helpers;
+using WinTenBot.Model;
 using WinTenBot.Providers;
 
 namespace WinTenBot.Services
@@ -23,12 +26,20 @@ namespace WinTenBot.Services
             return data;
         }
 
-        public async Task<DataTable> GetNotesBySlug(long chatId, string slug)
+        public async Task<List<CloudNote>> GetNotesBySlug(long chatId, string slug)
         {
-            var sql = $"SELECT * FROM {baseTable} WHERE chat_id = '{chatId}' " +
-                      $"AND MATCH(slug) AGAINST('{slug.SqlEscape()}')";
-            var data = await _mySql.ExecQueryAsync(sql);
-            return data;
+            var query = await new Query(baseTable)
+                .Where("chat_id",chatId)
+                .OrWhereContains("slug",slug)
+                .ExecForMysql()
+                .GetAsync();
+
+            var mapped = query.ToJson().MapObject<List<CloudNote>>();
+            return mapped;
+            // var sql = $"SELECT * FROM {baseTable} WHERE chat_id = '{chatId}' " +
+            // $"AND MATCH(slug) AGAINST('{slug.SqlEscape()}')";
+            // var data = await _mySql.ExecQueryAsync(sql);
+            // return data;
         }
 
         public async Task SaveNote(Dictionary<string, object> data)
