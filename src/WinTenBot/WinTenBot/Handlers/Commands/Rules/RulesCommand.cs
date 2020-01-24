@@ -20,7 +20,7 @@ namespace WinTenBot.Handlers.Commands.Rules
             var msg = context.Update.Message;
 
             _chatProcessor = new ChatProcessor(context);
-            _settingsService = new SettingsService(msg.Chat);
+            _settingsService = new SettingsService(msg);
 
 
             var sendText = "Under maintenance";

@@ -19,7 +19,7 @@ namespace WinTenBot.Handlers.Commands.Welcome
         {
             _chatProcessor = new ChatProcessor(context);
             var msg = context.Update.Message;
-            _settingsService = new SettingsService(msg.Chat);
+            _settingsService = new SettingsService(msg);
 
             if (msg.Chat.Type == ChatType.Private)
             {
