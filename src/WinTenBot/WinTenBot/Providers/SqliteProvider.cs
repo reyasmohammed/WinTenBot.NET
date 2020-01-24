@@ -10,7 +10,7 @@ using SqlKata.Execution;
 
 namespace WinTenBot.Providers
 {
-    public static class LocalStorageProvider
+    public static class SqliteProvider
     {
         static string dbPath = "Storage/Common/LocalStorage.db";
 
