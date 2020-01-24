@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
@@ -33,19 +34,20 @@ namespace WinTenBot.Handlers
             Log.Information("New Update");
 
             Parallel.Invoke(
-                async () => await AfkCheck(message), 
-                async () => await CheckUsername(message), 
-                async () => await FindNotesAsync(message), 
-                async () => await HitActivity(message));
+                async () => await _requestProvider.AfkCheck(message), 
+                async () => await _requestProvider.CheckUsername(message),
+                async () => await _requestProvider.FindNotesAsync(message),
+                async () => await ActivityHelper.HitActivity(message));
 
             if (context.Update.CallbackQuery == null)
             {
-                Parallel.Invoke(async () => await CheckMessage(message));
+                Parallel.Invoke(
+                    async () => await _requestProvider.CheckMessage(message));
             }
 
             if (!_requestProvider.IsPrivateChat())
             {
-                Parallel.Invoke(async () => await CheckGlobalBanAsync(message));
+                Parallel.Invoke(async () => await _requestProvider.CheckGlobalBanAsync(message));
             }
 
             await next(context, cancellationToken);
@@ -96,18 +98,6 @@ namespace WinTenBot.Handlers
             }
         }
 
-        private async Task CheckUsername(Message message)
-        {
-            var fromUser = message.From;
-            var noUsername = fromUser.IsNoUsername();
-            ConsoleHelper.WriteLine($"{fromUser} IsNoUsername: {noUsername}");
-
-            if (noUsername)
-            {
-                await $"{fromUser} belum memasang username".SendTextAsync();
-            }
-        }
-
         private async Task HitActivity(Message message)
         {
             var data = new Dictionary<string, object>()
@@ -134,38 +124,47 @@ namespace WinTenBot.Handlers
         private async Task FindNotesAsync(Message msg)
         {
             InlineKeyboardMarkup _replyMarkup = null;
-
-            var selectedNotes = await _notesService.GetNotesBySlug(msg.Chat.Id, msg.Text);
-            if (selectedNotes.Count > 0)
+            try
             {
-                var content = selectedNotes[0].Content;
-                var btnData = selectedNotes[0].BtnData;
-                if (btnData != "")
+                var selectedNotes = await _notesService.GetNotesBySlug(msg.Chat.Id, msg.Text);
+                if (selectedNotes.Count > 0)
                 {
-                    _replyMarkup = btnData.ToReplyMarkup(2);
+                    var content = selectedNotes[0].Content;
+                    var btnData = selectedNotes[0].BtnData;
+                    if (btnData != "")
+                    {
+                        _replyMarkup = btnData.ToReplyMarkup(2);
+                    }
+
+                    await _requestProvider.SendTextAsync(content, _replyMarkup);
+                    _replyMarkup = null;
+
+                    foreach (var note in selectedNotes)
+                    {
+                        Log.Debug(note.ToJson());
+                    }
                 }
-
-                await _requestProvider.SendTextAsync(content, _replyMarkup);
-                _replyMarkup = null;
-
-                foreach (var note in selectedNotes)
+                else
                 {
-                    Log.Debug(note.ToJson());
+                    Log.Debug("No rows result set in Notes");
                 }
             }
-            else
+            catch (Exception ex)
             {
-                Log.Debug("No rows result set in Notes");
+                Log.Error(ex,"Error when getting Notes");
             }
         }
 
         private async Task CheckMessage(Message message)
         {
             var text = message.Text;
-            var isMustDelete = await MessageHelper.IsMustDelete(text);
-            Log.Debug($"Message {message.MessageId} IsMustDelete: {isMustDelete}");
+            if (text != null)
+            {
+                var isMustDelete = await MessageHelper.IsMustDelete(text);
+                Log.Debug($"Message {message.MessageId} IsMustDelete: {isMustDelete}");
 
-            if (isMustDelete) await _requestProvider.DeleteAsync(message.MessageId);
+                if (isMustDelete) await _requestProvider.DeleteAsync(message.MessageId);
+            }
         }
     }
 }

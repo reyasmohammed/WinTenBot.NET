@@ -5,8 +5,10 @@ using SqlKata;
 using SqlKata.Execution;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Model;
 using WinTenBot.Providers;
+using WinTenBot.Services;
 
 namespace WinTenBot.Helpers
 {
@@ -89,13 +91,51 @@ namespace WinTenBot.Helpers
                         isMust = true;
                     }
                     
-                    Log.Debug($"Is ({isGlobal}) '{word}' == '{forFilter}' ? {isMust}");
+                    // Log.Debug($"Is ({isGlobal}) '{word}' == '{forFilter}' ? {isMust}");
                     
                     if(isMust) break;
                 }
             }
 
             return isMust;
+        }
+        
+        public static async Task CheckMessage(this RequestProvider requestProvider, Message message)
+        {
+            var text = message.Text;
+            var isMustDelete = await IsMustDelete(text);
+            Log.Debug($"Message {message.MessageId} IsMustDelete: {isMustDelete}");
+
+            if (isMustDelete) await requestProvider.DeleteAsync(message.MessageId);
+        }
+
+        public static async Task FindNotesAsync(this RequestProvider requestProvider, Message msg)
+        {
+            InlineKeyboardMarkup _replyMarkup = null;
+            var _notesService = new NotesService();
+            
+            var selectedNotes = await _notesService.GetNotesBySlug(msg.Chat.Id, msg.Text);
+            if (selectedNotes.Count > 0)
+            {
+                var content = selectedNotes[0].Content;
+                var btnData = selectedNotes[0].BtnData;
+                if (btnData != "")
+                {
+                    _replyMarkup = btnData.ToReplyMarkup(2);
+                }
+        
+                await requestProvider.SendTextAsync(content, _replyMarkup);
+                _replyMarkup = null;
+        
+                foreach (var note in selectedNotes)
+                {
+                    Log.Debug(note.ToJson());
+                }
+            }
+            else
+            {
+                Log.Debug("No rows result set in Notes");
+            }
         }
     }
 }
