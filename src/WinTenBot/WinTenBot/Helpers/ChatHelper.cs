@@ -12,6 +12,7 @@ using WinTenBot.Model;
 
 namespace WinTenBot.Helpers
 {
+    [Obsolete("This class will be replaced by RequestProvider.")]
     public static class ChatHelper
     {
         private static IUpdateContext UpdateContext { get; set; }
