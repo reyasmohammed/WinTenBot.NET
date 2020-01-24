@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -12,8 +12,8 @@ namespace WinTenBot
         {
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
-                .WriteTo.Console()
-                .WriteTo.File("Storage/Logs/Logs-.txt", 
+                .WriteTo.Console(theme: SystemConsoleTheme.Colored)
+                .WriteTo.File("Storage/Logs/Logs-.txt",
                     rollingInterval: RollingInterval.Day,
                     flushToDiskInterval: TimeSpan.FromSeconds(1))
                 .CreateLogger();
