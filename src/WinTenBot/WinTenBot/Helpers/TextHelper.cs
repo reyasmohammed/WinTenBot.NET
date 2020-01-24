@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,7 @@ namespace WinTenBot.Helpers
 {
     public static class TextHelper
     {
-        public static string ToJson(this object dataTable, bool indented = false)
+        public static string  ToJson(this object dataTable, bool indented = false)
         {
             return JsonConvert.SerializeObject(dataTable, indented ? Formatting.Indented : Formatting.None);
         }
@@ -155,6 +156,21 @@ namespace WinTenBot.Helpers
         
         public static string MkJoin(this ICollection<string> obj, string delim){
             return String.Join(delim,obj.ToArray());
+        }
+
+        public static string ToTitleCase(this string text)
+        {
+            var textInfo = new CultureInfo("en-US", false).TextInfo;
+            return textInfo.ToTitleCase(text.ToLower()); 
+        }
+
+        public static string CleanExceptAlphaNumeric(this string str)
+        {
+            var arr = str.Where(c => (char.IsLetterOrDigit(c) || 
+                                      char.IsWhiteSpace(c) || 
+                                      c == '-')).ToArray(); 
+
+            return new string(arr);
         }
     }
 }

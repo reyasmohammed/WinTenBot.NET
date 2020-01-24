@@ -24,7 +24,7 @@ namespace WinTenBot.Helpers
 
             return dict;
         }
-        public static IReplyMarkup CreateInlineKeyboardButton(Dictionary<string, string> buttonList, int columns)
+        public static InlineKeyboardMarkup CreateInlineKeyboardButton(Dictionary<string, string> buttonList, int columns)
         {
             int rows = (int)Math.Ceiling((double)buttonList.Count / (double)columns);
             InlineKeyboardButton[][] buttons = new InlineKeyboardButton[rows][];
@@ -40,15 +40,25 @@ namespace WinTenBot.Helpers
             return new InlineKeyboardMarkup(buttons);
         }
 
-        public static IReplyMarkup ToReplyMarkup(this string buttonStr, int columns)
+        public static InlineKeyboardMarkup ToReplyMarkup(this string buttonStr, int columns)
         {
             return CreateInlineKeyboardButton(StringToDict(buttonStr), columns);
         }
 
         public static async Task<InlineKeyboardMarkup> JsonToButton(this string jsonPath, int chunk = 2)
         {
-            ConsoleHelper.WriteLine($"Loading Json: {jsonPath}");
-            var json = await File.ReadAllTextAsync(jsonPath);
+            var json = "";
+            if (File.Exists(jsonPath))
+            {
+                Serilog.Log.Debug($"Loading Json from path: {jsonPath}");
+                json = await File.ReadAllTextAsync(jsonPath);
+            }
+            else
+            {
+                Serilog.Log.Debug($"Loading Json from string..");
+                json = jsonPath;
+            }
+
             var replyMarkup = json.ToDataTable();
             
             var btnList = new List<InlineKeyboardButton>();
@@ -69,14 +79,14 @@ namespace WinTenBot.Helpers
                 }
             }
 
-            ConsoleHelper.WriteLine($"Chunk buttons to {chunk}");
-            var chunksBtn = btnList
-                .Select((s, i) => new { Value = s, Index = i })
-                .GroupBy(x => x.Index / 2)
-                .Select(grp => grp.Select(x => x.Value).ToArray())
-                .ToArray();
+            // ConsoleHelper.WriteLine($"Chunk buttons to {chunk}");
+            // var chunksBtn = btnList
+            //     .Select((s, i) => new { Value = s, Index = i })
+            //     .GroupBy(x => x.Index / chunk)
+            //     .Select(grp => grp.Select(x => x.Value).ToArray())
+            //     .ToArray();
             
-            return new InlineKeyboardMarkup(chunksBtn);
+            return new InlineKeyboardMarkup(btnList.ChunkBy(chunk));
         }
     }
 }
