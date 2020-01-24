@@ -1,8 +1,11 @@
-using System;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
+using WinTenBot.Helpers;
 
 namespace WinTenBot
 {
@@ -17,7 +20,11 @@ namespace WinTenBot
                     rollingInterval: RollingInterval.Day,
                     flushToDiskInterval: TimeSpan.FromSeconds(1))
                 .CreateLogger();
-            
+
+            Parallel.Invoke(
+                async () => await "word_filter".MigrateLocalStorage(),
+                async () => await "rss_history".MigrateLocalStorage());
+
             try
             {
                 // BuildWebHost(args).Run();
