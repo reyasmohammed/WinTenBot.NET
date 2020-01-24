@@ -27,41 +27,26 @@ namespace WinTenBot.Handlers
 
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
-            // ChatHelper.Init(context);
             _requestProvider = new RequestProvider(context);
-
-
-            Log.Information("New Update");
-            // if (EnvironmentHelper.IsDev())
-            // {
-            //     context.ToJson().ToConsoleStamp();
-            // }
-
             var message = context.Update.Message ?? context.Update.CallbackQuery.Message;
-
-#pragma warning disable 4014
+            
+            Log.Information("New Update");
 
             Parallel.Invoke(
-                () => AfkCheck(message),
-                () => CheckUsername(message),
-                () => FindNotesAsync(message),
-                () => HitActivity(message),
-                () => CheckMessage(message));
+                async () => await AfkCheck(message), 
+                async () => await CheckUsername(message), 
+                async () => await FindNotesAsync(message), 
+                async () => await HitActivity(message));
 
-            // AfkCheck(message);
-            // CheckUsername(message);
+            if (context.Update.CallbackQuery == null)
+            {
+                Parallel.Invoke(async () => await CheckMessage(message));
+            }
 
             if (!_requestProvider.IsPrivateChat())
             {
-                Parallel.Invoke(() => CheckGlobalBanAsync(message));
+                Parallel.Invoke(async () => await CheckGlobalBanAsync(message));
             }
-
-            // FindNotesAsync(message);
-
-            // HitActivity(message);
-#pragma warning restore 4014
-
-            ChatHelper.Close();
 
             await next(context, cancellationToken);
         }
@@ -173,7 +158,7 @@ namespace WinTenBot.Handlers
                 Log.Debug("No rows result set in Notes");
             }
         }
-        
+
         private async Task CheckMessage(Message message)
         {
             var text = message.Text;
