@@ -33,7 +33,7 @@ namespace WinTenBot.Handlers.Events
         {
             Message msg = context.Update.Message;
             _chatProcessor = new ChatProcessor(context);
-            _settingsService = new SettingsService(msg.Chat);
+            _settingsService = new SettingsService(msg);
             _elasticSecurityService = new ElasticSecurityService(context.Update.Message);
 
             ConsoleHelper.WriteLine("New Chat Members...");
