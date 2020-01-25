@@ -4,6 +4,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Serilog;
+using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 using WinTenBot.Helpers;
 
@@ -14,8 +15,8 @@ namespace WinTenBot
         public static void Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Verbose()
-                .WriteTo.Console(theme: SystemConsoleTheme.Colored)
+                .MinimumLevel.Debug()
+                .WriteTo.Console(theme: SystemConsoleTheme.Colored,restrictedToMinimumLevel:LogEventLevel.Debug)
                 .WriteTo.File("Storage/Logs/Logs-.txt",
                     rollingInterval: RollingInterval.Day,
                     flushToDiskInterval: TimeSpan.FromSeconds(1))
