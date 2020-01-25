@@ -4,9 +4,15 @@ using System.Data;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Threading.Tasks;
 using Flurl;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Serilog;
+using SqlKata;
+using SqlKata.Execution;
+using WinTenBot.Model;
+using WinTenBot.Providers;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace WinTenBot.Helpers
@@ -66,7 +72,7 @@ namespace WinTenBot.Helpers
         {
             return JsonSerializer.Deserialize<T>(json);
         }
-        
+
         // Source: https://www.codeproject.com/Articles/44274/Transpose-a-DataTable-using-C
         public static DataTable TransposedTable(this DataTable inputTable)
         {
@@ -96,11 +102,43 @@ namespace WinTenBot.Helpers
                     string colValue = inputTable.Rows[cCount][rCount].ToString();
                     newRow[cCount + 1] = colValue;
                 }
+
                 outputTable.Rows.Add(newRow);
             }
 
             return outputTable;
         }
-        
+
+        public static async Task SyncWordToLocalAsync()
+        {
+            var cloudQuery = await new Query("word_filter")
+                .ExecForMysql()
+                .GetAsync();
+
+            var cloudWords = cloudQuery.ToJson().MapObject<List<WordFilter>>();
+
+            var clearData = await new Query("word_filter")
+                .ExecForSqLite(true)
+                .DeleteAsync();
+
+            Log.Information($"Deleting local Word Filter: {clearData} rows");
+
+            foreach (var row in cloudWords)
+            {
+                var data = new Dictionary<string, object>()
+                {
+                    {"word", row.Word},
+                    {"is_global", row.IsGlobal},
+                    {"deep_filter", row.DeepFilter},
+                    {"from_id", row.FromId},
+                    {"chat_id", row.ChatId},
+                    {"created_at", row.CreatedAt}
+                };
+
+                var insert = await new Query("word_filter")
+                    .ExecForSqLite(true)
+                    .InsertAsync(data);
+            }
+        }
     }
 }

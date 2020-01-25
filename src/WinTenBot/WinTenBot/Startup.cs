@@ -81,7 +81,8 @@ namespace WinTenBot
             services.AddScoped<GlobalBanCommand>()
                 .AddScoped<DelBanCommand>();
 
-            services.AddScoped<WordFilterCommand>();
+            services.AddScoped<WordFilterCommand>()
+                .AddScoped<WordSyncCommand>();
 
             services.AddScoped<PingHandler>()
                 .AddScoped<HelpCommand>()
@@ -266,6 +267,7 @@ namespace WinTenBot
                                     .UseCommand<UntagCommand>("untag")
                                     .UseCommand<WelcomeCommand>("welcome")
                                     .UseCommand<WordFilterCommand>("wfil")
+                                    .UseCommand<WordSyncCommand>("wsync")
                                 )
                                 .Use<GenericMessageHandler>()
 
