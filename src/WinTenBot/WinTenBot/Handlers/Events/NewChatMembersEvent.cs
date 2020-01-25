@@ -18,7 +18,6 @@ namespace WinTenBot.Handlers.Events
 {
     public class NewChatMembersEvent : IUpdateHandler
     {
-        private CasBanProvider _casBanProvider;
         private SettingsService _settingsService;
         private ChatProcessor _chatProcessor;
         private ElasticSecurityService _elasticSecurityService;
@@ -26,7 +25,7 @@ namespace WinTenBot.Handlers.Events
 
         public NewChatMembersEvent()
         {
-            _casBanProvider = new CasBanProvider();
+            
         }
 
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
@@ -142,7 +141,8 @@ namespace WinTenBot.Handlers.Events
 
                 if (Bot.HostingEnvironment.IsProduction())
                 {
-                    var isCasBan = await _casBanProvider.IsCasBan(newMember.Id);
+                    // var isCasBan = await IsCasBan(newMember.Id);
+                    await newMember.IsCasBanAsync();
                 }
 
                 var fullName = (newMember.FirstName + " " + newMember.LastName).Trim();

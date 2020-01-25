@@ -2,6 +2,9 @@
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Flurl;
+using Flurl.Http;
+using Serilog;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using WinTenBot.Providers;
@@ -118,8 +121,7 @@ namespace WinTenBot.Helpers
             var userId = message.From.Id;
             var user = message.From;
             var messageId = message.MessageId;
-
-            // var isBan = await _elasticSecurityService.IsExist(userId);
+            
             var isBan = await user.IsBanInCache();
             ConsoleHelper.WriteLine($"IsBan: {isBan}");
             if (isBan)
@@ -128,6 +130,34 @@ namespace WinTenBot.Helpers
                 await requestProvider.KickMemberAsync(user);
                 await requestProvider.UnbanMemberAsync(user);
             }
+        }
+
+        public static async Task<bool> IsCasBanAsync(this User user)
+        {
+            bool isBan = false;
+            var userId = user.Id;
+            var url = "https://api.cas.chat/check".SetQueryParam("user_id", userId);
+            var resp = await url.GetJsonAsync();
+            
+            Log.Debug("CasBan Response", resp);
+            
+            isBan = resp.ok;
+            ConsoleHelper.WriteLine($"UserId: {userId} is CAS ban: {isBan}");
+            return isBan;
+
+        }
+        public static async Task<bool> CheckCasBanAsync(this RequestProvider requestProvider, User user)
+        {
+            bool isBan = false;
+                      
+            isBan = await user.IsCasBanAsync();
+            Log.Information($"{user} is CAS ban: {isBan}");
+            if (isBan)
+            {
+                var sendText = $"{user} is banned in CAS!";
+                await requestProvider.SendTextAsync(sendText);
+            }
+            return isBan;
         }
     }
 }
