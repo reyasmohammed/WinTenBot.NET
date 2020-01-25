@@ -11,6 +11,7 @@ using WinTenBot.Model;
 
 namespace WinTenBot.Helpers.Processors
 {
+    [Obsolete("This class will be replaced by RequestProvider.")]
     public class ChatProcessor
     {
         private IUpdateContext UpdateContext { get; set; }
