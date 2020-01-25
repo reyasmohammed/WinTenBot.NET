@@ -11,18 +11,19 @@ namespace WinTenBot.Services
 {
     public class NotesService
     {
-        private readonly MySqlProvider _mySql;
         private string baseTable = "notes";
-
-        public NotesService()
-        {
-            _mySql = new MySqlProvider();
-        }
-
+        
         public async Task<DataTable> GetNotesByChatId(long chatId)
         {
-            var sql = $"SELECT * FROM {baseTable} WHERE chat_id = '{chatId}'";
-            var data = await _mySql.ExecQueryAsync(sql);
+            // var sql = $"SELECT * FROM {baseTable} WHERE chat_id = '{chatId}'";
+            // var data = await _mySql.ExecQueryAsync(sql);
+            
+            var query = await new Query(baseTable)
+                .Where("chat_id",chatId)
+                .ExecForMysql()
+                .GetAsync();
+
+            var data = query.ToJson().MapObject<DataTable>();
             return data;
         }
 
@@ -36,6 +37,7 @@ namespace WinTenBot.Services
 
             var mapped = query.ToJson().MapObject<List<CloudNote>>();
             return mapped;
+            
             // var sql = $"SELECT * FROM {baseTable} WHERE chat_id = '{chatId}' " +
             // $"AND MATCH(slug) AGAINST('{slug.SqlEscape()}')";
             // var data = await _mySql.ExecQueryAsync(sql);
@@ -47,7 +49,10 @@ namespace WinTenBot.Services
             var json = data.ToJson();
             ConsoleHelper.WriteLine(json);
 
-            var insert = await _mySql.Insert(baseTable, data);
+            var insert = await new Query(baseTable)
+                .ExecForMysql()
+                .InsertAsync( data);
+            
             ConsoleHelper.WriteLine($"SaveNote: {insert}");
         }
 
