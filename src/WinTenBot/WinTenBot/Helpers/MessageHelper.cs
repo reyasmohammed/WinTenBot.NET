@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Serilog;
 using SqlKata;
@@ -102,39 +103,53 @@ namespace WinTenBot.Helpers
         
         public static async Task CheckMessage(this RequestProvider requestProvider, Message message)
         {
-            var text = message.Text;
-            var isMustDelete = await IsMustDelete(text);
-            Log.Debug($"Message {message.MessageId} IsMustDelete: {isMustDelete}");
+            try
+            {
+                var text = message.Text;
+                var isMustDelete = await IsMustDelete(text);
+                Log.Debug($"Message {message.MessageId} IsMustDelete: {isMustDelete}");
 
-            if (isMustDelete) await requestProvider.DeleteAsync(message.MessageId);
+                if (isMustDelete) await requestProvider.DeleteAsync(message.MessageId);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex,"Error checking message");
+            }
         }
 
         public static async Task FindNotesAsync(this RequestProvider requestProvider, Message msg)
         {
-            InlineKeyboardMarkup _replyMarkup = null;
-            var _notesService = new NotesService();
-            
-            var selectedNotes = await _notesService.GetNotesBySlug(msg.Chat.Id, msg.Text);
-            if (selectedNotes.Count > 0)
+            try
             {
-                var content = selectedNotes[0].Content;
-                var btnData = selectedNotes[0].BtnData;
-                if (btnData != "")
+                InlineKeyboardMarkup _replyMarkup = null;
+                var notesService = new NotesService();
+
+                var selectedNotes = await notesService.GetNotesBySlug(msg.Chat.Id, msg.Text);
+                if (selectedNotes.Count > 0)
                 {
-                    _replyMarkup = btnData.ToReplyMarkup(2);
+                    var content = selectedNotes[0].Content;
+                    var btnData = selectedNotes[0].BtnData;
+                    if (btnData != "")
+                    {
+                        _replyMarkup = btnData.ToReplyMarkup(2);
+                    }
+
+                    await requestProvider.SendTextAsync(content, _replyMarkup);
+                    _replyMarkup = null;
+
+                    foreach (var note in selectedNotes)
+                    {
+                        Log.Debug(note.ToJson());
+                    }
                 }
-        
-                await requestProvider.SendTextAsync(content, _replyMarkup);
-                _replyMarkup = null;
-        
-                foreach (var note in selectedNotes)
+                else
                 {
-                    Log.Debug(note.ToJson());
+                    Log.Debug("No rows result set in Notes");
                 }
             }
-            else
+            catch (Exception ex)
             {
-                Log.Debug("No rows result set in Notes");
+                Log.Error(ex,"Error when getting Notes");
             }
         }
     }
