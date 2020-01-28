@@ -12,5 +12,13 @@ namespace WinTenBot.Helpers
             Log.Debug($"Migrating :{filePath}");
             await filePath.ExecuteFileForSqLite();
         }
+
+        public static void RunMigration()
+        {
+            Parallel.Invoke(
+                async () => await "word_filter".MigrateLocalStorage(),
+                async () => await "rss_history".MigrateLocalStorage(),
+                async ()=> await "warn_username_history".MigrateLocalStorage());
+        }
     }
 }
