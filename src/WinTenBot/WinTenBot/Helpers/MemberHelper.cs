@@ -1,12 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Flurl;
 using Flurl.Http;
 using Serilog;
+using SqlKata;
+using SqlKata.Execution;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using WinTenBot.Model;
 using WinTenBot.Providers;
 using WinTenBot.Services;
 
@@ -82,7 +86,12 @@ namespace WinTenBot.Helpers
 
             if (noUsername)
             {
-                await requestProvider.SendTextAsync($"{fromUser} belum memasang username");
+                var updateResult = await UpdateWarnUsernameStat(message);
+                var updatedStep = updateResult.StepCount;
+
+                await requestProvider.SendTextAsync($"{fromUser} belum memasang username." +
+                                                    $"\nPeringatan {updatedStep}/1000");
+
             }
         }
 
@@ -158,6 +167,68 @@ namespace WinTenBot.Helpers
                 await requestProvider.SendTextAsync(sendText);
             }
             return isBan;
+        }
+
+        private static async Task<WarnUsernameHistory> UpdateWarnUsernameStat(Message message)
+        {
+            var tableName = "warn_username_history";
+
+            var data = new Dictionary<string, object>()
+            {
+                {"from_id", message.From.Id},
+                {"first_name", message.From.FirstName},
+                {"last_name", message.From.LastName},
+                {"step_count",1 },
+                {"chat_id", message.Chat.Id},
+                {"created_at", DateTime.UtcNow }
+            };
+
+            var warnHistory = await new Query(tableName)
+                .Where("from_id",data["from_id"])
+                .ExecForSqLite()
+                .GetAsync();
+
+            var exist = warnHistory.Any();
+
+            Log.Information($"Check Warn Username History: {exist}");
+
+            if (exist)
+            {
+                var warnHistories = warnHistory.ToJson().MapObject<List<WarnUsernameHistory>>().First();
+
+                Log.Information($"Mapped: {warnHistories.ToJson(true)}");
+
+                var newStep = warnHistories.StepCount + 1;
+                Log.Information($"New step for {message.From} is {newStep}");
+
+                var update = new Dictionary<string, object>()
+                {
+                    {"step_count", newStep },
+                    {"updated_at", DateTime.UtcNow }
+                };
+
+                var insertHit = await new Query(tableName)
+                    .Where("from_id",data["from_id"])
+                    .ExecForSqLite()
+                    .UpdateAsync(update);
+                
+                Log.Information($"Update step: {insertHit}");
+            }
+            else
+            {
+                var insertHit = await new Query(tableName)
+                    .ExecForSqLite()
+                    .InsertAsync(data);
+                //
+                Log.Information($"Insert Hit: {insertHit}");
+            }
+
+            var updatedHistory = await new Query(tableName)
+                .Where("from_id",data["from_id"])
+                .ExecForSqLite()
+                .GetAsync();
+
+            return updatedHistory.ToJson().MapObject<List<WarnUsernameHistory>>().First();
         }
     }
 }
