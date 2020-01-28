@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -7,6 +7,7 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 using WinTenBot.Helpers;
+using WinTenBot.Scheduler;
 
 namespace WinTenBot
 {
@@ -26,9 +27,12 @@ namespace WinTenBot
                     flushToDiskInterval: TimeSpan.FromSeconds(1))
                 .CreateLogger();
 
-            Parallel.Invoke(
-                async () => await "word_filter".MigrateLocalStorage(),
-                async () => await "rss_history".MigrateLocalStorage());
+            // Parallel.Invoke(
+            //     async () => await "word_filter".MigrateLocalStorage(),
+            //     async () => await "rss_history".MigrateLocalStorage(),
+            //     async ()=> await "warn_username_history".MigrateLocalStorage());
+            
+            MigrationHelper.RunMigration();
 
             try
             {
