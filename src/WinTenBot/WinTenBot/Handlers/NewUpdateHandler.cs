@@ -15,23 +15,24 @@ namespace WinTenBot.Handlers
 
         public NewUpdateHandler()
         {
-           
         }
 
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
             _requestProvider = new RequestProvider(context);
+            if (context.Update.ChannelPost != null) return;
+
             var message = context.Update.Message ?? context.Update.CallbackQuery.Message;
 
             Log.Information("New Update");
 
             var actions = new List<Action>();
-            
+
             actions.Add(async () => await _requestProvider.AfkCheck(message));
             actions.Add(async () => await _requestProvider.CheckCasBanAsync(message.From));
             actions.Add(async () => await _requestProvider.CheckUsername(message));
             actions.Add(async () => await _requestProvider.FindNotesAsync(message));
-            actions.Add(async () => await ActivityHelper.HitActivity(message));
+            actions.Add(() => ActivityHelper.HitActivityBackground(message));
 
             if (context.Update.CallbackQuery == null)
             {
@@ -42,7 +43,7 @@ namespace WinTenBot.Handlers
             {
                 actions.Add(async () => await _requestProvider.CheckGlobalBanAsync(message));
             }
-            
+
             Parallel.Invoke(actions.ToArray());
 
             await next(context, cancellationToken);
