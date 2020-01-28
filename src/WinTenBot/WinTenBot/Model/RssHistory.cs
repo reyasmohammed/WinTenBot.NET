@@ -27,9 +27,9 @@ namespace WinTenBot.Model
         public string Author { get; set; }
         
         [JsonPropertyName("created_at")]
-        public DateTime CreatedAt { get; set; }
+        public string CreatedAt { get; set; }
         
         [JsonPropertyName("updated_at")]
-        public DateTime UpdatedAt { get; set; }
+        public string UpdatedAt { get; set; }
     }
 }

@@ -9,7 +9,7 @@ namespace WinTenBot.Model
         public string ChatId { get; set; }
         
         [JsonPropertyName("user_id")]
-        public string FromId { get; set; }
+        public int FromId { get; set; }
         
         [JsonPropertyName("slug")]
         public string Tag { get; set; }
@@ -27,9 +27,9 @@ namespace WinTenBot.Model
         public string IdData { get; set; }
         
         [JsonPropertyName("created_at")]
-        public DateTime CreatedAt { get; set; }
+        public string CreatedAt { get; set; }
         
         [JsonPropertyName("updated_at")]
-        public DateTime UpdatedAt { get; set; }
+        public string UpdatedAt { get; set; }
     }
 }
