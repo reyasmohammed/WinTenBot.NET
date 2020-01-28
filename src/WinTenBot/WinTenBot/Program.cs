@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -14,10 +14,14 @@ namespace WinTenBot
     {
         public static void Main(string[] args)
         {
+            var outputConsoleTemplate = "[{Timestamp:HH:mm:ss.ffff} {Level:u3}] {Message:lj}{NewLine}{Exception}";
+
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .WriteTo.Console(theme: SystemConsoleTheme.Colored,restrictedToMinimumLevel:LogEventLevel.Debug)
-                .WriteTo.File("Storage/Logs/Logs-.txt",
+                .WriteTo.Console(theme: SystemConsoleTheme.Colored,
+                    restrictedToMinimumLevel:LogEventLevel.Debug,
+                    outputTemplate:outputConsoleTemplate)
+                .WriteTo.File("Storage/Logs/Logs-.log",
                     rollingInterval: RollingInterval.Day,
                     flushToDiskInterval: TimeSpan.FromSeconds(1))
                 .CreateLogger();
