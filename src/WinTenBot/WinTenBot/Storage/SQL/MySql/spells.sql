@@ -1,0 +1,11 @@
+﻿CREATE TABLE IF NOT EXISTS `spells`
+(
+    `id`         INT(11)      NOT NULL AUTO_INCREMENT,
+    `typo`       VARCHAR(100) NULL,
+    `fix`        VARCHAR(100) NULL,
+    `chat_id`    VARCHAR(70)  NULL,
+    `user_id`    VARCHAR(70)  NULL,
+    `created_at` TIMESTAMP(0) NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP(0) NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB;

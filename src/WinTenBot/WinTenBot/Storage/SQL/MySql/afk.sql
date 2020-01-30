@@ -1,0 +1,11 @@
+﻿CREATE TABLE IF NOT EXISTS `afk`
+(
+    `id`         INT(11)      NOT NULL AUTO_INCREMENT,
+    `user_id`    VARCHAR(10)  NULL,
+    `chat_id`    VARCHAR(30)  NULL,
+    `afk_reason` TEXT(65535)  NULL,
+    `is_afk`     TINYINT(4)   NULL,
+    `afk_start`  TIMESTAMP(0) NULL DEFAULT CURRENT_TIMESTAMP,
+    `afk_end`    TIMESTAMP(0) NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB;

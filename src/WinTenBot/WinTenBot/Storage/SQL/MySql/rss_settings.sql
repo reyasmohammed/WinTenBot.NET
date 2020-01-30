@@ -1,0 +1,10 @@
+﻿CREATE TABLE IF NOT EXISTS `rss_settings`
+(
+    `id`         INT(11)      NOT NULL AUTO_INCREMENT,
+    `chat_id`    VARCHAR(30)  NULL,
+    `from_id`    VARCHAR(20)  NULL,
+    `url_feed`   VARCHAR(255) NULL,
+    `created_at` TIMESTAMP(0) NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP(0) NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB;
