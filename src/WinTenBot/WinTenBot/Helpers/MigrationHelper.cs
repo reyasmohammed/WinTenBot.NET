@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 using Serilog;
 using WinTenBot.Providers;
 
@@ -11,6 +12,20 @@ namespace WinTenBot.Helpers
             var filePath = $"Storage/SQL/Sqlite/{tableName}.sql";
             Log.Debug($"Migrating :{filePath}");
             await filePath.ExecuteFileForSqLite();
+        }
+
+        public static void MigrateMysql()
+        {
+            var path = @"Storage\SQL\MySql";
+            var listFiles = Directory.GetFiles(path);
+            foreach (var file in listFiles)
+            {
+                Log.Information($"Migrating => {file}");
+                var sql = File.ReadAllText(file);
+                var result = sql.ExecForMysqlNonQuery(true);
+                
+                Log.Information($"Result: {result}");
+            }
         }
 
         public static void RunMigration()
