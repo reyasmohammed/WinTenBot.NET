@@ -31,7 +31,10 @@ namespace WinTenBot.Providers
             Message = updateContext.Update.CallbackQuery != null
                 ? updateContext.Update.CallbackQuery.Message
                 : updateContext.Update.Message;
-            TimeInit = Message.Date.GetDelay();
+            if (Message != null)
+            {
+                TimeInit = Message.Date.GetDelay();
+            }
         }
 
 
