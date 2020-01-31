@@ -5,6 +5,7 @@ using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types.Enums;
 using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
+using WinTenBot.Providers;
 using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Welcome
@@ -12,12 +13,12 @@ namespace WinTenBot.Handlers.Commands.Welcome
     public class WelcomeCommand : CommandBase
     {
         private SettingsService _settingsService;
-        private ChatProcessor _chatProcessor;
+        private RequestProvider _requestProvider;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _chatProcessor = new ChatProcessor(context);
+            _requestProvider = new RequestProvider(context);
             var msg = context.Update.Message;
             _settingsService = new SettingsService(msg);
 
@@ -54,16 +55,16 @@ namespace WinTenBot.Handlers.Commands.Welcome
 //                sendText += " " + string.Join(", ",args);
                 if (welcomeMediaType != "")
                 {
-                    await _chatProcessor.SendMediaAsync(welcomeMedia, welcomeMediaType, welcomeMessage, keyboard);
+                    await _requestProvider.SendMediaAsync(welcomeMedia, welcomeMediaType, welcomeMessage, keyboard);
                 }
                 else
                 {
-                    await _chatProcessor.SendAsync(sendText, keyboard);
+                    await _requestProvider.SendTextAsync(sendText, keyboard);
                 }
             }
             else
             {
-                await _chatProcessor.SendAsync(sendText);
+                await _requestProvider.SendTextAsync(sendText);
             }
         }
     }

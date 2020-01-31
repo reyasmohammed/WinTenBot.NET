@@ -5,13 +5,14 @@ using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
+using WinTenBot.Providers;
 using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Tags
 {
     public class TagCommand : CommandBase
     {
-        private ChatProcessor _chatProcessor;
+        private RequestProvider _requestProvider;
         private TagsService _tagsService;
 
         public TagCommand()
@@ -23,7 +24,7 @@ namespace WinTenBot.Handlers.Commands.Tags
             CancellationToken cancellationToken)
         {
             var msg = context.Update.Message;
-            _chatProcessor = new ChatProcessor(context);
+            _requestProvider = new RequestProvider(context);
             var isSudoer = msg.From.Id.IsSudoer();
 
             var sendText = "ℹ Simpan tag ke Cloud Tags" +
@@ -46,7 +47,7 @@ namespace WinTenBot.Handlers.Commands.Tags
 
                 if (args[0].Length >= 3)
                 {
-                    await _chatProcessor.SendAsync("📖 Mengumpulkan informasi..");
+                    await _requestProvider.SendTextAsync("📖 Mengumpulkan informasi..");
 //                    ConsoleHelper.WriteLine(TextHelper.ToJson(msg.ReplyToMessage));
 
                     var content = msg.ReplyToMessage.Text;
@@ -64,24 +65,24 @@ namespace WinTenBot.Handlers.Commands.Tags
                             {"content", content}
                         };
 
-                        await _chatProcessor.EditAsync("📝 Menyimpan tag data..");
+                        await _requestProvider.EditAsync("📝 Menyimpan tag data..");
                         await _tagsService.SaveTag(data);
 
 //                        var keyboard = new InlineKeyboardMarkup(
 //                            InlineKeyboardButton.WithCallbackData("OK", "tag finish-create")
 //                        );
 
-                        await _chatProcessor.EditAsync("✅ Tag berhasil di simpan..");
+                        await _requestProvider.EditAsync("✅ Tag berhasil di simpan..");
 
                         await _tagsService.UpdateCacheAsync(msg);
                         return;
                     }
 
-                    await _chatProcessor.EditAsync(
+                    await _requestProvider.EditAsync(
                         "✅ Tag sudah ada. Silakan ganti Tag jika ingin isi konten berbeda");
                 }
 
-                await _chatProcessor.EditAsync("Slug Tag minimal 3 karakter");
+                await _requestProvider.EditAsync("Slug Tag minimal 3 karakter");
             }
             else
             {
@@ -90,7 +91,7 @@ namespace WinTenBot.Handlers.Commands.Tags
                     Console.WriteLine(arg);
                 }
 
-                await _chatProcessor.SendAsync(sendText);
+                await _requestProvider.SendTextAsync(sendText);
             }
         }
     }

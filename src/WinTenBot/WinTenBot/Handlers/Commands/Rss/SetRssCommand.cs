@@ -1,34 +1,39 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Org.BouncyCastle.Ocsp;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
+using WinTenBot.Providers;
 using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Rss
 {
-    public class SetRssCommand:CommandBase
+    public class SetRssCommand : CommandBase
     {
         private RssService _rssService;
-        public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args, CancellationToken cancellationToken)
-        { 
-            ChatHelper.Init(context);
-            _rssService = new RssService(ChatHelper.Message);
+        private RequestProvider _requestProvider;
 
-            var url = ChatHelper.Message.Text.GetTextWithoutCmd();
+        public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
+            CancellationToken cancellationToken)
+        {
+            _requestProvider = new RequestProvider(context);
+            _rssService = new RssService(_requestProvider.Message);
+
+            var url = _requestProvider.Message.Text.GetTextWithoutCmd();
             if (url != null)
             {
-                await $"Sedang memeriksa {url}".AppendTextAsync();
+                await _requestProvider.AppendTextAsync($"Sedang memeriksa {url}");
                 if (url.CheckUrlValid())
                 {
-                    await $"Sedang memvalidasi {url}".AppendTextAsync();
+                    await _requestProvider.AppendTextAsync($"Sedang memvalidasi {url}");
                     var isValid = await url.IsValidUrlFeed();
                     if (!isValid)
                     {
-                        await "Sedang mencari kemungkinan RSS yang valid".AppendTextAsync();
+                        await _requestProvider.AppendTextAsync("Sedang mencari kemungkinan RSS yang valid");
                         var foundUrl = await url.GetBaseUrl().FindUrlFeed();
                         ConsoleHelper.WriteLine($"Found URL Feed: {foundUrl}");
-                        
+
                         if (foundUrl != "")
                         {
                             url = foundUrl;
@@ -37,49 +42,44 @@ namespace WinTenBot.Handlers.Commands.Rss
                         {
                             var notfoundRss = $"Kami tidak dapat memvalidasi {url} adalah Link RSS yang valid, " +
                                               $"dan mencoba mencari di {url.GetBaseUrl()} tetap tidak dapat menemukan.";
-                            
-                            await notfoundRss.EditAsync();
-                            
-                            ChatHelper.Close();
+
+                            await _requestProvider.EditAsync(notfoundRss);
                             return;
                         }
-
                     }
-                    
+
                     var isFeedExist = await _rssService.IsExistRssAsync(url);
 
                     ConsoleHelper.WriteLine($"Is Url Exist: {isFeedExist}");
-                    
+
                     if (!isFeedExist)
                     {
-                        await $"Sedang menyimpan..".SendTextAsync();
+                        await _requestProvider.SendTextAsync($"Sedang menyimpan..");
 
                         var data = new Dictionary<string, object>()
                         {
                             {"url_feed", url},
-                            {"chat_id", ChatHelper.Message.Chat.Id},
-                            {"from_id", ChatHelper.Message.From.Id}
+                            {"chat_id", _requestProvider.Message.Chat.Id},
+                            {"from_id", _requestProvider.Message.From.Id}
                         };
 
                         await _rssService.SaveRssSettingAsync(data);
-                        await $"Url: {url} berhasil di simpan".EditAsync();
-
+                        await _requestProvider.EditAsync($"Url: {url} berhasil di simpan");
                     }
                     else
                     {
-                        await $"Url: {url} sudah di simpan".SendTextAsync();
+                        await _requestProvider.SendTextAsync($"Url: {url} sudah di simpan");
                     }
                 }
                 else
                 {
-                    await "Url tersebut sepertinya tidak valid".SendTextAsync();
+                    await _requestProvider.SendTextAsync("Url tersebut sepertinya tidak valid");
                 }
-            }else
-            {
-                await "Apa url Feednya?".SendTextAsync();
             }
-
-            ChatHelper.Close();
+            else
+            {
+                await _requestProvider.SendTextAsync("Apa url Feednya?");
+            }
+        }
     }
 }
-        }

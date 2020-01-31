@@ -5,16 +5,17 @@ using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
 using WinTenBot.Model;
+using WinTenBot.Providers;
 
 namespace WinTenBot.Handlers.Commands.Core
 {
     class StartCommand : CommandBase
     {
-        private ChatProcessor _chatProcessor;
+        private RequestProvider _requestProvider;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args, CancellationToken cancellationToken)
         {
-            _chatProcessor = new ChatProcessor(context);
+            _requestProvider = new RequestProvider(context);
             
             var botName = Bot.GlobalConfiguration["Engines:ProductName"];
             var botVer = Bot.GlobalConfiguration["Engines:Version"];
@@ -31,7 +32,7 @@ namespace WinTenBot.Handlers.Commands.Core
                 InlineKeyboardButton.WithUrl("Dapatkan bantuan", urlStart)
             );
         
-            if (_chatProcessor.IsPrivateChat())
+            if (_requestProvider.IsPrivateChat())
             {
                 keyboard = new InlineKeyboardMarkup(new[]
                 {
@@ -43,7 +44,7 @@ namespace WinTenBot.Handlers.Commands.Core
                 });
             }
             
-            await _chatProcessor.SendAsync(sendText,keyboard);
+            await _requestProvider.SendTextAsync(sendText,keyboard);
         }
     }
 }

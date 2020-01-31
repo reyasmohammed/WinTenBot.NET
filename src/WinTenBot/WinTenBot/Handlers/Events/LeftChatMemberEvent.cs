@@ -7,6 +7,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
+using WinTenBot.Providers;
 using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Events
@@ -14,13 +15,13 @@ namespace WinTenBot.Handlers.Events
     public class LeftChatMemberEvent : IUpdateHandler
     {
         private ElasticSecurityService _elasticSecurityService;
-        private ChatProcessor _chatProcessor;
+        private RequestProvider _requestProvider;
 
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
             Message msg = context.Update.Message;
             _elasticSecurityService = new ElasticSecurityService(msg);
-            _chatProcessor = new ChatProcessor(context);
+            _requestProvider = new RequestProvider(context);
             var leftMember = msg.LeftChatMember;
             var isBan = await _elasticSecurityService.IsExistInCache(leftMember.Id);
 
@@ -39,7 +40,7 @@ namespace WinTenBot.Handlers.Events
                 var sendText = $"Sampai jumpa lagi {leftFullName} " +
                                $"\nKami di <b>{chatTitle}</b> menunggumu kembali.. :(";
 
-                await _chatProcessor.SendAsync(sendText);
+                await _requestProvider.SendTextAsync(sendText);
             }
             else
             {

@@ -4,15 +4,16 @@ using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
+using WinTenBot.Providers;
 
 namespace WinTenBot.Handlers.Commands.Core
 {
     public class HelpCommand:CommandBase
     {
-        private ChatProcessor _chatProcessor;
+        private RequestProvider _requestProvider;
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args, CancellationToken cancellationToken)
         {
-            _chatProcessor = new ChatProcessor(context);
+            _requestProvider = new RequestProvider(context);
 
             var sendText = "Untuk mendapatkan bantuan klik tombol dibawah ini";
             var urlStart = await "help".GetUrlStart();
@@ -20,13 +21,13 @@ namespace WinTenBot.Handlers.Commands.Core
                 InlineKeyboardButton.WithUrl("Dapatkan bantuan", urlStart)
             );
             
-            if (_chatProcessor.IsPrivateChat())
+            if (_requestProvider.IsPrivateChat())
             {
                 sendText = await "home".LoadInBotDocs();
                 keyboard = await "Storage/Buttons/home.json".JsonToButton();
             }
             
-            await _chatProcessor.SendAsync(sendText, keyboard);
+            await _requestProvider.SendTextAsync(sendText, keyboard);
 
         }
     }

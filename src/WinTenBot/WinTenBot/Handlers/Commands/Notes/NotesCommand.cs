@@ -4,13 +4,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers.Processors;
+using WinTenBot.Providers;
 using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Notes
 {
     public class NotesCommand : CommandBase
     {
-        private ChatProcessor _chatProcessor;
+        private RequestProvider _requestProvider;
         private NotesService _notesService;
 
         public NotesCommand()
@@ -21,9 +22,9 @@ namespace WinTenBot.Handlers.Commands.Notes
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _chatProcessor = new ChatProcessor(context);
+            _requestProvider = new RequestProvider(context);
 
-            var notesData = await _notesService.GetNotesByChatId(_chatProcessor.Message.Chat.Id);
+            var notesData = await _notesService.GetNotesByChatId(_requestProvider.Message.Chat.Id);
 
             var sendText = "Filters di Obrolan ini.";
 
@@ -41,9 +42,9 @@ namespace WinTenBot.Handlers.Commands.Notes
                            "\nUntuk menambahkannya ketik /addfilter";
             }
 
-            await _notesService.UpdateCache(_chatProcessor.Message.Chat.Id);
+            await _notesService.UpdateCache(_requestProvider.Message.Chat.Id);
 
-            await _chatProcessor.SendAsync(sendText);
+            await _requestProvider.SendTextAsync(sendText);
         }
     }
 }

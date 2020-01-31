@@ -5,13 +5,14 @@ using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types.Enums;
 using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
+using WinTenBot.Providers;
 using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Rules
 {
     public class RulesCommand : CommandBase
     {
-        private ChatProcessor _chatProcessor;
+        private RequestProvider _requestProvider;
         private SettingsService _settingsService;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
@@ -19,7 +20,7 @@ namespace WinTenBot.Handlers.Commands.Rules
         {
             var msg = context.Update.Message;
 
-            _chatProcessor = new ChatProcessor(context);
+            _requestProvider = new RequestProvider(context);
             _settingsService = new SettingsService(msg);
 
 
@@ -42,7 +43,7 @@ namespace WinTenBot.Handlers.Commands.Rules
                 sendText = "Rules hanya untuk grup";
             }
 
-            await _chatProcessor.SendAsync(sendText);
+            await _requestProvider.SendTextAsync(sendText);
         }
     }
 }

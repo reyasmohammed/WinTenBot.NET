@@ -2,17 +2,18 @@
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers.Processors;
+using WinTenBot.Providers;
 
 namespace WinTenBot.Handlers.Commands.Group
 {
     public class PinCommand : CommandBase
     {
-        private ChatProcessor _chatProcessor;
+        private RequestProvider _requestProvider;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _chatProcessor = new ChatProcessor(context);
+            _requestProvider = new RequestProvider(context);
             var msg = context.Update.Message;
             var client = context.Bot.Client;
 
@@ -26,8 +27,7 @@ namespace WinTenBot.Handlers.Commands.Group
 //                ConsoleHelper.WriteLine(pin.);
             }
 
-            await _chatProcessor.SendAsync(sendText);
-//            throw new System.NotImplementedException();
+            await _requestProvider.SendTextAsync(sendText);
         }
     }
 }

@@ -3,13 +3,14 @@ using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
+using WinTenBot.Providers;
 using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Tags
 {
     public class UntagCommand:CommandBase
     {
-        private ChatProcessor _chatProcessor;
+        private RequestProvider _requestProvider;
         private TagsService _tagsService;
 
         public UntagCommand()
@@ -19,27 +20,27 @@ namespace WinTenBot.Handlers.Commands.Tags
         
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args, CancellationToken cancellationToken)
         {
-            _chatProcessor = new ChatProcessor(context);
+            _requestProvider = new RequestProvider(context);
             var msg = context.Update.Message;
 
-            var isAdmin = await _chatProcessor.IsAdminGroup();
+            var isAdmin = await _requestProvider.IsAdminGroup();
             var tagVal = args[0];
             var sendText = "Perintah Untag hanya untuk ngadmin.";
             
             if (isAdmin)
             {
-                await _chatProcessor.SendAsync("Memeriksa..");
-                var isExist = await _tagsService.IsExist(_chatProcessor.Message.Chat.Id, tagVal);
+                await _requestProvider.SendTextAsync("Memeriksa..");
+                var isExist = await _tagsService.IsExist(_requestProvider.Message.Chat.Id, tagVal);
                 if (isExist)
                 {
                     ConsoleHelper.WriteLine($"Sedang menghapus tag {tagVal}");
-                    var unTag = await _tagsService.DeleteTag(_chatProcessor.Message.Chat.Id, tagVal);
+                    var unTag = await _tagsService.DeleteTag(_requestProvider.Message.Chat.Id, tagVal);
                     if (unTag)
                     {
                         sendText = $"Hapus tag {tagVal} berhasil";
                     }
 
-                    await _chatProcessor.EditAsync(sendText);
+                    await _requestProvider.EditAsync(sendText);
                     return;
                 }
                 else
@@ -48,7 +49,7 @@ namespace WinTenBot.Handlers.Commands.Tags
                 }
             }
             
-            await _chatProcessor.SendAsync(sendText);
+            await _requestProvider.SendTextAsync(sendText);
 
         }
     }

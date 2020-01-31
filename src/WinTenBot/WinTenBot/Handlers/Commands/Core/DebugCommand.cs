@@ -4,15 +4,16 @@ using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
+using WinTenBot.Providers;
 
 namespace WinTenBot.Handlers.Commands.Core
 {
     public class DebugCommand:CommandBase
     {
-        private ChatProcessor _chatProcessor;
+        private RequestProvider _requestProvider;
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args, CancellationToken cancellationToken)
         {
-            _chatProcessor = new ChatProcessor(context);
+            _requestProvider = new RequestProvider(context);
 
             var msg = context.Update.Message;
             var json = msg.ToJson(true);
@@ -20,7 +21,7 @@ namespace WinTenBot.Handlers.Commands.Core
             ConsoleHelper.WriteLine(json.Length);
 
             var sendText = $"Debug:\n {json}";
-            await _chatProcessor.SendAsync(sendText);
+            await _requestProvider.SendTextAsync(sendText);
         }
     }
 }

@@ -6,14 +6,14 @@ using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Helpers;
-using WinTenBot.Helpers.Processors;
+using WinTenBot.Providers;
 using WinTenBot.Services;
 
 namespace WinTenBot.Handlers
 {
     public class CallTagsReceivedHandler : IUpdateHandler
     {
-        private ChatProcessor chatProcessor;
+        private RequestProvider _requestProvider;
         private TagsService tagsService;
 
         public CallTagsReceivedHandler()
@@ -23,7 +23,7 @@ namespace WinTenBot.Handlers
 
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
-            chatProcessor = new ChatProcessor(context);
+            _requestProvider = new RequestProvider(context);
             
             Message msg = context.Update.Message;
             ConsoleHelper.WriteLine("Tags Received..");
@@ -47,18 +47,18 @@ namespace WinTenBot.Handlers
                 var content = tagData[0].Content;
                 var buttonStr = tagData[0].BtnData;
 
-                IReplyMarkup buttonMarkup = null;
+                InlineKeyboardMarkup buttonMarkup = null;
                 if (buttonStr != "")
                 {
                     buttonMarkup = buttonStr.ToReplyMarkup(2);
                 }
 
-                await chatProcessor.SendAsync(content, buttonMarkup);
+                await _requestProvider.SendTextAsync(content, buttonMarkup);
             }
 
             if (partsText.Count() > limitedTags.Count())
             {
-                await chatProcessor.SendAsync("Due performance reason, we limit 5 batch call tags");
+                await _requestProvider.SendTextAsync("Due performance reason, we limit 5 batch call tags");
             }
         }
     }

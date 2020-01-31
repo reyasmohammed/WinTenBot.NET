@@ -4,13 +4,14 @@ using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
+using WinTenBot.Providers;
 using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Security
 {
     public class MediaFilterCommand : CommandBase
     {
-        private ChatProcessor _chatProcessor;
+        private RequestProvider _requestProvider;
         private MediaFilterService _mediaFilterService;
 
         public MediaFilterCommand()
@@ -21,7 +22,7 @@ namespace WinTenBot.Handlers.Commands.Security
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _chatProcessor = new ChatProcessor(context);
+            _requestProvider = new RequestProvider(context);
             var msg = context.Update.Message;
 
             var sendText = "Saat ini hanya untuk Sudoer saja.";
@@ -62,7 +63,7 @@ namespace WinTenBot.Handlers.Commands.Security
                     "terima kasih atas laporan nya.";
             }
 
-            await _chatProcessor.SendAsync(sendText);
+            await _requestProvider.SendTextAsync(sendText);
         }
     }
 }

@@ -2,16 +2,17 @@
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers.Processors;
+using WinTenBot.Providers;
 
 namespace WinTenBot.Handlers.Commands.Chat
 {
     public class IdCommand : CommandBase
     {
-        private ChatProcessor _chatProcessor;
+        private RequestProvider _requestProvider;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args, CancellationToken cancellationToken)
         {
-            _chatProcessor = new ChatProcessor(context);
+            _requestProvider = new RequestProvider(context);
             var msg = context.Update.Message;
 
             if (msg.ReplyToMessage != null)
@@ -36,7 +37,7 @@ namespace WinTenBot.Handlers.Commands.Chat
                        $"Username: @{username}\n" +
                        $"Language: {userLang.ToUpper()}";
 
-            await _chatProcessor.SendAsync(text);
+            await _requestProvider.SendTextAsync(text);
             //            await context.Bot.Client.SendTextMessageAsync(
             //                msg.Chat,
             //                text,

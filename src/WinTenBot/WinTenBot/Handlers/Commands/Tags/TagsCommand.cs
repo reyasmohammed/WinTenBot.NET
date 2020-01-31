@@ -6,6 +6,7 @@ using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
+using WinTenBot.Providers;
 using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Tags
@@ -14,7 +15,7 @@ namespace WinTenBot.Handlers.Commands.Tags
     {
         private readonly TagsService _tagsService;
         private SettingsService _settingsService;
-        private ChatProcessor _chatProcessor;
+        private RequestProvider _requestProvider;
 
         public TagsCommand()
         {
@@ -25,7 +26,7 @@ namespace WinTenBot.Handlers.Commands.Tags
             CancellationToken cancellationToken)
         {
             Message msg = context.Update.Message;
-            _chatProcessor = new ChatProcessor(context);
+            _requestProvider = new RequestProvider(context);
             _settingsService = new SettingsService(msg);
 
             var id = msg.From.Id;
@@ -33,8 +34,8 @@ namespace WinTenBot.Handlers.Commands.Tags
 
             ConsoleHelper.WriteLine(id.IsSudoer());
             
-            await _chatProcessor.DeleteAsync(msg.MessageId);
-            await _chatProcessor.SendAsync("🔄 Loading tags..");
+            await _requestProvider.DeleteAsync(msg.MessageId);
+            await _requestProvider.SendTextAsync("🔄 Loading tags..");
             var tagsData = await _tagsService.GetTagsByGroupAsync("*", msg.Chat.Id);
             var tagsStr = string.Empty;
 
@@ -46,7 +47,7 @@ namespace WinTenBot.Handlers.Commands.Tags
             sendText = $"#️⃣<b> {tagsData.Count} Tags</b>\n" +
                        $"\n{tagsStr}";
 
-            await _chatProcessor.EditAsync(sendText);
+            await _requestProvider.EditAsync(sendText);
             
             //            var jsonSettings = TextHelper.ToJson(currentSetting);
             //            ConsoleHelper.WriteLine($"CurrentSettings: {jsonSettings}");
@@ -57,12 +58,12 @@ namespace WinTenBot.Handlers.Commands.Tags
             var lastTagsMsgId = currentSetting.LastTagsMessageId;
             ConsoleHelper.WriteLine($"LastTagsMsgId: {lastTagsMsgId}");
 
-            await _chatProcessor.DeleteAsync(lastTagsMsgId.ToInt());
+            await _requestProvider.DeleteAsync(lastTagsMsgId.ToInt());
 
             await _tagsService.UpdateCacheAsync(msg);
 
-            ConsoleHelper.WriteLine(_chatProcessor.SentMessageId);
-            await _settingsService.UpdateCell("last_tags_message_id", _chatProcessor.SentMessageId);
+            ConsoleHelper.WriteLine(_requestProvider.SentMessageId);
+            await _settingsService.UpdateCell("last_tags_message_id", _requestProvider.SentMessageId);
 
 
 //            var json = TextHelper.ToJson(tagsData);

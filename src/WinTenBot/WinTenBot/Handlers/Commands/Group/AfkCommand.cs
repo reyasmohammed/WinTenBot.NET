@@ -4,13 +4,14 @@ using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
+using WinTenBot.Providers;
 using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Group
 {
     public class AfkCommand : CommandBase
     {
-        private ChatProcessor _chatProcessor;
+        private RequestProvider _requestProvider;
         private AfkService _afkService;
 
         public AfkCommand()
@@ -21,7 +22,7 @@ namespace WinTenBot.Handlers.Commands.Group
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _chatProcessor = new ChatProcessor(context);
+            _requestProvider = new RequestProvider(context);
             var msg = context.Update.Message;
 
             var data = new Dictionary<string, object>()
@@ -41,7 +42,7 @@ namespace WinTenBot.Handlers.Commands.Group
                 sendText += $"\n<i>{afkReason}</i>";
             }
 
-            await _chatProcessor.SendAsync(sendText);
+            await _requestProvider.SendTextAsync(sendText);
             await _afkService.SaveAsync(data);
             await _afkService.UpdateCacheAsync();
 

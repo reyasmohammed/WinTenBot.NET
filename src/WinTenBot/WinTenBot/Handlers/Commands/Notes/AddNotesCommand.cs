@@ -5,13 +5,14 @@ using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
+using WinTenBot.Providers;
 using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Notes
 {
     public class AddNotesCommand : CommandBase
     {
-        private ChatProcessor _chatProcessor;
+        private RequestProvider _requestProvider;
         private NotesService _notesService;
 
         public AddNotesCommand()
@@ -22,13 +23,13 @@ namespace WinTenBot.Handlers.Commands.Notes
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _chatProcessor = new ChatProcessor(context);
+            _requestProvider = new RequestProvider(context);
             var msg = context.Update.Message;
 
             if (msg.ReplyToMessage != null)
             {
                 var repMsg = msg.ReplyToMessage;
-                await _chatProcessor.SendAsync("Mengumpulkan informasi");
+                await _requestProvider.SendTextAsync("Mengumpulkan informasi");
 
                 var partsContent = repMsg.Text.Split(new[] {"\n\n"}, StringSplitOptions.None);
                 var partsMsgText = msg.Text.GetTextWithoutCmd().Split("\n\n");
@@ -51,10 +52,10 @@ namespace WinTenBot.Handlers.Commands.Notes
                     data.Add("btn_data", partsMsgText[1]);
                 }
 
-                await _chatProcessor.EditAsync("Menyimpan..");
+                await _requestProvider.EditAsync("Menyimpan..");
                 await _notesService.SaveNote(data);
 
-                await _chatProcessor.EditAsync("Berhasil");
+                await _requestProvider.EditAsync("Berhasil");
             }
         }
     }

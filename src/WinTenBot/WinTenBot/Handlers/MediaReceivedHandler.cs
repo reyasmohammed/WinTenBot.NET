@@ -6,13 +6,14 @@ using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
 using WinTenBot.Model;
+using WinTenBot.Providers;
 using WinTenBot.Services;
 
 namespace WinTenBot.Handlers
 {
     public class MediaReceivedHandler : IUpdateHandler
     {
-        private ChatProcessor _chatProcessor;
+        private RequestProvider _requestProvider;
         private MediaFilterService _mediaFilterService;
 
         public MediaReceivedHandler()
@@ -22,7 +23,7 @@ namespace WinTenBot.Handlers
 
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
-            _chatProcessor = new ChatProcessor(context);
+            _requestProvider = new RequestProvider(context);
             var msg = context.Update.Message;
 
             ConsoleHelper.WriteLine("Media received... ");
@@ -30,7 +31,7 @@ namespace WinTenBot.Handlers
 //            var isBan = await _mediaFilterService.IsExist("file_id", msg.GetReducedFileId());
             if (isBan)
             {
-                await _chatProcessor.DeleteAsync(msg.MessageId);
+                await _requestProvider.DeleteAsync(msg.MessageId);
             }
 
             ConsoleHelper.WriteLine($"Media isBan: {isBan}");

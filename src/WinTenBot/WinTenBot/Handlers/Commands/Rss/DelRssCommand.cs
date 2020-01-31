@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
+using WinTenBot.Providers;
 using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Rss
@@ -9,19 +10,20 @@ namespace WinTenBot.Handlers.Commands.Rss
     public class DelRssCommand : CommandBase
     {
         private RssService _rssService;
+        private RequestProvider _requestProvider;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            ChatHelper.Init(context);
+            _requestProvider = new RequestProvider(context);
             _rssService = new RssService(context.Update.Message);
 
-            var isAdminOrPrivateChat = await ChatHelper.IsAdminOrPrivateChat();
+            var isAdminOrPrivateChat = await _requestProvider.IsAdminOrPrivateChat();
             if (isAdminOrPrivateChat)
             {
-                var urlFeed = ChatHelper.Message.Text.GetTextWithoutCmd();
+                var urlFeed = _requestProvider.Message.Text.GetTextWithoutCmd();
 
-                await $"Sedang menghapus {urlFeed}".SendTextAsync();
+                await _requestProvider.SendTextAsync($"Sedang menghapus {urlFeed}");
 
                 var delete = await _rssService.DeleteRssAsync(urlFeed);
 
@@ -29,11 +31,8 @@ namespace WinTenBot.Handlers.Commands.Rss
                     ? "berhasil."
                     : "gagal. Mungkin RSS tersebut sudah di hapus atau belum di tambahkan";
 
-                await $"Hapus {urlFeed} {success}".EditAsync();
+                await _requestProvider.EditAsync($"Hapus {urlFeed} {success}");
             }
-
-
-            ChatHelper.Close();
         }
     }
 }

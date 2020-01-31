@@ -3,15 +3,16 @@ using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
+using WinTenBot.Providers;
 
 namespace WinTenBot.Handlers.Commands.Group
 {
     public class DemoteCommand:CommandBase
     {
-        private ChatProcessor _chatProcessor;
+        private RequestProvider _requestProvider;
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args, CancellationToken cancellationToken)
         {
-            _chatProcessor = new ChatProcessor(context);
+            _requestProvider = new RequestProvider(context);
             var msg = context.Update.Message;
             if (msg.ReplyToMessage != null)
             {
@@ -23,7 +24,7 @@ namespace WinTenBot.Handlers.Commands.Group
 
             var sendText = $"{nameLink} diturunkan dari admin";
 
-            var promote = await _chatProcessor.DemoteChatMemberAsync(userId);
+            var promote = await _requestProvider.DemoteChatMemberAsync(userId);
             if (!promote.IsSuccess)
             {
                 var errorCode = promote.ErrorCode;
@@ -33,7 +34,7 @@ namespace WinTenBot.Handlers.Commands.Group
                            $"\nPesan: {errorMessage}";
             }
 
-            await _chatProcessor.SendAsync(sendText);
+            await _requestProvider.SendTextAsync(sendText);
         }
     }
 }

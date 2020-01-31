@@ -8,18 +8,19 @@ using Telegram.Bot.Types;
 using WinTenBot.Handlers.Callbacks;
 using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
+using WinTenBot.Providers;
 
 namespace WinTenBot.Handlers
 {
     public class CallbackQueryHandler : IUpdateHandler
     {
-        private ChatProcessor _chatProcessor;
+        private RequestProvider _requestProvider;
 
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
-            _chatProcessor = new ChatProcessor(context);
+            _requestProvider = new RequestProvider(context);
             CallbackQuery cq = context.Update.CallbackQuery;
-            _chatProcessor.CallBackMessageId = cq.Message.MessageId;
+            _requestProvider.CallBackMessageId = cq.Message.MessageId;
 
             ConsoleHelper.WriteLine(cq.ToJson());
             ConsoleHelper.WriteLine($"CallBackData: {cq.Data}");
@@ -52,7 +53,7 @@ namespace WinTenBot.Handlers
                     var keyboard = await $"Storage/Buttons/{jsonButton}.json".JsonToButton();
                     
 
-                    await _chatProcessor.EditMessageCallback(sendText, keyboard);
+                    await _requestProvider.EditMessageCallback(sendText, keyboard);
 
                     // var a = new HelpCallbackQuery(cq);
                     break;

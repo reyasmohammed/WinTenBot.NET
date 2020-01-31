@@ -3,20 +3,20 @@ using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types.Enums;
 using WinTenBot.Helpers;
-using WinTenBot.Helpers.Processors;
+using WinTenBot.Providers;
 
 namespace WinTenBot.Handlers.Commands.Group
 {
     public class AdminCommand : CommandBase
     {
-        private ChatProcessor chatProcessor;
+        private RequestProvider _requestProvider;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args, CancellationToken cancellationToken)
         {
             var msg = context.Update.Message;
-            chatProcessor = new ChatProcessor(context);
+            _requestProvider = new RequestProvider(context);
 
-            await chatProcessor.SendAsync("🍽 Loading..");
+            await _requestProvider.SendTextAsync("🍽 Loading..");
             //            var admins = context.Update.Message.Chat.AllMembersAreAdministrators;
             var admins = await context.Bot.Client.GetChatAdministratorsAsync(msg.Chat.Id, cancellationToken);
             var creatorStr = string.Empty;
@@ -45,7 +45,7 @@ namespace WinTenBot.Handlers.Commands.Group
                            $"\n👥️ <b>Administrators</b>" +
                            $"\n{adminStr}";
 
-            await chatProcessor.EditAsync(sendText);
+            await _requestProvider.EditAsync(sendText);
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Model;
+using WinTenBot.Providers;
 using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Rss
@@ -11,18 +12,18 @@ namespace WinTenBot.Handlers.Commands.Rss
     public class RssInfoCommand:CommandBase
     {
         private RssService _rssService;
+        private RequestProvider _requestProvider;
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args, CancellationToken cancellationToken)
         {
-            _rssService = new RssService(ChatHelper.Message);
-            
-            ChatHelper.Init(context);
+            _requestProvider = new RequestProvider(context);
+            _rssService = new RssService(context.Update.Message);
 
-            var chatId = ChatHelper.Message.Chat.Id.ToString();
-            var isAdmin = await ChatHelper.IsAdminGroup();
+            var chatId = _requestProvider.Message.Chat.Id.ToString();
+            var isAdmin = await _requestProvider.IsAdminGroup();
             
-            if (isAdmin || ChatHelper.IsPrivateChat())
+            if (isAdmin || _requestProvider.IsPrivateChat())
             {
-                await "🔄 Sedang meload data..".SendTextAsync();
+                await _requestProvider.SendTextAsync("🔄 Sedang meload data..");
                 var rssData = await _rssService.GetRssSettingsAsync(chatId);
                 
                 var sendText = $"📚 <b>List RSS</b>: {rssData.Count} Items.";
@@ -46,8 +47,6 @@ namespace WinTenBot.Handlers.Commands.Rss
             {
                 await "Kamu bukan admin, atau kamu bisa mengaturnya di japri ".SendTextAsync();
             }
-            
-            ChatHelper.Close();
         }
     }
 }

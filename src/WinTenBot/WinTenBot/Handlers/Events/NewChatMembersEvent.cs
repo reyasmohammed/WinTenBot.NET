@@ -19,7 +19,7 @@ namespace WinTenBot.Handlers.Events
     public class NewChatMembersEvent : IUpdateHandler
     {
         private SettingsService _settingsService;
-        private ChatProcessor _chatProcessor;
+        private RequestProvider _requestProvider;
         private ElasticSecurityService _elasticSecurityService;
 
 
@@ -31,7 +31,7 @@ namespace WinTenBot.Handlers.Events
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
             Message msg = context.Update.Message;
-            _chatProcessor = new ChatProcessor(context);
+            _requestProvider = new RequestProvider(context);
             _settingsService = new SettingsService(msg);
             _elasticSecurityService = new ElasticSecurityService(context.Update.Message);
 
@@ -49,7 +49,7 @@ namespace WinTenBot.Handlers.Events
                                $"\n\nAku akan menerapkan konfigurasi standard jika aku baru pertama kali masuk kesini. " +
                                $"\n\nUntuk melihat daftar perintah bisa ketikkan /help";
                 
-                await _chatProcessor.SendAsync(sendText);
+                await _requestProvider.SendTextAsync(sendText);
                 
                 await _settingsService.SaveSettingsAsync(new Dictionary<string, object>()
                 {
@@ -70,7 +70,7 @@ namespace WinTenBot.Handlers.Events
                 var chatSettings = await _settingsService.GetSettingByGroup();
 
                 var chatTitle = msg.Chat.Title;
-                var memberCount = await _chatProcessor.GetMemberCount();
+                var memberCount = await _requestProvider.GetMemberCount();
                 var newMemberCount = newMembers.Length;
 
                 ConsoleHelper.WriteLine("Preparing send Welcome..");
@@ -92,7 +92,7 @@ namespace WinTenBot.Handlers.Events
                     memberCount
                 });
 
-                IReplyMarkup keyboard = null;
+                InlineKeyboardMarkup keyboard = null;
                 if (!chatSettings.WelcomeButton.IsNullOrEmpty())
                 {
                     keyboard = chatSettings.WelcomeButton.ToReplyMarkup(2);
@@ -100,7 +100,7 @@ namespace WinTenBot.Handlers.Events
 
                 if (!chatSettings.WelcomeMediaType.IsNullOrEmpty())
                 {
-                    await _chatProcessor.SendMediaAsync(
+                    await _requestProvider.SendMediaAsync(
                         chatSettings.WelcomeMedia,
                         chatSettings.WelcomeMediaType,
                         sendText,
@@ -108,7 +108,7 @@ namespace WinTenBot.Handlers.Events
                 }
                 else
                 {
-                    await _chatProcessor.SendAsync(sendText, keyboard);
+                    await _requestProvider.SendTextAsync(sendText, keyboard);
                 }
 
                 await _settingsService.SaveSettingsAsync(new Dictionary<string, object>()
@@ -184,10 +184,10 @@ namespace WinTenBot.Handlers.Events
             if (!isBan) return isKicked;
 
             var sendText = $"{user} terdeteksi pada penjaringan WinTenDev ES2 tapi gagal di tendang.";
-            isKicked = await _chatProcessor.KickMemberAsync(user);
+            isKicked = await _requestProvider.KickMemberAsync(user);
             if (isKicked)
             {
-                await _chatProcessor.UnbanMemberAsync(user);
+                await _requestProvider.UnbanMemberAsync(user);
                 sendText = sendText.Replace("tapi gagal", "dan berhasil");
             }
             else
@@ -195,7 +195,7 @@ namespace WinTenBot.Handlers.Events
                 sendText += " Pastikan saya admin yang dapat menghapus Pengguna";
             }
 
-            await _chatProcessor.SendAsync(sendText);
+            await _requestProvider.SendTextAsync(sendText);
 
             return isKicked;
         }

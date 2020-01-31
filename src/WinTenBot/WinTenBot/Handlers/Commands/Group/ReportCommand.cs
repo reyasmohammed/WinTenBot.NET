@@ -5,23 +5,24 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
+using WinTenBot.Providers;
 
 namespace WinTenBot.Handlers.Commands.Group
 {
     public class ReportCommand : CommandBase
     {
-        private ChatProcessor _chatProcessor;
+        private RequestProvider _requestProvider;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _chatProcessor = new ChatProcessor(context);
+            _requestProvider = new RequestProvider(context);
             var msg = context.Update.Message;
             var sendText = "Balas pesan yg mau di report";
 
             if (msg.Chat.Type == ChatType.Private)
             {
-                await _chatProcessor.SendAsync("Report hanya untuk grup saja");
+                await _requestProvider.SendTextAsync("Report hanya untuk grup saja");
                 return;
             }
 
@@ -31,7 +32,7 @@ namespace WinTenBot.Handlers.Commands.Group
 
                 if (msg.From.Id != repMsg.From.Id)
                 {
-                    var mentionAdmins = await _chatProcessor.GetMentionAdminsStr();
+                    var mentionAdmins = await _requestProvider.GetMentionAdminsStr();
 
                     sendText = $"Ada laporan nich." +
                                $"\n{msg.GetFromNameLink()} melaporkan {repMsg.GetFromNameLink()}" +
@@ -51,7 +52,7 @@ namespace WinTenBot.Handlers.Commands.Group
                         }
                     });
                     
-                    await _chatProcessor.SendAsync(sendText);
+                    await _requestProvider.SendTextAsync(sendText);
                     return;
                 }
 
@@ -59,7 +60,7 @@ namespace WinTenBot.Handlers.Commands.Group
             }
 
 
-            await _chatProcessor.SendAsync(sendText);
+            await _requestProvider.SendTextAsync(sendText);
         }
     }
 }

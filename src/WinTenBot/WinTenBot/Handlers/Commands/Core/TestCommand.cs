@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 using SqlKata;
 using SqlKata.Execution;
 using Telegram.Bot.Framework.Abstractions;
@@ -14,44 +15,49 @@ namespace WinTenBot.Handlers.Commands.Core
     public class TestCommand : CommandBase
     {
         private RssService _rssService;
+        private RequestProvider _requestProvider;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            ChatHelper.Init(context);
+         _requestProvider = new RequestProvider(context);
             _rssService = new RssService(context.Update.Message);
 
-            var chatId = ChatHelper.Message.Chat.Id;
+            var chatId = _requestProvider.Message.Chat.Id;
 
-            if (ChatHelper.Message.From.Id.IsSudoer())
+            if (_requestProvider.Message.From.Id.IsSudoer())
             {
-                ConsoleHelper.WriteLine("Test started..");
-                await "Sedang mengetes sesuatu".SendTextAsync();
+                Log.Information("Test started..");
+                await _requestProvider.SendTextAsync("Sedang mengetes sesuatu");
                 
-                var data = await new Query("rss_history")
-                    .Where("chat_id", chatId)
-                    .ExecForMysql()
-                    .GetAsync();
-                
-                var rssHistories = data
-                    .ToJson()
-                    .MapObject<List<RssHistory>>();
+                // var data = await new Query("rss_history")
+                //     .Where("chat_id", chatId)
+                //     .ExecForMysql()
+                //     .GetAsync();
+                //
+                // var rssHistories = data
+                //     .ToJson()
+                //     .MapObject<List<RssHistory>>();
+                //
+                // ConsoleHelper.WriteLine(data.GetType());
+                // // ConsoleHelper.WriteLine(data.ToJson(true));
+                //
+                // ConsoleHelper.WriteLine(rssHistories.GetType());
+                // // ConsoleHelper.WriteLine(rssHistories.ToJson(true));
+                //
+                // ConsoleHelper.WriteLine("Test completed..");
 
-                ConsoleHelper.WriteLine(data.GetType());
-                ConsoleHelper.WriteLine(data.ToJson(true));
+                // await "This test".LogToChannel();
+
+                // await RssHelper.SyncRssHistoryToCloud();
+                await BotHelper.ClearLog();
                 
-                ConsoleHelper.WriteLine(rssHistories.GetType());
-                ConsoleHelper.WriteLine(rssHistories.ToJson(true));
-                
-                ConsoleHelper.WriteLine("Test completed..");
-                await "Selesai ngetest".EditAsync();
+                await _requestProvider.EditAsync("Selesai ngetest");
             }
             else
             {
-                await "Unauthorized.".SendTextAsync();
+                await _requestProvider.SendTextAsync("Unauthorized.");
             }
-
-            ChatHelper.Close();
         }
     }
 }

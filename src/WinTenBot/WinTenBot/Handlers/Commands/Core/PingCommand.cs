@@ -6,18 +6,18 @@ using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Helpers;
 using WinTenBot.Helpers.Processors;
 using WinTenBot.Model;
+using WinTenBot.Providers;
 
 namespace WinTenBot.Handlers.Commands.Core
 {
     internal class PingCommand : CommandBase
     {
-        // private ChatProcessor _chatProcessor;
+        private RequestProvider _requestProvider;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            // _chatProcessor = new ChatProcessor(context);
-            ChatHelper.Init(context);
+            _requestProvider = new RequestProvider(context);
 
             var msg = context.Update.Message;
 
@@ -38,7 +38,7 @@ namespace WinTenBot.Handlers.Commands.Core
                 if (getWebHookInfo.Url == "")
                 {
                     // sendText += "\n\n<i>Bot run in Poll mode.</i>";
-                    await "\n<i>Bot run in Poll mode.</i>".AppendTextAsync(keyboard);
+                    await _requestProvider.AppendTextAsync("\n<i>Bot run in Poll mode.</i>", keyboard);
                 }
                 else
                 {
@@ -51,13 +51,11 @@ namespace WinTenBot.Handlers.Commands.Core
                                    $"\nLast Error: {getWebHookInfo.LastErrorDate}" +
                                    $"\nError Message: {getWebHookInfo.LastErrorMessage}";
                     
-                    await hookInfo.AppendTextAsync(keyboard);
+                    await _requestProvider.AppendTextAsync(hookInfo, keyboard);
                 }
             }
 
             // await sendText.AppendTextAsync(keyboard);
-
-            ChatHelper.Close();
         }
     }
 }
