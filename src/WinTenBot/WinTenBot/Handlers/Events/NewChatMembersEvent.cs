@@ -75,7 +75,7 @@ namespace WinTenBot.Handlers.Events
 
                 ConsoleHelper.WriteLine("Preparing send Welcome..");
 
-                if (chatSettings.WelcomeMessage == "")
+                if (chatSettings.WelcomeMessage.IsNullOrEmpty())
                 {
                     chatSettings.WelcomeMessage = $"Hai {allNewMember}" +
                                                   $"\nSelamat datang di kontrakan {chatTitle}" +
@@ -93,13 +93,12 @@ namespace WinTenBot.Handlers.Events
                 });
 
                 IReplyMarkup keyboard = null;
-                if (chatSettings.WelcomeButton != "")
+                if (!chatSettings.WelcomeButton.IsNullOrEmpty())
                 {
                     keyboard = chatSettings.WelcomeButton.ToReplyMarkup(2);
                 }
 
-
-                if (chatSettings.WelcomeMediaType != "")
+                if (!chatSettings.WelcomeMediaType.IsNullOrEmpty())
                 {
                     await _chatProcessor.SendMediaAsync(
                         chatSettings.WelcomeMedia,

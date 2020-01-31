@@ -73,6 +73,11 @@ namespace WinTenBot.Helpers
             return JsonSerializer.Deserialize<T>(json);
         }
 
+        public static bool IsNullOrEmpty(this string str)
+        {
+            return string.IsNullOrEmpty(str);
+        }
+
         // Source: https://www.codeproject.com/Articles/44274/Transpose-a-DataTable-using-C
         public static DataTable TransposedTable(this DataTable inputTable)
         {
