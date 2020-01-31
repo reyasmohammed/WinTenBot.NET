@@ -146,12 +146,12 @@ namespace WinTenBot.Helpers
             bool isBan = false;
             var userId = user.Id;
             var url = "https://api.cas.chat/check".SetQueryParam("user_id", userId);
-            var resp = await url.GetJsonAsync();
+            var resp = await url.GetJsonAsync<CasBan>();
             
             Log.Debug("CasBan Response", resp);
-            
-            isBan = resp.ok;
-            ConsoleHelper.WriteLine($"UserId: {userId} is CAS ban: {isBan}");
+
+            isBan = resp.Ok;
+            Log.Information($"UserId: {userId} is CAS ban: {isBan}");
             return isBan;
 
         }
