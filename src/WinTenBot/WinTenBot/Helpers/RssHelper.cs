@@ -1,13 +1,18 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CodeHollow.FeedReader;
 using Serilog;
+using SqlKata;
+using SqlKata.Execution;
+using SqlKata.Extensions;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types.Enums;
 using WinTenBot.Model;
+using WinTenBot.Providers;
 using WinTenBot.Services;
 
 namespace WinTenBot.Helpers
@@ -23,15 +28,12 @@ namespace WinTenBot.Helpers
 
             Log.Information("Getting RSS settings..");
             var rssSettings = await rssService.GetRssSettingsAsync(chatId);
-            
+
             var tasks = rssSettings.Select(async rssSetting =>
             {
-            // foreach (RssSetting rssSetting in rssSettings)
-            // {
+                // foreach (RssSetting rssSetting in rssSettings)
+                // {
                 var rssUrl = rssSetting.UrlFeed;
-
-                // var rssUrl = rssSetting["url_feed"].ToString();
-                // var chatId = rssSetting["chat_id"].ToString();
 
                 ConsoleHelper.WriteLine($"Processing {rssUrl} for {chatId}.");
                 try
@@ -39,7 +41,7 @@ namespace WinTenBot.Helpers
                     var rssFeeds = await FeedReader.ReadAsync(rssUrl);
                     var rssTitle = rssFeeds.Title;
 
-                    var castLimit = 3;
+                    var castLimit = 1;
                     var castStep = 0;
 
                     foreach (var rssFeed in rssFeeds.Items)
@@ -78,7 +80,8 @@ namespace WinTenBot.Helpers
                                     {"chat_id", chatId},
                                     {"title", rssFeed.Title},
                                     {"publish_date", rssFeed.PublishingDate.ToString()},
-                                    {"author", rssFeed.Author}
+                                    {"author", rssFeed.Author},
+                                    {"created_at", DateTime.Now.ToString()}
                                 };
 
                                 Log.Information($"Writing to RSS History");
@@ -109,11 +112,12 @@ namespace WinTenBot.Helpers
                     // ConsoleHelper.WriteLine(ex.Message);
                     // ConsoleHelper.WriteLine(ex.ToString());
                 }
-            // }
+
+                // }
             });
 
             await Task.WhenAll(tasks);
-            
+
             Log.Information($"RSS Scheduler finished. New RSS Count: {newRssCount}");
 
             return newRssCount;
