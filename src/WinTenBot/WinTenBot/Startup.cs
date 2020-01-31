@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 using Telegram.Bot;
 using Telegram.Bot.Framework;
 using Telegram.Bot.Framework.Abstractions;
@@ -165,7 +166,7 @@ namespace WinTenBot
 
             ConsoleHelper.WriteLine($"Hangfire Auth: {hangfireUsername} | {hangfirePassword}");
 
-            var options = new DashboardOptions
+            var dashboardOptions = new DashboardOptions
             {
                 Authorization = new[]
                 {
@@ -184,7 +185,7 @@ namespace WinTenBot
                 app.UseTelegramBotLongPolling<ZiziBot>(configureBot, TimeSpan.FromSeconds(1));
                 app.UseTelegramBotLongPolling<MacOsBot>(configureBot, TimeSpan.FromSeconds(1));
 
-                app.UseHangfireDashboard("/hangfire", options);
+                app.UseHangfireDashboard("/hangfire", dashboardOptions);
             }
             else
             {
@@ -196,10 +197,15 @@ namespace WinTenBot
                 app.EnsureWebhookSet<ZiziBot>();
                 app.EnsureWebhookSet<MacOsBot>();
 
-                app.UseHangfireDashboard(hangfireBaseUrl, options);
+                app.UseHangfireDashboard(hangfireBaseUrl, dashboardOptions);
             }
-
-            app.UseHangfireServer(additionalProcesses: new[]
+            
+            var serverOptions = new BackgroundJobServerOptions
+            {
+                WorkerCount = Environment.ProcessorCount * 20
+            };
+            
+            app.UseHangfireServer(serverOptions, additionalProcesses: new[]
             {
                 new ProcessMonitor(checkInterval: TimeSpan.FromSeconds(1))
             });
