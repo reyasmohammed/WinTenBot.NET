@@ -106,10 +106,17 @@ namespace WinTenBot.Helpers
             try
             {
                 var text = message.Text;
-                var isMustDelete = await IsMustDelete(text);
-                Log.Debug($"Message {message.MessageId} IsMustDelete: {isMustDelete}");
+                if (!text.IsNullOrEmpty())
+                {
+                    var isMustDelete = await IsMustDelete(text);
+                    Log.Information($"Message {message.MessageId} IsMustDelete: {isMustDelete}");
 
-                if (isMustDelete) await requestProvider.DeleteAsync(message.MessageId);
+                    if (isMustDelete) await requestProvider.DeleteAsync(message.MessageId);
+                }
+                else
+                {
+                    Log.Information("No message Text for scan.");
+                }
             }
             catch (Exception ex)
             {
