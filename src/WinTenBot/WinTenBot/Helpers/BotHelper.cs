@@ -1,11 +1,15 @@
 ﻿using Serilog;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using WinTenBot.Model;
+using WinTenBot.Providers;
 using File = System.IO.File;
 
 namespace WinTenBot.Helpers
@@ -23,6 +27,42 @@ namespace WinTenBot.Helpers
         {
             var me = await Bot.Client.GetMeAsync();
             return (from user in users where user.Id == me.Id select user.Id == me.Id).FirstOrDefault();
+        }
+
+        public static bool IsRestricted()
+        {
+            return Bot.GlobalConfiguration["CommonConfig:IsRestricted"].ToBool();
+        }
+        public static bool CheckRestriction(this long chatId)
+        {
+            var isRestricted = false;
+            var sudoers = Bot.GlobalConfiguration.GetSection("RestrictArea").Get<List<string>>();
+            var match = sudoers.FirstOrDefault(x => x == chatId.ToString());
+            if (match == null && !IsRestricted())
+            {
+                isRestricted =  true;
+            }
+            Log.Information($"ChatId: {chatId} IsAllowed: {isRestricted}");
+            return isRestricted;
+        }
+
+        public static async Task<bool> EnsureChatRestriction(this RequestProvider requestProvider)
+        {
+            var chatId = requestProvider.Message.Chat.Id;
+            
+            if (chatId.CheckRestriction()) return false;
+
+            Log.Information("I must leave right now!");
+            var msgOut = $"Sepertinya saya salah alamat, saya pamit dulu..";
+                
+            await requestProvider.SendTextAsync(msgOut);
+            await requestProvider.LeaveChat(chatId);
+            return true;
+        }
+
+        public static ITelegramBotClient GetClient(string name)
+        {
+            return Bot.Clients[name];
         }
 
         public static async Task ClearLog()

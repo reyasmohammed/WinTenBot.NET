@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -41,6 +42,20 @@ namespace WinTenBot.Handlers.Events
             var isBootAdded = await newMembers.IsBotAdded();
             if (isBootAdded)
             {
+                // if (!msg.Chat.Id.IsAllowed())
+                // {
+                //     Log.Information("I must leave right now!");
+                //     
+                //     var msgOut = $"Sepertinya saya salah alamat, saya pamit dulu..";
+                //
+                //     await _requestProvider.SendTextAsync(msgOut);
+                //     await _requestProvider.LeaveChat(msg.Chat.Id);
+                //     return;
+                // }
+
+                var isRestricted = await _requestProvider.EnsureChatRestriction();
+                if(isRestricted) return;
+
                 var botName = Bot.GlobalConfiguration["Engines:ProductName"];
                 var sendText = $"Hai, perkenalkan saya {botName}" +
                                $"\nFYI saya di bangun ulang menggunakan .NET Core, tepatnya ASP .NET Core." +
@@ -50,7 +65,6 @@ namespace WinTenBot.Handlers.Events
                                $"\n\nUntuk melihat daftar perintah bisa ketikkan /help";
                 
                 await _requestProvider.SendTextAsync(sendText);
-                
                 await _settingsService.SaveSettingsAsync(new Dictionary<string, object>()
                 {
                     {"chat_id", msg.Chat.Id},
