@@ -20,20 +20,13 @@ namespace WinTenBot
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.Console(theme: SystemConsoleTheme.Colored,
-                    restrictedToMinimumLevel:LogEventLevel.Debug,
-                    outputTemplate:outputConsoleTemplate)
+                    restrictedToMinimumLevel: LogEventLevel.Debug,
+                    outputTemplate: outputConsoleTemplate)
                 .WriteTo.File("Storage/Logs/Logs-.log",
                     rollingInterval: RollingInterval.Day,
                     flushToDiskInterval: TimeSpan.FromSeconds(1))
                 .CreateLogger();
-
-            // Parallel.Invoke(
-            //     async () => await "word_filter".MigrateLocalStorage(),
-            //     async () => await "rss_history".MigrateLocalStorage(),
-            //     async ()=> await "warn_username_history".MigrateLocalStorage());
             
-            MigrationHelper.RunMigration();
-
             try
             {
                 // BuildWebHost(args).Run();
@@ -58,6 +51,7 @@ namespace WinTenBot
                 .ConfigureAppConfiguration((hostBuilder, configBuilder) => configBuilder
                     .AddJsonFile("appsettings.json", true, true)
                     .AddJsonFile($"appsettings.{hostBuilder.HostingEnvironment.EnvironmentName}.json", true, true)
+                    .AddJsonFile("Storage/Config/security-base.json", true, true)
                     .AddJsonEnvVar("QUICKSTART_SETTINGS", true)
                 ).UseStartup<Startup>();
         }
