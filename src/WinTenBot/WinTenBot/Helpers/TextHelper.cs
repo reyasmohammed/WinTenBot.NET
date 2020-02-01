@@ -43,6 +43,8 @@ namespace WinTenBot.Helpers
             var sb = new StringBuilder();
             var pos = 0;
 
+            if(input == null) return input;
+
             foreach (Match toReplace in regex.Matches( input )) {
                 var capture = toReplace.Groups[ 0 ];
                 var paramName = toReplace.Groups[ toReplace.Groups.Count - 1 ].Value;
