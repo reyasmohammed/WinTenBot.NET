@@ -25,16 +25,16 @@ namespace WinTenBot.Handlers.Commands.Core
                 InlineKeyboardButton.WithCallbackData("Ping", "PONG")
             );
 
-            await "ℹ️ Pong!!".AppendTextAsync();
+            await _requestProvider.AppendTextAsync("ℹ️ Pong!!");
             var isSudoer = msg.From.Id.IsSudoer();
 
             if (msg.Chat.Type == ChatType.Private && isSudoer)
             {
                 // await "\n<b>Engine info.</b>".AppendTextAsync();
-                await "🎛 <b>Engine info.</b>".AppendTextAsync();
+                await _requestProvider.AppendTextAsync("🎛 <b>Engine info.</b>");
 
                 // var getWebHookInfo = await _chatProcessor.Client.GetWebhookInfoAsync(cancellationToken);
-                var getWebHookInfo = await Bot.Client.GetWebhookInfoAsync(cancellationToken);
+                var getWebHookInfo = await _requestProvider.Client.GetWebhookInfoAsync(cancellationToken);
                 if (getWebHookInfo.Url == "")
                 {
                     // sendText += "\n\n<i>Bot run in Poll mode.</i>";
