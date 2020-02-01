@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Framework.Abstractions;
@@ -355,14 +356,21 @@ namespace WinTenBot.Providers
 
         public async Task LeaveChat(long chatId = 0)
         {
-            var chatTarget = chatId;
-            if (chatId == 0)
+            try
             {
-                chatTarget = Message.Chat.Id;
-            }
+                var chatTarget = chatId;
+                if (chatId == 0)
+                {
+                    chatTarget = Message.Chat.Id;
+                }
 
-            ConsoleHelper.WriteLine($"Leaving from {chatTarget}");
-            await Client.LeaveChatAsync(chatTarget);
+                ConsoleHelper.WriteLine($"Leaving from {chatTarget}");
+                await Client.LeaveChatAsync(chatTarget);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex,"Error LeaveChat.");
+            }
         }
 
         public async Task<long> GetMemberCount()
