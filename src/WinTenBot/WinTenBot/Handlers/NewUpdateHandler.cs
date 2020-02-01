@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,7 +32,7 @@ namespace WinTenBot.Handlers
             actions.Add(async () => await _requestProvider.CheckCasBanAsync(message.From));
             actions.Add(async () => await _requestProvider.CheckUsername(message));
             actions.Add(async () => await _requestProvider.FindNotesAsync(message));
-            actions.Add(() => ActivityHelper.HitActivityBackground(message));
+            actions.Add(async () => await _requestProvider.HitActivity());
 
             if (context.Update.CallbackQuery == null)
             {
