@@ -58,6 +58,7 @@ namespace WinTenBot
             Bot.Client = new TelegramBotClient(Configuration["ZiziBot:ApiToken"]);
             
             MigrationHelper.MigrateMysql();
+            MigrationHelper.RunMigration();
         }
 
         public void ConfigureServices(IServiceCollection services)
