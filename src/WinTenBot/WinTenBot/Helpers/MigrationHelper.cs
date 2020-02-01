@@ -24,7 +24,7 @@ namespace WinTenBot.Helpers
                 var sql = File.ReadAllText(file);
                 var result = sql.ExecForMysqlNonQuery(true);
                 
-                Log.Information($"Result: {result}");
+                // Log.Information($"Result: {result}");
             }
         }
 
