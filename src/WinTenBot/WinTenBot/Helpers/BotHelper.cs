@@ -16,11 +16,16 @@ namespace WinTenBot.Helpers
 {
     public static class BotHelper
     {
-        public static async Task<string> GetUrlStart(this string param)
+        public static async Task<string> GetUrlStart(this RequestProvider requestProvider, string param)
         {
-            var bot = await Bot.Client.GetMeAsync();
+            var bot = await requestProvider.Client.GetMeAsync();
             var username = bot.Username;
-            return $"https://t.me/{username}?start={param}";
+            return $"https://t.me/{username}?{param}";
+        }
+        
+        public static async Task<User> GetBotUser(this RequestProvider requestProvider)
+        {
+            return await requestProvider.Client.GetMeAsync();
         }
 
         public static async Task<bool> IsBotAdded(this User[] users)
