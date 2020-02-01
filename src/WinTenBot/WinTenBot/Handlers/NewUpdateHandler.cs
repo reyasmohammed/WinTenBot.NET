@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,7 +28,6 @@ namespace WinTenBot.Handlers
 
             var actions = new List<Action>();
 
-            actions.Add(async () => await _requestProvider.EnsureChatRestriction());
             actions.Add(async () => await _requestProvider.AfkCheck(message));
             actions.Add(async () => await _requestProvider.CheckCasBanAsync(message.From));
             actions.Add(async () => await _requestProvider.CheckUsername(message));
@@ -42,6 +41,7 @@ namespace WinTenBot.Handlers
 
             if (!_requestProvider.IsPrivateChat())
             {
+                actions.Add(async () => await _requestProvider.EnsureChatRestriction());
                 actions.Add(async () => await _requestProvider.CheckGlobalBanAsync(message));
             }
 
