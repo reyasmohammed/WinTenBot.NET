@@ -36,25 +36,28 @@ namespace WinTenBot.Helpers
         public static bool CheckRestriction(this long chatId)
         {
             var isRestricted = false;
+            var globalRestrict = IsRestricted();
             var sudoers = Bot.GlobalConfiguration.GetSection("RestrictArea").Get<List<string>>();
             var match = sudoers.FirstOrDefault(x => x == chatId.ToString());
-            if (match == null && !IsRestricted())
+
+            Log.Information($@"Global Restriction: {globalRestrict}");
+            if (match == null && globalRestrict)
             {
                 isRestricted =  true;
             }
-            Log.Information($"ChatId: {chatId} IsAllowed: {isRestricted}");
+            Log.Information($"ChatId: {chatId} IsRestricted: {isRestricted}");
             return isRestricted;
         }
 
         public static async Task<bool> EnsureChatRestriction(this RequestProvider requestProvider)
         {
             var chatId = requestProvider.Message.Chat.Id;
-            
-            if (chatId.CheckRestriction()) return false;
 
+            if (!chatId.CheckRestriction()) return false;
+            
             Log.Information("I must leave right now!");
             var msgOut = $"Sepertinya saya salah alamat, saya pamit dulu..";
-                
+
             await requestProvider.SendTextAsync(msgOut);
             await requestProvider.LeaveChat(chatId);
             return true;
