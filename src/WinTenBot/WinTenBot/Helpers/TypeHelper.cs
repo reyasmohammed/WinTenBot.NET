@@ -19,5 +19,10 @@ namespace WinTenBot.Helpers
         {
             return Convert.ToInt64(obj);
         }
+
+        public static int ToInt(this string str)
+        {
+            return str.ToLower() == "disable" ? 0 : 1;
+        }
     }
 }
