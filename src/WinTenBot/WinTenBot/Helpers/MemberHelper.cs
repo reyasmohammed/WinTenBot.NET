@@ -68,6 +68,16 @@ namespace WinTenBot.Helpers
             return filtered.Rows.Count > 0;
         }
 
+        public static async Task<bool> IsGBan(this User user)
+        {
+            var query = await new Query("fban_user")
+                .Where("user_id",user.Id)
+                .ExecForSqLite(true)
+                .GetAsync();
+
+            return query.Any();
+        }
+
         public static bool IsNoUsername(this User user)
         {
             return user.Username == null;
@@ -131,7 +141,8 @@ namespace WinTenBot.Helpers
             var user = message.From;
             var messageId = message.MessageId;
             
-            var isBan = await user.IsBanInCache();
+            // var isBan = await user.IsBanInCache();
+            var isBan = await user.IsGBan();
             ConsoleHelper.WriteLine($"IsBan: {isBan}");
             if (isBan)
             {
