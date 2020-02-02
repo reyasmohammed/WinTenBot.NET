@@ -15,7 +15,7 @@ namespace WinTenBot.Providers
 {
     public class RequestProvider
     {
-        private IUpdateContext UpdateContext { get; set; }
+        public IUpdateContext Context { get; set; }
         private string AppendText { get; set; }
         public ITelegramBotClient Client { get; set; }
         public Message Message { get; set; }
@@ -27,7 +27,7 @@ namespace WinTenBot.Providers
 
         public RequestProvider(IUpdateContext updateContext)
         {
-            UpdateContext = updateContext;
+            Context = updateContext;
             Client = updateContext.Bot.Client;
             Message = updateContext.Update.CallbackQuery != null
                 ? updateContext.Update.CallbackQuery.Message
