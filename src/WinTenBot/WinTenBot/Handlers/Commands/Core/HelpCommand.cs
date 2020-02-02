@@ -16,7 +16,7 @@ namespace WinTenBot.Handlers.Commands.Core
             _requestProvider = new RequestProvider(context);
 
             var sendText = "Untuk mendapatkan bantuan klik tombol dibawah ini";
-            var urlStart = await "help".GetUrlStart();
+            var urlStart = await _requestProvider.GetUrlStart("start=help");
             var keyboard = new InlineKeyboardMarkup(
                 InlineKeyboardButton.WithUrl("Dapatkan bantuan", urlStart)
             );
