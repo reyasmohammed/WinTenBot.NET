@@ -1,15 +1,13 @@
-﻿using System.Data;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
-using WinTenBot.Helpers;
 using WinTenBot.Model;
 using WinTenBot.Providers;
 using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Rss
 {
-    public class RssInfoCommand:CommandBase
+    public class RssInfoCommand : CommandBase
     {
         private RssService _rssService;
         private RequestProvider _requestProvider;
@@ -20,12 +18,12 @@ namespace WinTenBot.Handlers.Commands.Rss
 
             var chatId = _requestProvider.Message.Chat.Id.ToString();
             var isAdmin = await _requestProvider.IsAdminGroup();
-            
+
             if (isAdmin || _requestProvider.IsPrivateChat())
             {
                 await _requestProvider.SendTextAsync("🔄 Sedang meload data..");
                 var rssData = await _rssService.GetRssSettingsAsync(chatId);
-                
+
                 var sendText = $"📚 <b>List RSS</b>: {rssData.Count} Items.";
                 int num = 1;
                 foreach (RssSetting rss in rssData)
@@ -41,11 +39,11 @@ namespace WinTenBot.Handlers.Commands.Rss
                                 "\nGunakan <code>/setrss https://link_rss_nya</code> untuk menambahkan.";
                 }
 
-                await sendText.EditAsync();
+                await _requestProvider.EditAsync(sendText);
             }
             else
             {
-                await "Kamu bukan admin, atau kamu bisa mengaturnya di japri ".SendTextAsync();
+                await _requestProvider.SendTextAsync("Kamu bukan admin, atau kamu bisa mengaturnya di japri ");
             }
         }
     }
