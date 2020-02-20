@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -12,8 +12,10 @@
 
   <ItemGroup>
     <PackageReference Include="CodeHollow.FeedReader" Version="1.2.1" />
+    <PackageReference Include="Costura.Fody" Version="4.1.0" />
     <PackageReference Include="CsvHelper" Version="14.0.0" />
     <PackageReference Include="Flurl.Http" Version="2.4.2" />
+    <PackageReference Include="Fody" Version="6.1.0" />
     <PackageReference Include="Hangfire.AspNetCore" Version="1.7.9" />
     <PackageReference Include="Hangfire.Dashboard.Basic.Authentication" Version="1.1.0" />
     <PackageReference Include="Hangfire.Heartbeat" Version="0.5.0" />
