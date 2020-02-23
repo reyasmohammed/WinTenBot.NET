@@ -1,4 +1,7 @@
-﻿using System;
+﻿using CodeHollow.FeedReader;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
@@ -7,17 +10,26 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using CodeHollow.FeedReader;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using WinTenBot.Helpers.JsonSettings;
 
 namespace WinTenBot.Helpers
 {
     public static class TextHelper
     {
-        public static string  ToJson(this object dataTable, bool indented = false)
+        public static string ToJson(this object dataTable, bool indented = false, bool followProperty = false)
         {
-            return JsonConvert.SerializeObject(dataTable, indented ? Formatting.Indented : Formatting.None);
+            var serializerSetting = new JsonSerializerSettings();
+
+            if(followProperty) serializerSetting.ContractResolver = new CamelCaseFollowProperty();
+            serializerSetting.Formatting = indented ? Formatting.Indented : Formatting.None;
+
+            return JsonConvert.SerializeObject(dataTable, serializerSetting);
+        }
+        
+        public static T MapObject<T>(this string json)
+        {
+            // return JsonSerializer.Deserialize<T>(json);
+            return JsonConvert.DeserializeObject<T>(json);
         }
 
         public static DataTable ToDataTable(this string data)
@@ -34,63 +46,67 @@ namespace WinTenBot.Helpers
         {
             return text.Split(delimiter).ToList();
         }
-        
-        public static string ResolveVariable(this string input, object parameters) {
-            
+
+        public static string ResolveVariable(this string input, object parameters)
+        {
+
             ConsoleHelper.WriteLine("Resolving variable..");
             var type = parameters.GetType();
-            Regex regex = new Regex( "\\{(.*?)\\}" );
+            Regex regex = new Regex("\\{(.*?)\\}");
             var sb = new StringBuilder();
             var pos = 0;
 
-            if(input == null) return input;
+            if (input == null) return input;
 
-            foreach (Match toReplace in regex.Matches( input )) {
-                var capture = toReplace.Groups[ 0 ];
-                var paramName = toReplace.Groups[ toReplace.Groups.Count - 1 ].Value;
-                var property = type.GetProperty( paramName );
+            foreach (Match toReplace in regex.Matches(input))
+            {
+                var capture = toReplace.Groups[0];
+                var paramName = toReplace.Groups[toReplace.Groups.Count - 1].Value;
+                var property = type.GetProperty(paramName);
                 if (property == null) continue;
-                sb.Append( input.Substring( pos, capture.Index - pos) );
-                sb.Append( property.GetValue( parameters, null ) );
+                sb.Append(input.Substring(pos, capture.Index - pos));
+                sb.Append(property.GetValue(parameters, null));
                 pos = capture.Index + capture.Length;
             }
 
-            if (input.Length > pos + 1) sb.Append( input.Substring( pos ) );
+            if (input.Length > pos + 1) sb.Append(input.Substring(pos));
 
             return sb.ToString();
         }
-        
+
         public static async Task ToFile(this string content, string path)
         {
             ConsoleHelper.WriteLine($"Writing file to {path}");
             await File.WriteAllTextAsync(path, content);
 
-//            var sw = new StreamWriter(path);
-//            sw.Write(content);
-//            sw.Close();
-//            sw.Dispose();
+            //            var sw = new StreamWriter(path);
+            //            sw.Write(content);
+            //            sw.Close();
+            //            sw.Dispose();
 
-//            using (var sw = new StreamWriter(@path))
-//            {
-//                await sw.WriteAsync(content);
-//                sw.Close();
-//                sw.Dispose();
-//            }
+            //            using (var sw = new StreamWriter(@path))
+            //            {
+            //                await sw.WriteAsync(content);
+            //                sw.Close();
+            //                sw.Dispose();
+            //            }
 
-//            var buffer = Encoding.UTF8.GetBytes(content);
-//
-//            using (var fs = new FileStream(@path, FileMode.OpenOrCreate, 
-//                FileAccess.Write, FileShare.None, buffer.Length, true))
-//            {
-//                await fs.WriteAsync(buffer, 0, buffer.Length);
-//                fs.Close();
-//            }
+            //            var buffer = Encoding.UTF8.GetBytes(content);
+            //
+            //            using (var fs = new FileStream(@path, FileMode.OpenOrCreate, 
+            //                FileAccess.Write, FileShare.None, buffer.Length, true))
+            //            {
+            //                await fs.WriteAsync(buffer, 0, buffer.Length);
+            //                fs.Close();
+            //            }
         }
 
-        public static string SqlEscape(this object str)
+        public static string SqlEscape(this string str)
         {
-            return Regex.Replace(str.ToString(), @"[\x00'""\b\n\r\t\cZ\\%_]",
-                delegate(Match match)
+            if (str.IsNullOrEmpty()) return str;
+
+            var escaped = Regex.Replace(str.ToString(), @"[\x00'""\b\n\r\t\cZ\\%_]",
+                delegate (Match match)
                 {
                     var v = match.Value;
                     switch (v)
@@ -117,16 +133,19 @@ namespace WinTenBot.Helpers
                             return "\\" + v;
                     }
                 });
+            escaped = escaped.Replace("'", "\'");
+
+            return escaped;
         }
 
         public static string NewSqlEscape(this object obj)
         {
             return obj.ToString().Replace("'", "''");
         }
-        
+
         public static bool CheckUrlValid(this string source)
         {
-            return Uri.TryCreate(source, UriKind.Absolute, out Uri uriResult) 
+            return Uri.TryCreate(source, UriKind.Absolute, out Uri uriResult)
                    && (uriResult.Scheme == Uri.UriSchemeHttps || uriResult.Scheme == Uri.UriSchemeHttp);
         }
 
@@ -139,7 +158,7 @@ namespace WinTenBot.Helpers
         public static async Task<string> GetUrlRssFeed(string url)
         {
             var urls = await FeedReader.GetFeedUrlsFromUrlAsync(url);
-            
+
             string feedUrl = url;
             if (urls.Count() < 1) // no url - probably the url is already the right feed url
                 feedUrl = url;
@@ -155,24 +174,31 @@ namespace WinTenBot.Helpers
         {
             return $"<a href ='{url}'>{text}</a>";
         }
-        
-        public static string MkJoin(this ICollection<string> obj, string delim){
-            return String.Join(delim,obj.ToArray());
+
+        public static string MkJoin(this ICollection<string> obj, string delim)
+        {
+            return String.Join(delim, obj.ToArray());
         }
 
         public static string ToTitleCase(this string text)
         {
             var textInfo = new CultureInfo("en-US", false).TextInfo;
-            return textInfo.ToTitleCase(text.ToLower()); 
+            return textInfo.ToTitleCase(text.ToLower());
         }
 
         public static string CleanExceptAlphaNumeric(this string str)
         {
-            var arr = str.Where(c => (char.IsLetterOrDigit(c) || 
-                                      char.IsWhiteSpace(c) || 
-                                      c == '-')).ToArray(); 
+            var arr = str.Where(c => (char.IsLetterOrDigit(c) ||
+                                      char.IsWhiteSpace(c) ||
+                                      c == '-')).ToArray();
 
             return new string(arr);
+        }
+
+        public static string RemoveThisChar(this string str,string chars)
+        {
+            return str.IsNullOrEmpty() ? str : chars.Aggregate(str, (current, c) => 
+                current.Replace($"{c}", ""));
         }
     }
 }

@@ -68,11 +68,6 @@ namespace WinTenBot.Helpers
             return dt;
         }
 
-        public static T MapObject<T>(this string json)
-        {
-            return JsonSerializer.Deserialize<T>(json);
-        }
-
         public static bool IsNullOrEmpty(this string str)
         {
             return string.IsNullOrEmpty(str);
@@ -144,6 +139,16 @@ namespace WinTenBot.Helpers
                     .ExecForSqLite(true)
                     .InsertAsync(data);
             }
+        }
+
+
+        public static List<List<T>> ChunkBy<T>(this List<T> source, int chunkSize)
+        {
+            return source
+                .Select((x, i) => new { Index = i, Value = x })
+                .GroupBy(x => x.Index / chunkSize)
+                .Select(x => x.Select(v => v.Value).ToList())
+                .ToList();
         }
     }
 }
