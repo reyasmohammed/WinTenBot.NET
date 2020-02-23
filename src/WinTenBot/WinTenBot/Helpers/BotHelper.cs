@@ -56,6 +56,8 @@ namespace WinTenBot.Helpers
 
         public static async Task<bool> EnsureChatRestriction(this RequestProvider requestProvider)
         {
+            Log.Information("Starting ensure Chat Restriction");
+
             var chatId = requestProvider.Message.Chat.Id;
 
             if (!chatId.CheckRestriction()) return false;
@@ -81,7 +83,8 @@ namespace WinTenBot.Helpers
 
             var dirInfo = new DirectoryInfo(logsPath);
             var files = dirInfo.GetFiles();
-            var filteredFiles = files.Where(fileInfo => fileInfo.CreationTimeUtc < DateTime.UtcNow.AddDays(-1)).ToArray();
+            var filteredFiles = files.Where(fileInfo => 
+                fileInfo.CreationTimeUtc < DateTime.UtcNow.AddDays(-1)).ToArray();
 
             if (filteredFiles.Length > 0)
             {

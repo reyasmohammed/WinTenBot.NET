@@ -90,6 +90,8 @@ namespace WinTenBot.Helpers
 
         public static async Task CheckUsername(this RequestProvider requestProvider, Message message)
         {
+            Log.Information("Starting check Username");
+
             var fromUser = message.From;
             var noUsername = fromUser.IsNoUsername();
             ConsoleHelper.WriteLine($"{fromUser} IsNoUsername: {noUsername}");
@@ -107,6 +109,8 @@ namespace WinTenBot.Helpers
 
         public static async Task AfkCheck(this RequestProvider requestProvider, Message message)
         {
+            Log.Information("Starting check AFK");
+
             var afkService = new AfkService();
 
             if (message.ReplyToMessage != null)
@@ -137,6 +141,8 @@ namespace WinTenBot.Helpers
         
         public static async Task CheckGlobalBanAsync(this RequestProvider requestProvider, Message message)
         {
+            Log.Information("Starting check Global Ban");
+
             var userId = message.From.Id;
             var user = message.From;
             var messageId = message.MessageId;
@@ -169,7 +175,8 @@ namespace WinTenBot.Helpers
         public static async Task<bool> CheckCasBanAsync(this RequestProvider requestProvider, User user)
         {
             bool isBan = false;
-                      
+            Log.Information("Starting check in Cas Ban");
+
             isBan = await user.IsCasBanAsync();
             Log.Information($"{user} is CAS ban: {isBan}");
             if (isBan)

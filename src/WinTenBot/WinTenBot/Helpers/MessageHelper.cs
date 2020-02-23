@@ -105,6 +105,8 @@ namespace WinTenBot.Helpers
         {
             try
             {
+                Log.Information("Starting check Message");
+
                 var text = message.Text;
                 if (!text.IsNullOrEmpty())
                 {
@@ -128,6 +130,7 @@ namespace WinTenBot.Helpers
         {
             try
             {
+                Log.Information("Starting find Notes in Cloud");
                 InlineKeyboardMarkup _replyMarkup = null;
                 var notesService = new NotesService();
 

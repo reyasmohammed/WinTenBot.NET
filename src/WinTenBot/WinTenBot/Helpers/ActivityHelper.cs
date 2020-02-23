@@ -13,6 +13,8 @@ namespace WinTenBot.Helpers
     {
         public static async Task HitActivity(this RequestProvider requestProvider)
         {
+            Log.Information("Starting Hit Activity");
+
             var message = requestProvider.Message;
             var botUser = await requestProvider.GetBotUser();
             var data = new Dictionary<string, object>()
