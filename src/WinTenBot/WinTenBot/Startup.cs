@@ -59,9 +59,6 @@ namespace WinTenBot
 
             Bot.Clients.Add("zizibot", new TelegramBotClient(Configuration["ZiziBot:ApiToken"]));
             Bot.Clients.Add("macosbot", new TelegramBotClient(Configuration["MacOsBot:ApiToken"]));
-
-            MigrationHelper.MigrateMysql();
-            MigrationHelper.RunMigration();
         }
 
         public void ConfigureServices(IServiceCollection services)
