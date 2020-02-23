@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Serilog;
-using Serilog.Events;
-using Serilog.Sinks.SystemConsole.Themes;
-using WinTenBot.Helpers;
-using WinTenBot.Scheduler;
+using WinTenBot.Providers;
 
 namespace WinTenBot
 {
@@ -15,20 +11,11 @@ namespace WinTenBot
     {
         public static void Main(string[] args)
         {
-            var outputConsoleTemplate = "[{Timestamp:HH:mm:ss.ffff} {Level:u3}] {Message:lj}{NewLine}{Exception}";
-
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.Console(theme: SystemConsoleTheme.Colored,
-                    restrictedToMinimumLevel: LogEventLevel.Debug,
-                    outputTemplate: outputConsoleTemplate)
-                .WriteTo.File("Storage/Logs/Logs-.log",
-                    rollingInterval: RollingInterval.Day,
-                    flushToDiskInterval: TimeSpan.FromSeconds(1))
-                .CreateLogger();
+            SerilogProvider.InitializeSerilog();
             
             try
             {
+                Log.Information("Starting WebAPI..");
                 // BuildWebHost(args).Run();
                 CreateWebHostBuilder(args).Build().Run();
 
