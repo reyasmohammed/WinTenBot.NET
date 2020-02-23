@@ -138,7 +138,8 @@ namespace WinTenBot
                 .AddScoped<DebugCommand>()
                 .AddScoped<StartCommand>()
                 .AddScoped<IdCommand>()
-                .AddScoped<InfoCommand>();
+                .AddScoped<InfoCommand>()
+                .AddScoped<BotCommand>();
 
             services.AddScoped<OutCommand>();
 
@@ -250,6 +251,7 @@ namespace WinTenBot
                                     .UseCommand<AddNotesCommand>("addfilter")
                                     .UseCommand<AfkCommand>("afk")
                                     .UseCommand<BanCommand>("ban")
+                                    .UseCommand<BotCommand>("bot")
                                     .UseCommand<DebugCommand>("dbg")
                                     .UseCommand<DelBanCommand>("dban")
                                     .UseCommand<DelRssCommand>("delrss")
