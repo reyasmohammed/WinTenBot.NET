@@ -60,7 +60,7 @@ namespace WinTenBot.Providers
             Message send = null;
             try
             {
-                ConsoleHelper.WriteLine($"Sending message to {chatTarget}");
+                Log.Information($"Sending message to {chatTarget}");
                 send = await Client.SendTextMessageAsync(
                     chatTarget,
                     sendText,
@@ -71,11 +71,11 @@ namespace WinTenBot.Providers
             }
             catch (ApiRequestException apiRequestException)
             {
-                ConsoleHelper.WriteLine($"SendMessage: {apiRequestException.Message}");
+                Log.Error(apiRequestException,$"SendMessage Ex1");
 
                 try
                 {
-                    ConsoleHelper.WriteLine($"Try Sending message to {chatTarget} without reply to Msg Id.");
+                    Log.Information($"Try Sending message to {chatTarget} without reply to Msg Id.");
                     send = await Client.SendTextMessageAsync(
                         chatTarget,
                         sendText,
@@ -85,8 +85,7 @@ namespace WinTenBot.Providers
                 }
                 catch (ApiRequestException apiRequestException2)
                 {
-                    ConsoleHelper.WriteLine(
-                        $"SendMessage: {apiRequestException2.ErrorCode}: {apiRequestException2.Message}");
+                    Log.Error(apiRequestException2, $"SendMessage Ex2");
                 }
             }
 
@@ -96,7 +95,7 @@ namespace WinTenBot.Providers
         public async Task SendMediaAsync(string fileId, string mediaType, string caption = "",
             IReplyMarkup replyMarkup = null, int replyToMsgId = -1)
         {
-            ConsoleHelper.WriteLine($"Sending media: {mediaType}, fileId: {fileId} to {Message.Chat.Id}");
+            Log.Information($"Sending media: {mediaType}, fileId: {fileId} to {Message.Chat.Id}");
             switch (mediaType.ToLower())
             {
                 case "document":
@@ -110,7 +109,7 @@ namespace WinTenBot.Providers
                     break;
 
                 default:
-                    ConsoleHelper.WriteLine($"Media unknown: {mediaType}");
+                    Log.Information($"Media unknown: {mediaType}");
                     break;
             }
         }
@@ -137,11 +136,10 @@ namespace WinTenBot.Providers
 
         public async Task EditMessageCallback(string sendText, InlineKeyboardMarkup replyMarkup = null)
         {
-            Message edit = null;
             try
             {
-                ConsoleHelper.WriteLine($"Editing {CallBackMessageId}");
-                edit = await Client.EditMessageTextAsync(
+                Log.Information($"Editing {CallBackMessageId}");
+                await Client.EditMessageTextAsync(
                     Message.Chat,
                     CallBackMessageId,
                     sendText,
@@ -151,7 +149,7 @@ namespace WinTenBot.Providers
             }
             catch (Exception e)
             {
-                ConsoleHelper.WriteLine(e);
+                Log.Error(e,"Error EditMessage");
             }
         }
 
@@ -159,13 +157,13 @@ namespace WinTenBot.Providers
         {
             if (string.IsNullOrEmpty(AppendText))
             {
-                ConsoleHelper.WriteLine("Sending new message");
+                Log.Information("Sending new message");
                 AppendText = sendText;
                 await SendTextAsync(AppendText, replyMarkup);
             }
             else
             {
-                ConsoleHelper.WriteLine("Next, edit existing message");
+                Log.Information("Next, edit existing message");
                 AppendText += $"\n{sendText}";
                 await EditAsync(AppendText, replyMarkup);
             }
@@ -173,21 +171,21 @@ namespace WinTenBot.Providers
 
         public async Task DeleteAsync(int messageId = -1, int delay = 0)
         {
-            var mssgId = messageId != -1 ? messageId : SentMessageId;
+            var msgId = messageId != -1 ? messageId : SentMessageId;
             Thread.Sleep(delay);
 
             try
             {
-                ConsoleHelper.WriteLine($"Delete MsgId: {mssgId} on ChatId: {Message.Chat.Id}");
-                await Client.DeleteMessageAsync(Message.Chat.Id, mssgId);
+                Log.Information($"Delete MsgId: {msgId} on ChatId: {Message.Chat.Id}");
+                await Client.DeleteMessageAsync(Message.Chat.Id, msgId);
             }
             catch (ChatNotFoundException chatNotFoundException)
             {
-                ConsoleHelper.WriteLine($"{chatNotFoundException.ErrorCode}: {chatNotFoundException.Message}");
+                Log.Error(chatNotFoundException,$"Error Delete NotFound");
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"{ex.Message}");
+                Log.Error(ex,$"Error Delete Message");
             }
         }
 
@@ -251,14 +249,10 @@ namespace WinTenBot.Providers
 
         public async Task<bool> KickMemberAsync(User user = null)
         {
-            var isKicked = false;
+            bool isKicked;
             var idTarget = user.Id;
-            var fromId = Message.From.Id;
-            //if(id == -1)
-            //{
-            //    idTarget = Message.From.Id;
-            //}
-            ConsoleHelper.WriteLine($"Kick {idTarget} from {Message.Chat.Id}");
+            
+            Log.Information($"Kick {idTarget} from {Message.Chat.Id}");
             try
             {
                 await Client.KickChatMemberAsync(Message.Chat.Id, idTarget, DateTime.Now);
@@ -266,9 +260,7 @@ namespace WinTenBot.Providers
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine("KickMember " + ex.Message);
-                ConsoleHelper.WriteLine(ex.StackTrace);
-                // await SendAsync(ex.Message);
+                Log.Error(ex,"Error Kick Member");
                 isKicked = false;
             }
 
@@ -278,15 +270,14 @@ namespace WinTenBot.Providers
         public async Task UnbanMemberAsync(User user = null)
         {
             var idTarget = user.Id;
-            ConsoleHelper.WriteLine($"Unban {idTarget} from {Message.Chat.Id}");
+            Log.Information($"Unban {idTarget} from {Message.Chat.Id}");
             try
             {
                 await Client.UnbanChatMemberAsync(Message.Chat.Id, idTarget);
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine(ex.Message);
-                ConsoleHelper.WriteLine(ex.StackTrace);
+                Log.Error(ex,"UnBan Member");
                 await SendTextAsync(ex.Message);
             }
         }
@@ -311,6 +302,7 @@ namespace WinTenBot.Providers
             }
             catch (ApiRequestException apiRequestException)
             {
+                Log.Error(apiRequestException,"Error Promote Member");
                 requestResult.IsSuccess = false;
                 requestResult.ErrorCode = apiRequestException.ErrorCode;
                 requestResult.ErrorMessage = apiRequestException.Message;
@@ -342,11 +334,12 @@ namespace WinTenBot.Providers
                 requestResult.IsSuccess = false;
                 requestResult.ErrorCode = apiRequestException.ErrorCode;
                 requestResult.ErrorMessage = apiRequestException.Message;
-                ConsoleHelper.WriteLine(apiRequestException.ToString());
+                
+                Log.Error(apiRequestException,"Error Demote Member");
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine(ex.ToString());
+                Log.Error(ex,"Demote Member Ex");
             }
 
             return requestResult;
@@ -364,7 +357,7 @@ namespace WinTenBot.Providers
                     chatTarget = Message.Chat.Id;
                 }
 
-                ConsoleHelper.WriteLine($"Leaving from {chatTarget}");
+                Log.Information($"Leaving from {chatTarget}");
                 await Client.LeaveChatAsync(chatTarget);
             }
             catch (Exception ex)
