@@ -5,6 +5,12 @@ Official repository WinTenBot, written in .NET
 - Microsoft Visual Studio 2019 (Community is free edition) or Jetbrains Rider (by Jetbrains)
 - Net Core 3.1 SDK for ASP Net Core
 
+# Run Locally
+- Install MySQL/MariaDB and create database e.g. zizibot
+- Update setting ConnectionString in appsettings.Development.json
+- Run project in IDE and send Database migration command (as first run) to bot with `/bot migrate`
+- Bot now run in Poll mode.
+
 # Deploy to Server
 - VPS Installed nginx with domain name include HTTPS support (e.g https://yoursite.co.id)
 - Net Core 3.1 Runtime
