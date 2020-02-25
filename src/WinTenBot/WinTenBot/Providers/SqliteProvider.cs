@@ -1,8 +1,7 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
 using SqlKata;
@@ -17,17 +16,22 @@ namespace WinTenBot.Providers
 
         private static SQLiteConnection InitSqLite()
         {
-            if (File.Exists(dbPath)) return new SQLiteConnection($"Data Source={dbPath};Version=3;");
+            var connBuilder = new SQLiteConnectionStringBuilder
+            {
+                DataSource = dbPath, JournalMode = SQLiteJournalModeEnum.Memory, Version = 3
+            };
+            var connStr = connBuilder.ConnectionString;
+            
+            if (File.Exists(dbPath)) return new SQLiteConnection(connStr);
             
             Log.Information($"Creating {dbPath} for LocalStorage");
             SQLiteConnection.CreateFile(dbPath);
 
-            return new SQLiteConnection($"Data Source={dbPath};Version=3;");
+            return new SQLiteConnection(connStr);
         }
         
         public static Query ExecForSqLite(this Query query, bool printSql = false)
         {
-            // var connection = new SQLiteConnection(dbPath);
             var connection = InitSqLite();
             
             var factory = new QueryFactory(connection, new SqliteCompiler());
