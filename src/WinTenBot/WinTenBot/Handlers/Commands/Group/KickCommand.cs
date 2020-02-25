@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
-using WinTenBot.Helpers.Processors;
 using WinTenBot.Providers;
 
 namespace WinTenBot.Handlers.Commands.Group

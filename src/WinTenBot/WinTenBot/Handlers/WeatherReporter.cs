@@ -4,7 +4,6 @@ using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using WinTenBot.Interfaces;
-using WinTenBot.Services;
 
 namespace WinTenBot.Handlers
 {

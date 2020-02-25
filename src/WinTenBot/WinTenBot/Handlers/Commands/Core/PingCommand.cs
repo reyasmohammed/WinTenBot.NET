@@ -4,8 +4,6 @@ using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Helpers;
-using WinTenBot.Helpers.Processors;
-using WinTenBot.Model;
 using WinTenBot.Providers;
 
 namespace WinTenBot.Handlers.Commands.Core

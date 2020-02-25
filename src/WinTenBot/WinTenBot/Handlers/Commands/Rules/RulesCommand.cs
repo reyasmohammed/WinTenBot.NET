@@ -1,10 +1,8 @@
-﻿using System.Data;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types.Enums;
 using WinTenBot.Helpers;
-using WinTenBot.Helpers.Processors;
 using WinTenBot.Providers;
 using WinTenBot.Services;
 

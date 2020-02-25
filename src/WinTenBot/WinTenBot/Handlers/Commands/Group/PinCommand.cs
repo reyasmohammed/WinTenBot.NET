@@ -1,7 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
-using WinTenBot.Helpers.Processors;
 using WinTenBot.Providers;
 
 namespace WinTenBot.Handlers.Commands.Group
