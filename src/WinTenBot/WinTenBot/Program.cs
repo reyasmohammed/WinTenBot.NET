@@ -40,7 +40,8 @@ namespace WinTenBot
                     .AddJsonFile($"appsettings.{hostBuilder.HostingEnvironment.EnvironmentName}.json", true, true)
                     .AddJsonFile("Storage/Config/security-base.json", true, true)
                     .AddJsonEnvVar("QUICKSTART_SETTINGS", true)
-                ).UseStartup<Startup>();
+                ).UseStartup<Startup>()
+                .UseSerilog();
         }
     }
 }

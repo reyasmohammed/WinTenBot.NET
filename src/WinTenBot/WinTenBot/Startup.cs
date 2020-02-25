@@ -214,6 +214,8 @@ namespace WinTenBot
 
             app.Run(async context => { await context.Response.WriteAsync("Hello World!"); });
 
+            app.UseSerilogRequestLogging();
+            
             BotScheduler.StartScheduler();
 
             ConsoleHelper.WriteLine("App is ready.");
