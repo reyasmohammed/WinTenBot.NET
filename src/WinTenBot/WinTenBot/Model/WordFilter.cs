@@ -1,6 +1,5 @@
 using System;
 using System.Text.Json.Serialization;
-using WinTenBot.Handlers.Commands.Rss;
 
 namespace WinTenBot.Model
 {
