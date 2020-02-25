@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MySqlX.XDevAPI.Relational;
 using Serilog;
 using SqlKata;
 using SqlKata.Execution;
 using Telegram.Bot.Types;
-using WinTenBot.Helpers;
 using WinTenBot.Providers;
 
 namespace WinTenBot.Services

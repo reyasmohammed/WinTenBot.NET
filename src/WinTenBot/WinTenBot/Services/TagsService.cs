@@ -76,13 +76,13 @@ namespace WinTenBot.Services
         public async Task SaveTag(Dictionary<string, object> data)
         {
             var json = TextHelper.ToJson(data);
-            ConsoleHelper.WriteLine(json);
+            Log.Information(json);
             var insert = await new Query("tags")
                 .ExecForMysql()
                 .InsertAsync(data);
 
                 // var insert = await _mySqlProvider.Insert("tags", data);
-            ConsoleHelper.WriteLine($"SaveTag: {insert}");
+            Log.Information($"SaveTag: {insert}");
         }
 
         public async Task<bool> DeleteTag(long chatId, string tag)

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
+using Serilog;
 using SqlKata;
 using SqlKata.Execution;
 using WinTenBot.Helpers;
@@ -47,13 +48,13 @@ namespace WinTenBot.Services
         public async Task SaveNote(Dictionary<string, object> data)
         {
             var json = data.ToJson();
-            ConsoleHelper.WriteLine(json);
+            Log.Information(json);
 
             var insert = await new Query(baseTable)
                 .ExecForMysql()
                 .InsertAsync( data);
             
-            ConsoleHelper.WriteLine($"SaveNote: {insert}");
+            Log.Information($"SaveNote: {insert}");
         }
 
         public async Task UpdateCache(long chatId)

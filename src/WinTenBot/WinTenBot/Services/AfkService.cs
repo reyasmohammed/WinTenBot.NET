@@ -2,6 +2,7 @@
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Serilog;
 using SqlKata;
 using SqlKata.Execution;
 using Telegram.Bot.Types;
@@ -22,7 +23,7 @@ namespace WinTenBot.Services
                 .ExecForMysql()
                 .GetAsync();
             
-            ConsoleHelper.WriteLine($"Check AFK Exist: {data.Count().ToBool()}");
+            Log.Information($"Check AFK Exist: {data.Count().ToBool()}");
             return data.Any();
         }
 
@@ -34,7 +35,7 @@ namespace WinTenBot.Services
             if (!search.Any()) return false;
 
             var filtered = search.CopyToDataTable();
-            ConsoleHelper.WriteLine($"AFK found in Caches: {filtered.ToJson()}");
+            Log.Information($"AFK found in Caches: {filtered.ToJson()}");
             return true;
         }
 
@@ -49,13 +50,13 @@ namespace WinTenBot.Services
                               && row.Field<string>("user_id").ToString() == message.From.Id.ToString());
             if (!filteredAfk.Any()) isAfk = false;
 
-            ConsoleHelper.WriteLine($"IsAfk: {isAfk}");
+            Log.Information($"IsAfk: {isAfk}");
             return isAfk;
         }
 
         public async Task SaveAsync(Dictionary<string, object> data)
         {
-            ConsoleHelper.WriteLine(data.ToJson());
+            Log.Information(data.ToJson());
             var where = new Dictionary<string, object>()
             {
                 {"user_id", data["user_id"]}
@@ -84,7 +85,7 @@ namespace WinTenBot.Services
                     .InsertAsync(data);
             }
 
-            ConsoleHelper.WriteLine($"SaveAfk: {insert}");
+            Log.Information($"SaveAfk: {insert}");
         }
 
         public async Task<DataTable> GetAllAfk()
@@ -100,7 +101,7 @@ namespace WinTenBot.Services
         public async Task UpdateCacheAsync()
         {
             var data = await GetAllAfk();
-            ConsoleHelper.WriteLine($"Updating AFK caches to {FileJson}");
+            Log.Information($"Updating AFK caches to {FileJson}");
 
             await data.WriteCacheAsync(FileJson);
         }

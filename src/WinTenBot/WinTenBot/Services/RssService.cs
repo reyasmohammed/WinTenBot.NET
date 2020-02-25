@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Serilog;
 using SqlKata;
 using SqlKata.Execution;
 using Telegram.Bot.Types;
 using WinTenBot.Helpers;
-using WinTenBot.Migration;
 using WinTenBot.Model;
 using WinTenBot.Providers;
 
@@ -37,7 +37,7 @@ namespace WinTenBot.Services
                 .ExecForSqLite(true)
                 .GetAsync();
 
-            ConsoleHelper.WriteLine($"Check RSS History: {data.Count().ToBool()}");
+            Log.Information($"Check RSS History: {data.Count().ToBool()}");
             return data.Any();
         }
 
@@ -49,7 +49,7 @@ namespace WinTenBot.Services
                 .ExecForMysql()
                 .GetAsync();
 
-            ConsoleHelper.WriteLine($"Check RSS Setting: {data.Count().ToBool()}");
+            Log.Information($"Check RSS Setting: {data.Count().ToBool()}");
 
             return data.Any();
         }
@@ -83,9 +83,9 @@ namespace WinTenBot.Services
                 .GetAsync();
 
             var mapped = data.ToJson().MapObject<List<RssSetting>>();
-            // ConsoleHelper.WriteLine(mapped.ToJson());
+            // Log.Information(mapped.ToJson());
 
-            ConsoleHelper.WriteLine($"Get RSS Settings: {data.Count()}");
+            Log.Information($"Get RSS Settings: {data.Count()}");
             return mapped;
 
             // return data.ToJson().ToDataTable();
@@ -101,7 +101,7 @@ namespace WinTenBot.Services
 
             var mapped = data.ToJson().MapObject<List<RssSetting>>();
 
-            ConsoleHelper.WriteLine($"Get List ChatID: {data.Count()}");
+            Log.Information($"Get List ChatID: {data.Count()}");
             return mapped;
 
             // return data.ToJson().ToDataTable();
