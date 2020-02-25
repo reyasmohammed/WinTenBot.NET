@@ -32,9 +32,14 @@ namespace WinTenBot.Providers
             catch (FlurlHttpException ex)
             {
                 var callHttpStatus = ex.Call.HttpStatus;
-                if (callHttpStatus == HttpStatusCode.NotFound)
+                switch (callHttpStatus)
                 {
-                    spamWatch.IsBan = false;
+                    case HttpStatusCode.NotFound:
+                        spamWatch.IsBan = false;
+                        break;
+                    case HttpStatusCode.Unauthorized:
+                        Log.Warning("Please check your SpamWatch API Token!");
+                        break;
                 }
 
                 Log.Information($"StatusCode: {callHttpStatus}");
