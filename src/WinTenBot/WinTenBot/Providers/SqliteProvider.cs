@@ -1,4 +1,5 @@
-﻿using System.Data.SQLite;
+using System.Collections.Generic;
+using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -45,6 +46,32 @@ namespace WinTenBot.Providers
             if (printSql) factory.Logger = sqlResult => { Log.Debug($"SQLiteExec: {sqlResult}"); };
 
             return await factory.StatementAsync(sql, param);
+        }
+
+        public static async Task<IEnumerable<dynamic>> ExecForSqLiteQuery(this string sql, bool printSql = false, object param = null)
+        {
+            var connection = InitSqLite();
+
+            var factory = new QueryFactory(connection, new SqliteCompiler());
+
+            if (printSql) factory.Logger = sqlResult => { Log.Debug($"SQLiteExec: {sqlResult}"); };
+
+            return await factory.SelectAsync(sql, param);
+        }
+
+        public static async Task<int> DeleteDuplicateRow(this string tableName, string columnKey)
+        {
+            Log.Information("Deleting duplicate row(s)");
+            var sql = $"DELETE FROM {tableName} " +
+                      "WHERE rowid NOT IN( " +
+                      "SELECT min(rowid) " +
+                      $"FROM {tableName} " +
+                      $"GROUP BY {columnKey});";
+
+            var result = await sql.ExecForSqLite(true);
+            Log.Information($"Deleted {result}");
+
+            return result;
         }
 
         public static bool IfTableExist(this string tableName)
