@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Serilog;
 
@@ -9,7 +8,7 @@ namespace WinTenBot.Helpers
     {
         public static T[][] ChunkBy<T>(this IEnumerable<T> btnList, int chunk = 2)
         {
-            ConsoleHelper.WriteLine($"Chunk buttons to {chunk}");
+            Log.Information($"Chunk buttons to {chunk}");
             var chunksBtn = btnList
                 .Select((s, i) => new { Value = s, Index = i })
                 .GroupBy(x => x.Index / chunk)

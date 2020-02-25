@@ -6,14 +6,11 @@ using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 using Flurl;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Serilog;
 using SqlKata;
 using SqlKata.Execution;
 using WinTenBot.Model;
 using WinTenBot.Providers;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace WinTenBot.Helpers
 {
@@ -36,7 +33,7 @@ namespace WinTenBot.Helpers
         {
             var webClient = new WebClient();
 
-            ConsoleHelper.WriteLine($"Saving {remoteFileUrl} to {localFileName}");
+            Log.Information($"Saving {remoteFileUrl} to {localFileName}");
             webClient.DownloadFile(remoteFileUrl, localFileName);
             webClient.Dispose();
         }
@@ -81,7 +78,7 @@ namespace WinTenBot.Helpers
             // Add columns by looping rows
 
             // Header row's first column is same as in inputTable
-            outputTable.Columns.Add(inputTable.Columns[0].ColumnName.ToString());
+            outputTable.Columns.Add(inputTable.Columns[0].ColumnName);
 
             // Header row's second column onwards, 'inputTable's first column taken
             foreach (DataRow inRow in inputTable.Rows)
@@ -96,7 +93,7 @@ namespace WinTenBot.Helpers
                 DataRow newRow = outputTable.NewRow();
 
                 // First column is inputTable's Header row's second column
-                newRow[0] = inputTable.Columns[rCount].ColumnName.ToString();
+                newRow[0] = inputTable.Columns[rCount].ColumnName;
                 for (int cCount = 0; cCount <= inputTable.Rows.Count - 1; cCount++)
                 {
                     string colValue = inputTable.Rows[cCount][rCount].ToString();

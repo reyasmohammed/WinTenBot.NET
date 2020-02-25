@@ -66,7 +66,7 @@ namespace WinTenBot.Helpers
                 messageLink = $"https://t.me/c/{trimmedChatId}/{messageId}";
             }
             
-            ConsoleHelper.WriteLine($"MessageLink: {messageLink}");
+            Log.Information($"MessageLink: {messageLink}");
             return messageLink;
         }
         
@@ -131,7 +131,7 @@ namespace WinTenBot.Helpers
             try
             {
                 Log.Information("Starting find Notes in Cloud");
-                InlineKeyboardMarkup _replyMarkup = null;
+                InlineKeyboardMarkup inlineKeyboardMarkup = null;
                 var notesService = new NotesService();
 
                 var selectedNotes = await notesService.GetNotesBySlug(msg.Chat.Id, msg.Text);
@@ -141,11 +141,11 @@ namespace WinTenBot.Helpers
                     var btnData = selectedNotes[0].BtnData;
                     if (btnData != "")
                     {
-                        _replyMarkup = btnData.ToReplyMarkup(2);
+                        inlineKeyboardMarkup = btnData.ToReplyMarkup(2);
                     }
 
-                    await requestProvider.SendTextAsync(content, _replyMarkup);
-                    _replyMarkup = null;
+                    await requestProvider.SendTextAsync(content, inlineKeyboardMarkup);
+                    inlineKeyboardMarkup = null;
 
                     foreach (var note in selectedNotes)
                     {

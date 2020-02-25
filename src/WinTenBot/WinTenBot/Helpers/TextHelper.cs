@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Serilog;
 using WinTenBot.Helpers.JsonSettings;
 
 namespace WinTenBot.Helpers
@@ -50,7 +51,7 @@ namespace WinTenBot.Helpers
         public static string ResolveVariable(this string input, object parameters)
         {
 
-            ConsoleHelper.WriteLine("Resolving variable..");
+            Log.Information("Resolving variable..");
             var type = parameters.GetType();
             Regex regex = new Regex("\\{(.*?)\\}");
             var sb = new StringBuilder();
@@ -76,7 +77,7 @@ namespace WinTenBot.Helpers
 
         public static async Task ToFile(this string content, string path)
         {
-            ConsoleHelper.WriteLine($"Writing file to {path}");
+            Log.Information($"Writing file to {path}");
             await File.WriteAllTextAsync(path, content);
 
             //            var sw = new StreamWriter(path);
@@ -105,7 +106,7 @@ namespace WinTenBot.Helpers
         {
             if (str.IsNullOrEmpty()) return str;
 
-            var escaped = Regex.Replace(str.ToString(), @"[\x00'""\b\n\r\t\cZ\\%_]",
+            var escaped = Regex.Replace(str, @"[\x00'""\b\n\r\t\cZ\\%_]",
                 delegate (Match match)
                 {
                     var v = match.Value;

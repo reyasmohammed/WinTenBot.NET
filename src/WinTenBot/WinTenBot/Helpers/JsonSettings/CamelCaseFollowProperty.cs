@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -13,7 +9,7 @@ namespace WinTenBot.Helpers.JsonSettings
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
             var property = base.CreateProperty(member, memberSerialization);
-            if (member.GetCustomAttribute<JsonPropertyAttribute>() is JsonPropertyAttribute jsonProperty)
+            if (member.GetCustomAttribute<JsonPropertyAttribute>() is {} jsonProperty)
             {
                 property.PropertyName = jsonProperty.PropertyName;
             }

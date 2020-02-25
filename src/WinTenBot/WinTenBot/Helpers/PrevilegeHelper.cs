@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
+using Serilog;
 using WinTenBot.Model;
 
 namespace WinTenBot.Helpers
@@ -22,7 +22,7 @@ namespace WinTenBot.Helpers
             {
                 isSudoer = true;
             }
-            ConsoleHelper.WriteLine($"UserId: {userId} IsSudoer: {isSudoer}");
+            Log.Information($"UserId: {userId} IsSudoer: {isSudoer}");
             return  isSudoer;
         }
     }

@@ -1,21 +1,20 @@
 ﻿using Hangfire;
 using Hangfire.Storage;
+using Serilog;
 
 namespace WinTenBot.Helpers
 {
-    public class HangfireHelper
+    public static class HangfireHelper
     {
         public static void DeleteAllJobs()
         {
-            using (var connection = JobStorage.Current.GetConnection()) 
+            using var connection = JobStorage.Current.GetConnection();
+            foreach (var recurringJob in connection.GetRecurringJobs())
             {
-                foreach (var recurringJob in connection.GetRecurringJobs())
-                {
-                    var recurringJobId = recurringJob.Id;
-                    ConsoleHelper.WriteLine($"Deleting {recurringJobId}");
+                var recurringJobId = recurringJob.Id;
+                Log.Information($"Deleting {recurringJobId}");
                     
-                    RecurringJob.RemoveIfExists(recurringJobId);
-                }
+                RecurringJob.RemoveIfExists(recurringJobId);
             }
         }
     }

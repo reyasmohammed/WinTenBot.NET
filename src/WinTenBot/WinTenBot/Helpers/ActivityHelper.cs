@@ -4,7 +4,6 @@ using Hangfire;
 using Serilog;
 using SqlKata;
 using SqlKata.Execution;
-using Telegram.Bot.Types;
 using WinTenBot.Providers;
 
 namespace WinTenBot.Helpers
@@ -41,7 +40,6 @@ namespace WinTenBot.Helpers
 
         public static void HitActivityBackground(this RequestProvider requestProvider)
         {
-            var message = requestProvider.Message;
             BackgroundJob.Enqueue(() => HitActivity(requestProvider));
 
             Log.Information("Hit Activity scheduled in Background");

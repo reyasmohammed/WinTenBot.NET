@@ -17,7 +17,7 @@ namespace WinTenBot.Helpers
             var data = JArray.Parse(File.ReadAllText(Environment.CurrentDirectory + @"/Storage/Common/emoji.json"));
             ColonedEmojis = data.OfType<JObject>().ToDictionary(
                 // key dictionary by coloned short names
-                c => ":" + ((JValue)c["short_name"]).Value.ToString() + ":",
+                c => ":" + ((JValue)c["short_name"]).Value + ":",
                 c => {
                     var unicodeRaw = ((JValue)c["unified"]).Value.ToString();
                     var chars = new List<char>();

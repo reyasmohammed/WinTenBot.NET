@@ -14,9 +14,9 @@ namespace WinTenBot.Helpers
 {
     public static class MemberHelper
     {
-        public static string GetNameLink(int userId, string Name)
+        public static string GetNameLink(int userId, string name)
         {
-            return $"<a href='tg://user?id={userId}'>{Name}</a>";
+            return $"<a href='tg://user?id={userId}'>{name}</a>";
         }
 
         public static string GetFromNameLink(this Message message)
@@ -90,7 +90,7 @@ namespace WinTenBot.Helpers
 
             var fromUser = message.From;
             var noUsername = fromUser.IsNoUsername();
-            ConsoleHelper.WriteLine($"{fromUser} IsNoUsername: {noUsername}");
+            Log.Information($"{fromUser} IsNoUsername: {noUsername}");
 
             if (noUsername)
             {
@@ -138,12 +138,10 @@ namespace WinTenBot.Helpers
         public static async Task CheckGlobalBanAsync(this RequestProvider requestProvider, Message message)
         {
             Log.Information("Starting check Global Ban");
-
-            var userId = message.From.Id;
+            
             var user = message.From;
             var messageId = message.MessageId;
             
-            // var isBan = await user.IsBanInCache();
             var isBan = await user.Id.CheckGBan();
             Log.Information($"IsBan: {isBan}");
             if (isBan)
@@ -156,7 +154,7 @@ namespace WinTenBot.Helpers
         
         public static async Task<bool> CheckCasBanAsync(this RequestProvider requestProvider, User user)
         {
-            bool isBan = false;
+            bool isBan;
             Log.Information("Starting check in Cas Ban");
 
             isBan = await user.IsCasBanAsync();
@@ -173,7 +171,7 @@ namespace WinTenBot.Helpers
 
         public static async Task<bool> CheckSpamWatchAsync(this RequestProvider requestProvider, User user)
         {
-            bool isBan = false;
+            bool isBan;
             Log.Information("Starting Run SpamWatch");
 
             var spamWatch = await user.Id.CheckSpamWatch();

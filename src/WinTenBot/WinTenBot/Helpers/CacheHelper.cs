@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Hangfire;
+using Serilog;
 
 namespace WinTenBot.Helpers
 {
@@ -16,13 +17,13 @@ namespace WinTenBot.Helpers
 
             var json = dataTable.ToJson(indented);
             await json.ToFile(filePath);
-            ConsoleHelper.WriteLine("Writing cache success..");
+            Log.Information("Writing cache success..");
         }
 
         public static void BackgroundWriteCache(this object dataTable, string fileJson)
         {
             var jobId = BackgroundJob.Enqueue(() => WriteCacheAsync(dataTable, fileJson, true));
-            ConsoleHelper.WriteLine($"Background Write Cache scheduled with ID: {jobId}");
+            Log.Information($"Background Write Cache scheduled with ID: {jobId}");
         }
 
         public static async Task<DataTable> ReadCacheAsync(this string fileJson)
@@ -30,7 +31,7 @@ namespace WinTenBot.Helpers
             var filePath = $"{workingDir}/{fileJson}";
             var json = await File.ReadAllTextAsync(filePath);
             var dataTable = json.ToDataTable();
-            ConsoleHelper.WriteLine($"Loaded cache. Rows: {dataTable.Rows.Count} items");
+            Log.Information($"Loaded cache. Rows: {dataTable.Rows.Count} items");
             return dataTable;
         }
     }

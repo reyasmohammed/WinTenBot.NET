@@ -4,6 +4,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Serilog;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace WinTenBot.Helpers
@@ -13,11 +14,11 @@ namespace WinTenBot.Helpers
         public static Dictionary<string,string> StringToDict(string buttonStr)
         {
             var dict = new Dictionary<string,string>();
-            var splitWelcomeButton = buttonStr.Split(',').ToList<string>();
+            var splitWelcomeButton = buttonStr.Split(',').ToList();
             foreach (var button in splitWelcomeButton)
             {
                 var buttonLink = button.Split('|').ToList();
-                ConsoleHelper.WriteLine($"Appending keyboard: {buttonLink[0]} -> {buttonLink[1]}");
+                Log.Information($"Appending keyboard: {buttonLink[0]} -> {buttonLink[1]}");
                 dict.Add(buttonLink[0], buttonLink[1]);
                 
             }
@@ -26,7 +27,7 @@ namespace WinTenBot.Helpers
         }
         public static InlineKeyboardMarkup CreateInlineKeyboardButton(Dictionary<string, string> buttonList, int columns)
         {
-            int rows = (int)Math.Ceiling((double)buttonList.Count / (double)columns);
+            int rows = (int)Math.Ceiling(buttonList.Count / (double)columns);
             InlineKeyboardButton[][] buttons = new InlineKeyboardButton[rows][];
 
             for (int i = 0; i < buttons.Length; i++)
@@ -50,12 +51,12 @@ namespace WinTenBot.Helpers
             var json = "";
             if (File.Exists(jsonPath))
             {
-                Serilog.Log.Debug($"Loading Json from path: {jsonPath}");
+                Log.Information($"Loading Json from path: {jsonPath}");
                 json = await File.ReadAllTextAsync(jsonPath);
             }
             else
             {
-                Serilog.Log.Debug($"Loading Json from string..");
+                Log.Information("Loading Json from string..");
                 json = jsonPath;
             }
 
@@ -69,12 +70,12 @@ namespace WinTenBot.Helpers
                 var data = row["data"].ToString();
                 if (data.CheckUrlValid())
                 {
-                    ConsoleHelper.WriteLine($"Appending Text: '{btnText}', Url: '{data}'.");
+                    Log.Information($"Appending Text: '{btnText}', Url: '{data}'.");
                     btnList.Add(InlineKeyboardButton.WithUrl(btnText, data));
                 }
                 else
                 {
-                    ConsoleHelper.WriteLine($"Appending Text: '{btnText}', Data: '{data}'.");
+                    Log.Information($"Appending Text: '{btnText}', Data: '{data}'.");
                     btnList.Add(InlineKeyboardButton.WithCallbackData(btnText,data));
                 }
             }

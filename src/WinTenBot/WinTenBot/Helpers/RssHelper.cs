@@ -1,18 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CodeHollow.FeedReader;
 using Serilog;
-using SqlKata;
-using SqlKata.Execution;
-using SqlKata.Extensions;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types.Enums;
 using WinTenBot.Model;
-using WinTenBot.Providers;
 using WinTenBot.Services;
 
 namespace WinTenBot.Helpers
@@ -35,7 +31,7 @@ namespace WinTenBot.Helpers
                 // {
                 var rssUrl = rssSetting.UrlFeed;
 
-                ConsoleHelper.WriteLine($"Processing {rssUrl} for {chatId}.");
+                Log.Information($"Processing {rssUrl} for {chatId}.");
                 try
                 {
                     var rssFeeds = await FeedReader.ReadAsync(rssUrl);
@@ -81,7 +77,7 @@ namespace WinTenBot.Helpers
                                     {"title", rssFeed.Title},
                                     {"publish_date", rssFeed.PublishingDate.ToString()},
                                     {"author", rssFeed.Author},
-                                    {"created_at", DateTime.Now.ToString()}
+                                    {"created_at", DateTime.Now.ToString(CultureInfo.InvariantCulture)}
                                 };
 
                                 Log.Information($"Writing to RSS History");
@@ -94,8 +90,6 @@ namespace WinTenBot.Helpers
                             {
                                 Log.Information($"May Bot not added in {chatId}.");
                                 Log.Error(chatNotFoundException, "Chat Not Found");
-                                // ConsoleHelper.WriteLine($"May Bot not added in {chatId}." +
-                                // $"\n{chatNotFoundException.Message}");
                             }
                         }
                         else
@@ -108,9 +102,6 @@ namespace WinTenBot.Helpers
                 {
                     Log.Error(ex, "Broadcasting RSS Feed.");
                     Thread.Sleep(4000);
-
-                    // ConsoleHelper.WriteLine(ex.Message);
-                    // ConsoleHelper.WriteLine(ex.ToString());
                 }
 
                 // }
@@ -154,8 +145,6 @@ namespace WinTenBot.Helpers
             catch (Exception ex)
             {
                 Log.Error(ex, "Validating RSS Feed");
-                // ConsoleHelper.WriteLine(ex.Message);
-                // ConsoleHelper.WriteLine(ex.ToString());
             }
 
             Log.Debug($"{url} IsValidUrlFeed: {isValid}");
