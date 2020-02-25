@@ -32,6 +32,7 @@ namespace WinTenBot.Handlers
             var nonAwaitTasks = new List<Task>();
 
             shouldAwaitTasks.Add(_requestProvider.CheckCasBanAsync(fromUser));
+            shouldAwaitTasks.Add(_requestProvider.CheckSpamWatchAsync(fromUser));
             shouldAwaitTasks.Add(_requestProvider.CheckUsername(message));
             
             nonAwaitTasks.Add(_requestProvider.AfkCheck(message));

@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using Flurl;
-using Flurl.Http;
 using Serilog;
 using SqlKata;
 using SqlKata.Execution;
-using Telegram.Bot;
 using Telegram.Bot.Types;
 using WinTenBot.Model;
 using WinTenBot.Providers;
@@ -50,43 +46,43 @@ namespace WinTenBot.Helpers
             return isAdmin;
         }
 
-        public static async Task<bool> IsBanInCache(this User user)
-        {
-            var filtered = new DataTable(null);
-            var data = await "fban_user.json".ReadCacheAsync();
-            var userId = user.Id;
+        // public static async Task<bool> IsBanInCache(this User user)
+        // {
+        //     var filtered = new DataTable(null);
+        //     var data = await "fban_user.json".ReadCacheAsync();
+        //     var userId = user.Id;
+        //
+        //     ConsoleHelper.WriteLine($"Checking {user} in Global Ban Cache");
+        //     var search = data.AsEnumerable()
+        //         .Where(row => row.Field<string>("user_id") == userId.ToString());
+        //     if (search.Any())
+        //     {
+        //         filtered = search.CopyToDataTable();
+        //     }
+        //
+        //     ConsoleHelper.WriteLine($"Caches found: {filtered.ToJson()}");
+        //     return filtered.Rows.Count > 0;
+        // }
 
-            ConsoleHelper.WriteLine($"Checking {user} in Global Ban Cache");
-            var search = data.AsEnumerable()
-                .Where(row => row.Field<string>("user_id") == userId.ToString());
-            if (search.Any())
-            {
-                filtered = search.CopyToDataTable();
-            }
-
-            ConsoleHelper.WriteLine($"Caches found: {filtered.ToJson()}");
-            return filtered.Rows.Count > 0;
-        }
-
-        public static async Task<bool> IsGBan(this User user)
-        {
-            var query = await new Query("fban_user")
-                .Where("user_id",user.Id)
-                .ExecForSqLite(true)
-                .GetAsync();
-
-            return query.Any();
-        }
+        // public static async Task<bool> IsGBan(this User user)
+        // {
+        //     var query = await new Query("fban_user")
+        //         .Where("user_id",user.Id)
+        //         .ExecForSqLite(true)
+        //         .GetAsync();
+        //
+        //     return query.Any();
+        // }
 
         public static bool IsNoUsername(this User user)
         {
             return user.Username == null;
         }
-        public static bool IsSudoer(this RequestProvider requestProvider)
-        {
-            var message = requestProvider.Message;
-            return message.From.Id.IsSudoer();
-        }
+        // public static bool IsSudoer(this RequestProvider requestProvider)
+        // {
+        //     var message = requestProvider.Message;
+        //     return message.From.Id.IsSudoer();
+        // }
 
         public static async Task CheckUsername(this RequestProvider requestProvider, Message message)
         {
@@ -148,7 +144,7 @@ namespace WinTenBot.Helpers
             var messageId = message.MessageId;
             
             // var isBan = await user.IsBanInCache();
-            var isBan = await user.IsGBan();
+            var isBan = await user.Id.CheckGBan();
             ConsoleHelper.WriteLine($"IsBan: {isBan}");
             if (isBan)
             {
@@ -157,21 +153,7 @@ namespace WinTenBot.Helpers
                 await requestProvider.UnbanMemberAsync(user);
             }
         }
-
-        public static async Task<bool> IsCasBanAsync(this User user)
-        {
-            bool isBan = false;
-            var userId = user.Id;
-            var url = "https://api.cas.chat/check".SetQueryParam("user_id", userId);
-            var resp = await url.GetJsonAsync<CasBan>();
-            
-            Log.Debug("CasBan Response", resp);
-
-            isBan = resp.Ok;
-            Log.Information($"UserId: {userId} is CAS ban: {isBan}");
-            return isBan;
-
-        }
+        
         public static async Task<bool> CheckCasBanAsync(this RequestProvider requestProvider, User user)
         {
             bool isBan = false;
@@ -184,6 +166,27 @@ namespace WinTenBot.Helpers
                 var sendText = $"{user} is banned in CAS!";
                 await requestProvider.SendTextAsync(sendText);
             }
+            return isBan;
+        }
+
+        public static async Task<bool> CheckSpamWatchAsync(this RequestProvider requestProvider, User user)
+        {
+            bool isBan = false;
+            Log.Information("Starting Run SpamWatch");
+
+            var spamWatch = await user.Id.CheckSpamWatch();
+            isBan = spamWatch.IsBan;
+            
+            Log.Information($"{user} is SpamWatch Ban => {isBan}");
+
+            if (isBan)
+            {
+                var sendText = $"{user} is banned in SpamWatch!" +
+                               $"\nFed: @SpamWatch" +
+                               $"\nReason: {spamWatch.Reason}";
+                await requestProvider.SendTextAsync(sendText);
+            }
+
             return isBan;
         }
 
