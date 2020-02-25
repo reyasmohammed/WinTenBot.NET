@@ -3,6 +3,7 @@ using Serilog;
 
 namespace WinTenBot.Helpers
 {
+    [Obsolete("Please use Serilog directly.")]
     public static class ConsoleHelper
     {
         private static object BuildMsg(object message)
