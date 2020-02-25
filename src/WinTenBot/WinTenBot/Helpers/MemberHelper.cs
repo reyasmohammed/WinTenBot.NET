@@ -145,7 +145,7 @@ namespace WinTenBot.Helpers
             
             // var isBan = await user.IsBanInCache();
             var isBan = await user.Id.CheckGBan();
-            ConsoleHelper.WriteLine($"IsBan: {isBan}");
+            Log.Information($"IsBan: {isBan}");
             if (isBan)
             {
                 await requestProvider.DeleteAsync(messageId);
@@ -165,6 +165,8 @@ namespace WinTenBot.Helpers
             {
                 var sendText = $"{user} is banned in CAS!";
                 await requestProvider.SendTextAsync(sendText);
+                await requestProvider.KickMemberAsync(user);
+                await requestProvider.UnbanMemberAsync(user);
             }
             return isBan;
         }
@@ -185,6 +187,8 @@ namespace WinTenBot.Helpers
                                $"\nFed: @SpamWatch" +
                                $"\nReason: {spamWatch.Reason}";
                 await requestProvider.SendTextAsync(sendText);
+                await requestProvider.KickMemberAsync(user);
+                await requestProvider.UnbanMemberAsync(user);
             }
 
             return isBan;
