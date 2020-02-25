@@ -28,7 +28,6 @@ using WinTenBot.Handlers.Commands.Security;
 using WinTenBot.Handlers.Commands.Tags;
 using WinTenBot.Handlers.Commands.Welcome;
 using WinTenBot.Handlers.Events;
-using WinTenBot.Helpers;
 using WinTenBot.Interfaces;
 using WinTenBot.Model;
 using WinTenBot.Options;
@@ -166,7 +165,7 @@ namespace WinTenBot
             var hangfireUsername = Configuration["Hangfire:Username"];
             var hangfirePassword = Configuration["Hangfire:Password"];
 
-            ConsoleHelper.WriteLine($"Hangfire Auth: {hangfireUsername} | {hangfirePassword}");
+            Log.Information($"Hangfire Auth: {hangfireUsername} | {hangfirePassword}");
 
             var dashboardOptions = new DashboardOptions
             {
@@ -218,7 +217,7 @@ namespace WinTenBot
             
             BotScheduler.StartScheduler();
 
-            ConsoleHelper.WriteLine("App is ready.");
+            Log.Information("App is ready.");
         }
 
         private IBotBuilder ConfigureBot()
