@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CodeHollow.FeedReader;
+﻿using System.Threading.Tasks;
 using Hangfire;
 using Serilog;
-using Telegram.Bot.Exceptions;
-using Telegram.Bot.Types.Enums;
 using WinTenBot.Helpers;
 using WinTenBot.Model;
 using WinTenBot.Services;
