@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -24,9 +25,9 @@ namespace WinTenBot.Handlers
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
             _requestProvider = new RequestProvider(context);
-            
+
             Message msg = context.Update.Message;
-            ConsoleHelper.WriteLine("Tags Received..");
+            Log.Information("Tags Received..");
             var partsText = msg.Text.Split(new char[] { ' ', '\n', ',' })
                 .Where(x => x.Contains("#"));
 
@@ -35,15 +36,15 @@ namespace WinTenBot.Handlers
             //            int count = 1;
             foreach (var split in limitedTags)
             {
-                ConsoleHelper.WriteLine("Processing : " + split.TrimStart('#'));
+                Log.Information("Processing : " + split.TrimStart('#'));
                 //                await chatProcessor.SendAsync($"This is tag of {split}");
                 var tagData = await tagsService.GetTagByTag(msg.Chat.Id, split.TrimStart('#'));
                 var json = tagData.ToJson();
-                Console.WriteLine(json);
+                Log.Information(json);
 
                 // var content = tagData.Result.Rows[0]["content"].ToString();
                 // var buttonStr = tagData.Result.Rows[0]["btn_data"].ToString();
-                
+
                 var content = tagData[0].Content;
                 var buttonStr = tagData[0].BtnData;
 
