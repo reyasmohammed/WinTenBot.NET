@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
@@ -31,7 +32,7 @@ namespace WinTenBot.Handlers.Commands.Rss
                     {
                         await _requestProvider.AppendTextAsync("Sedang mencari kemungkinan RSS yang valid");
                         var foundUrl = await url.GetBaseUrl().FindUrlFeed();
-                        ConsoleHelper.WriteLine($"Found URL Feed: {foundUrl}");
+                        Log.Information($"Found URL Feed: {foundUrl}");
 
                         if (foundUrl != "")
                         {
@@ -49,7 +50,7 @@ namespace WinTenBot.Handlers.Commands.Rss
 
                     var isFeedExist = await _rssService.IsExistRssAsync(url);
 
-                    ConsoleHelper.WriteLine($"Is Url Exist: {isFeedExist}");
+                    Log.Information($"Is Url Exist: {isFeedExist}");
 
                     if (!isFeedExist)
                     {

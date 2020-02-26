@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types.Enums;
 using WinTenBot.Helpers;
@@ -29,10 +30,10 @@ namespace WinTenBot.Handlers.Commands.Rules
                 {
                     var settings = await _settingsService.GetSettingByGroup();
                     await _settingsService.UpdateCache();
-                    ConsoleHelper.WriteLine(settings.ToJson());
+                    Log.Information(settings.ToJson());
                     // var rules = settings.Rows[0]["rules_text"].ToString();
                     var rules = settings.RulesText;
-                    ConsoleHelper.WriteLine(rules);
+                    Log.Information(rules);
                     sendText = rules;
                 }
             }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
@@ -41,19 +42,19 @@ namespace WinTenBot.Handlers.Commands.Tags
 
             if (msg.ReplyToMessage != null && isSudoer)
             {
-                ConsoleHelper.WriteLine("Replied message detected..");
-                ConsoleHelper.WriteLine($"Arg0: {args[0]}");
+                Log.Information("Replied message detected..");
+                Log.Information($"Arg0: {args[0]}");
 
                 if (args[0].Length >= 3)
                 {
                     await _requestProvider.SendTextAsync("📖 Mengumpulkan informasi..");
-//                    ConsoleHelper.WriteLine(TextHelper.ToJson(msg.ReplyToMessage));
+//                    Log.Information(TextHelper.ToJson(msg.ReplyToMessage));
 
                     var content = msg.ReplyToMessage.Text;
-                    ConsoleHelper.WriteLine(content);
+                    Log.Information(content);
 
                     bool isExist = await _tagsService.IsExist(msg.Chat.Id, args[0].Trim());
-                    ConsoleHelper.WriteLine($"Tag isExist: {isExist}");
+                    Log.Information($"Tag isExist: {isExist}");
                     if (!isExist)
                     {
                         var data = new Dictionary<string, object>()

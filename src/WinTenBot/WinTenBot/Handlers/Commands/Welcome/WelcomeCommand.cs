@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types.Enums;
 using WinTenBot.Helpers;
@@ -22,7 +23,7 @@ namespace WinTenBot.Handlers.Commands.Welcome
             _settingsService = new SettingsService(msg);
 
 
-            ConsoleHelper.WriteLine($"Args: {string.Join(" ", args)}");
+            Log.Information($"Args: {string.Join(" ", args)}");
             var sendText = "Perintah /welcome hanya untuk grup saja";
 
             if (msg.Chat.Type != ChatType.Private)

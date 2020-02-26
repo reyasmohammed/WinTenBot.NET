@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
@@ -31,7 +32,7 @@ namespace WinTenBot.Handlers.Commands.Security
                 if (msg.ReplyToMessage != null)
                 {
                     var repMsg = msg.ReplyToMessage;
-                    ConsoleHelper.WriteLine(msg.Type);
+                    Log.Information(msg.Type.ToJson(true));
 
                     var fileId = repMsg.GetReducedFileId();
 

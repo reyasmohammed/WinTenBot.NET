@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Model;
@@ -24,7 +25,7 @@ namespace WinTenBot.Handlers
             _requestProvider = new RequestProvider(context);
             var msg = context.Update.Message;
 
-            ConsoleHelper.WriteLine("Media received... ");
+            Log.Information("Media received... ");
             var isBan = await _mediaFilterService.IsExistInCache("file_id", msg.GetReducedFileId());
 //            var isBan = await _mediaFilterService.IsExist("file_id", msg.GetReducedFileId());
             if (isBan)
@@ -32,14 +33,14 @@ namespace WinTenBot.Handlers
                 await _requestProvider.DeleteAsync(msg.MessageId);
             }
 
-            ConsoleHelper.WriteLine($"Media isBan: {isBan}");
+            Log.Information($"Media isBan: {isBan}");
 
             if (Bot.HostingEnvironment.IsProduction())
                 await _mediaFilterService.UpdateCacheAsync();
             else
-                ConsoleHelper.WriteLine($"Update cache skipped because local Env");
+                Log.Information($"Update cache skipped because local Env");
 
-            ConsoleHelper.WriteLine("Media Filter complete.");
+            Log.Information("Media Filter complete.");
 
             await next(context);
         }

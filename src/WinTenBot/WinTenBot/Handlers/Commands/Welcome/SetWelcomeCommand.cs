@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types.Enums;
 using WinTenBot.Helpers;
@@ -30,7 +31,7 @@ namespace WinTenBot.Handlers.Commands.Welcome
             var partsMsg = msg.Text.Split(' ').ToArray();
 
             string[] commands = {"message", "msg", "button", "btn"};
-            ConsoleHelper.WriteLine(partsMsg.ToJson());
+            Log.Information(partsMsg.ToJson());
 
             var isAdmin = await _requestProvider.IsAdminGroup();
             if (isAdmin)
@@ -44,7 +45,7 @@ namespace WinTenBot.Handlers.Commands.Welcome
                         await _requestProvider.SendTextAsync("Sedang menyimpan Welcome Media..");
                         await _settingsService.UpdateCell("welcome_media", repMsg.GetFileId());
                         await _settingsService.UpdateCell("welcome_media_type", mediaType);
-                        ConsoleHelper.WriteLine("Save media success..");
+                        Log.Information("Save media success..");
 
                         await _requestProvider.EditAsync("Welcome Media berhasil di simpan.");
                         return;
@@ -55,8 +56,6 @@ namespace WinTenBot.Handlers.Commands.Welcome
                         return;
                     }
                 }
-
-                ConsoleHelper.WriteLine(partsMsg.Length);
                 
                 var missParamText = $"Parameter yg di dukung {string.Join(", ", commands)}" +
                                $"\nContoh: <code>/setwelcome message</code>";
@@ -75,8 +74,8 @@ namespace WinTenBot.Handlers.Commands.Welcome
                                 .Replace(partsMsg[0], "")
                                 .Replace(partsMsg[1], "").Trim();
 
-                            // ConsoleHelper.WriteLine(columnTarget);
-                            // ConsoleHelper.WriteLine(data);
+                            // Log.Information(columnTarget);
+                            // Log.Information(data);
 
                             await _requestProvider.SendTextAsync("Sedang menyimpan Welcome Message..");
 

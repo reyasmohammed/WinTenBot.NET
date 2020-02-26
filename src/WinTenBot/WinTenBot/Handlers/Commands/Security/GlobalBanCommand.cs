@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
@@ -42,12 +43,12 @@ namespace WinTenBot.Handlers.Commands.Security
                             var repMsg = msg.ReplyToMessage;
                             var userId = repMsg.From.Id;
                     
-                            ConsoleHelper.WriteLine("Execute Global Ban");
+                            Log.Information("Execute Global Ban");
                             await _requestProvider.SendTextAsync("Mempersiapkan..");
                             await _requestProvider.DeleteAsync(msg.MessageId);
 
                             var isBan = await _elasticSecurityService.IsExist(userId);
-                            ConsoleHelper.WriteLine($"IsBan: {isBan}");
+                            Log.Information($"IsBan: {isBan}");
                             if (isBan)
                             {
                                 await _requestProvider.EditAsync("Pengguna sudah di ban");
@@ -63,7 +64,7 @@ namespace WinTenBot.Handlers.Commands.Security
 
                                 await _requestProvider.EditAsync("Menyimpan informasi..");
                                 var save = await _elasticSecurityService.SaveBanAsync(data);
-                                ConsoleHelper.WriteLine($"SaveBan: {save}");
+                                Log.Information($"SaveBan: {save}");
 
                                 await _requestProvider.EditAsync("Menulis ke Cache..");
                                 await _elasticSecurityService.UpdateCacheAsync();

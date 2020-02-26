@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -33,7 +34,7 @@ namespace WinTenBot.Handlers.Events
             _settingsService = new SettingsService(msg);
             _elasticSecurityService = new ElasticSecurityService(context.Update.Message);
 
-            ConsoleHelper.WriteLine("New Chat Members...");
+            Log.Information("New Chat Members...");
 
             var newMembers = msg.NewChatMembers;
             var isBootAdded = await newMembers.IsBotAdded();
@@ -84,7 +85,7 @@ namespace WinTenBot.Handlers.Events
                 var memberCount = await _requestProvider.GetMemberCount();
                 var newMemberCount = newMembers.Length;
 
-                ConsoleHelper.WriteLine("Preparing send Welcome..");
+                Log.Information("Preparing send Welcome..");
 
                 if (chatSettings.WelcomeMessage.IsNullOrEmpty())
                 {
@@ -131,7 +132,7 @@ namespace WinTenBot.Handlers.Events
             }
             else
             {
-                ConsoleHelper.WriteLine("Welcome Message ignored because User is Global Banned.");
+                Log.Information("Welcome Message ignored because User is Global Banned.");
             }
         }
 
@@ -143,7 +144,7 @@ namespace WinTenBot.Handlers.Events
             var allNoUsername = new StringBuilder();
             var allNewBot = new StringBuilder();
 
-            ConsoleHelper.WriteLine($"Parsing new {users.Length} members..");
+            Log.Information($"Parsing new {users.Length} members..");
             foreach (var newMember in users)
             {
                 var isBan = await CheckGlobalBanAsync(newMember);
@@ -191,7 +192,7 @@ namespace WinTenBot.Handlers.Events
             var isKicked = false;
 
             var isBan = await _elasticSecurityService.IsExistInCache(userId);
-            ConsoleHelper.WriteLine($"{user} IsBan: {isBan}");
+            Log.Information($"{user} IsBan: {isBan}");
             if (!isBan) return isKicked;
 
             var sendText = $"{user} terdeteksi pada penjaringan WinTenDev ES2 tapi gagal di tendang.";

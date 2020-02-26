@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
@@ -30,20 +31,19 @@ namespace WinTenBot.Handlers.Commands.Notes
                 var repMsg = msg.ReplyToMessage;
                 await _requestProvider.SendTextAsync("Mengumpulkan informasi");
 
-                var partsContent = repMsg.Text.Split(new[] {"\n\n"}, StringSplitOptions.None);
+                var partsContent = repMsg.Text.Split(new[] { "\n\n" }, StringSplitOptions.None);
                 var partsMsgText = msg.Text.GetTextWithoutCmd().Split("\n\n");
 
-                ConsoleHelper.WriteLine(msg.Text);
-                ConsoleHelper.WriteLine(repMsg.Text);
-                ConsoleHelper.WriteLine(partsContent.ToJson());
-                ConsoleHelper.WriteLine(partsMsgText.ToJson());
+                Log.Information(msg.Text);
+                Log.Information(repMsg.Text);
+                Log.Information(partsContent.ToJson());
+                Log.Information(partsMsgText.ToJson());
 
-                var data = new Dictionary<string, object>()
-                {
-                    {"slug", partsMsgText[0]},
-                    {"content", partsContent[0]},
-                    {"chat_id", msg.Chat.Id},
-                    {"user_id", msg.From.Id}
+                var data = new Dictionary<string, object>() {
+                    { "slug", partsMsgText[0] },
+                    { "content", partsContent[0] },
+                    { "chat_id", msg.Chat.Id },
+                    { "user_id", msg.From.Id }
                 };
 
                 if (partsMsgText[1] != "")

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 
@@ -12,7 +13,7 @@ namespace WinTenBot.Handlers
         {
             Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.Yellow;
-            ConsoleHelper.WriteLine("Updating chat members list...");
+            Log.Information("Updating chat members list...");
             Console.ResetColor();
 
             return next(context);

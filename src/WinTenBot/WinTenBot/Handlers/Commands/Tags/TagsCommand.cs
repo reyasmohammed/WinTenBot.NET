@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 using WinTenBot.Helpers;
@@ -28,8 +29,6 @@ namespace WinTenBot.Handlers.Commands.Tags
 
             var id = msg.From.Id;
             var sendText = "Under maintenance";
-
-            ConsoleHelper.WriteLine(id.IsSudoer());
             
             await _requestProvider.DeleteAsync(msg.MessageId);
             await _requestProvider.SendTextAsync("🔄 Loading tags..");
@@ -47,19 +46,16 @@ namespace WinTenBot.Handlers.Commands.Tags
             await _requestProvider.EditAsync(sendText);
             
             //            var jsonSettings = TextHelper.ToJson(currentSetting);
-            //            ConsoleHelper.WriteLine($"CurrentSettings: {jsonSettings}");
+            //            Log.Information($"CurrentSettings: {jsonSettings}");
 
             // var lastTagsMsgId = int.Parse(currentSetting.Rows[0]["last_tags_message_id"].ToString());
 
             var currentSetting = await _settingsService.GetSettingByGroup();
             var lastTagsMsgId = currentSetting.LastTagsMessageId;
-            ConsoleHelper.WriteLine($"LastTagsMsgId: {lastTagsMsgId}");
+            Log.Information($"LastTagsMsgId: {lastTagsMsgId}");
 
             await _requestProvider.DeleteAsync(lastTagsMsgId.ToInt());
-
             await _tagsService.UpdateCacheAsync(msg);
-
-            ConsoleHelper.WriteLine(_requestProvider.SentMessageId);
             await _settingsService.UpdateCell("last_tags_message_id", _requestProvider.SentMessageId);
 
 

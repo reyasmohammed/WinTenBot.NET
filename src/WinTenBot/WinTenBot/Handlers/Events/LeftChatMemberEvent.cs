@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 using WinTenBot.Helpers;
@@ -23,7 +24,7 @@ namespace WinTenBot.Handlers.Events
 
             if (!isBan)
             {
-                ConsoleHelper.WriteLine("Left Chat Members...");
+                Log.Information("Left Chat Members...");
 
                 var chatTitle = msg.Chat.Title;
 
@@ -40,7 +41,7 @@ namespace WinTenBot.Handlers.Events
             }
             else
             {
-                ConsoleHelper.WriteLine($"Left Message ignored because {leftMember} is Global Banned");
+                Log.Information($"Left Message ignored because {leftMember} is Global Banned");
 
             }
         }
