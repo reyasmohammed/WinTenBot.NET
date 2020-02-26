@@ -12,6 +12,7 @@ using WinTenBot.Services;
 
 namespace WinTenBot.Handlers
 {
+    [Obsolete("Soon this Class will move to MessageHelper as Function.")]
     public class CallTagsReceivedHandler : IUpdateHandler
     {
         private RequestProvider _requestProvider;
