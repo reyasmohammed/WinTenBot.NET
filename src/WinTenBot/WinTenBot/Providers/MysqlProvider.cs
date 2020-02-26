@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Data.SQLite;
-using System.IO;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using Serilog;
@@ -11,7 +9,7 @@ using WinTenBot.Model;
 
 namespace WinTenBot.Providers
 {
-    public static class SqlKataProvider
+    public static class MysqlProvider
     {
         public static QueryFactory GetMysqlInstances()
         {
