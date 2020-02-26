@@ -20,9 +20,9 @@ namespace WinTenBot.Services
         {
             var data = await new Query(BaseTable)
                 .Where(key, value)
-                .ExecForMysql()
+                .ExecForMysql(true)
                 .GetAsync();
-            
+
             Log.Information($"Check AFK Exist: {data.Count().ToBool()}");
             return data.Any();
         }
@@ -35,7 +35,7 @@ namespace WinTenBot.Services
             if (!search.Any()) return false;
 
             var filtered = search.CopyToDataTable();
-            Log.Information($"AFK found in Caches: {filtered.ToJson()}");
+            Log.Information($"AFK found in Caches: {filtered.ToJson(true)}");
             return true;
         }
 
@@ -62,15 +62,15 @@ namespace WinTenBot.Services
                 {"user_id", data["user_id"]}
             };
 
-            var insert =0;
-            
+            var insert = 0;
+
             var checkExist = await new Query(BaseTable)
                 .Where(where)
                 .ExecForMysql()
                 .GetAsync();
 
             var isExist = checkExist.Any();
-            
+
             if (isExist)
             {
                 insert = await new Query(BaseTable)

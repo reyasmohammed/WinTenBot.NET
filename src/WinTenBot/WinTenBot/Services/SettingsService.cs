@@ -135,37 +135,37 @@ namespace WinTenBot.Services
             return listBtn;
         }
 
-        public async Task SaveSettingsAsync(Dictionary<string, object> data)
+        public async Task<int> SaveSettingsAsync(Dictionary<string, object> data)
         {
             var where = new Dictionary<string, object>() {{"chat_id", data["chat_id"]}};
-            // var isExist = await IsDataExist(baseTable, where);
 
             var check = await new Query(baseTable)
                 .Where(where)
                 .ExecForMysql()
                 .GetAsync();
             var isExist = check.Any();
-
+            
+            var insert = -1;
             Log.Information($"Group setting IsExist: {isExist}");
             if (!isExist)
             {
                 Log.Information($"Inserting new data for {Message.Chat}");
-                // await Insert(baseTable, data);
 
-                var insert = await new Query(baseTable)
+                insert = await new Query(baseTable)
                     .ExecForMysql()
                     .InsertAsync(data);
             }
             else
             {
                 Log.Information($"Updating data for {Message.Chat}");
-                // await Update(baseTable, data, where);
 
-                var insert = await new Query(baseTable)
+                insert = await new Query(baseTable)
                     .Where(where)
                     .ExecForMysql()
                     .UpdateAsync(data);
             }
+
+            return insert;
         }
 
         public async Task UpdateCell(string key, object value)
