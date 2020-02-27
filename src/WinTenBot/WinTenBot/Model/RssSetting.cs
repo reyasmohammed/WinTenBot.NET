@@ -1,26 +1,26 @@
 ﻿using System;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace WinTenBot.Model
 {
     public class RssSetting
     {
-        [JsonPropertyName("id")]
+        [JsonProperty("id")]
         public int Id { get; set; }
         
-        [JsonPropertyName("chat_id")]
+        [JsonProperty("chat_id")]
         public string ChatId { get; set; }
         
-        [JsonPropertyName("from_id")]
+        [JsonProperty("from_id")]
         public string FromId { get; set; }
         
-        [JsonPropertyName("url_feed")]
+        [JsonProperty("url_feed")]
         public string UrlFeed { get; set; }
         
-        [JsonPropertyName("created_at")]
+        [JsonProperty("created_at")]
         public DateTime CreatedAt { get; set; }
         
-        [JsonPropertyName("updated_at")]
+        [JsonProperty("updated_at")]
         public DateTime UpdatedAt { get; set; }
     }
 }
