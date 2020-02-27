@@ -18,7 +18,7 @@ namespace WinTenBot.Scheduler
                 var baseId = "rss-scheduler";
                 var cronInMinute = 5;
                 var rssService = new RssService();
-                
+
                 Log.Information("Getting list Chat ID");
                 var listChatId = await rssService.GetListChatIdAsync();
                 foreach (RssSetting row in listChatId)
@@ -35,6 +35,23 @@ namespace WinTenBot.Scheduler
 
                 Log.Information("Registering RSS Scheduler complete.");
             });
+        }
+
+        public static void RegisterScheduler(this string chatId)
+        {
+            Log.Information("Initializing RSS Scheduler.");
+
+            var baseId = "rss-scheduler";
+            var cronInMinute = 5;
+            var recurringId = $"{chatId}-{baseId}";
+
+            Log.Information($"Creating Jobs for {chatId}");
+
+            RecurringJob.RemoveIfExists(recurringId);
+            RecurringJob.AddOrUpdate(recurringId, ()
+                => RssHelper.ExecBroadcasterAsync(chatId), $"*/{cronInMinute} * * * *");
+            
+            Log.Information("Registering RSS Scheduler complete.");
         }
     }
 }
