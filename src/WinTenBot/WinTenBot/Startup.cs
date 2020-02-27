@@ -2,7 +2,6 @@ using System;
 using Hangfire;
 using Hangfire.Heartbeat;
 using Hangfire.Heartbeat.Server;
-using Hangfire.LiteDB;
 using HangfireBasicAuthenticationFilter;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,6 +30,7 @@ using WinTenBot.Handlers.Events;
 using WinTenBot.Interfaces;
 using WinTenBot.Model;
 using WinTenBot.Options;
+using WinTenBot.Providers;
 using WinTenBot.Scheduler;
 using WinTenBot.Services;
 
@@ -43,21 +43,21 @@ namespace WinTenBot
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-
-            GlobalConfiguration.Configuration
-                .UseSerilogLogProvider()
-                .UseColouredConsoleLogProvider();
-
+            
             Bot.GlobalConfiguration = Configuration;
             Bot.DbConnectionString = Configuration["CommonConfig:ConnectionString"];
 
-            Console.WriteLine($"ProductName: {Configuration["Engines:ProductName"]}");
-            Console.WriteLine($"Version: {Configuration["Engines:Version"]}");
+            Log.Information($"ProductName: {Configuration["Engines:ProductName"]}");
+            Log.Information($"Version: {Configuration["Engines:Version"]}");
 
             Bot.Client = new TelegramBotClient(Configuration["ZiziBot:ApiToken"]);
 
             Bot.Clients.Add("zizibot", new TelegramBotClient(Configuration["ZiziBot:ApiToken"]));
             Bot.Clients.Add("macosbot", new TelegramBotClient(Configuration["MacOsBot:ApiToken"]));
+
+            GlobalConfiguration.Configuration
+                .UseSerilogLogProvider()
+                .UseColouredConsoleLogProvider();
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -66,11 +66,11 @@ namespace WinTenBot
                 .AddTransient<ZiziBot>()
                 .Configure<BotOptions<ZiziBot>>(Configuration.GetSection("ZiziBot"))
                 .Configure<CustomBotOptions<ZiziBot>>(Configuration.GetSection("ZiziBot"))
-                
+
                 .AddTransient<MacOsBot>()
                 .Configure<BotOptions<MacOsBot>>(Configuration.GetSection("MacOsBot"))
                 .Configure<CustomBotOptions<MacOsBot>>(Configuration.GetSection("MacOsBot"))
-                
+
                 .AddScoped<NewUpdateHandler>()
                 .AddScoped<GenericMessageHandler>()
                 .AddScoped<WebhookLogger>()
@@ -96,8 +96,7 @@ namespace WinTenBot
             services.AddScoped<MigrateCommand>()
                 .AddScoped<MediaFilterCommand>();
 
-            services.AddScoped<CallTagsReceivedHandler>()
-                .AddScoped<TagsCommand>()
+            services.AddScoped<TagsCommand>()
                 .AddScoped<TagCommand>()
                 .AddScoped<UntagCommand>();
 
@@ -140,20 +139,19 @@ namespace WinTenBot
             services.AddScoped<OutCommand>();
 
             services.AddScoped<QrCommand>();
-
-
-            // Hangfire
-            var hangfireOptions = new LiteDbStorageOptions
-            {
-                QueuePollInterval = TimeSpan.FromSeconds(5)
-            };
+            
 
             services.AddHangfireServer();
-            services.AddHangfire(t =>
+            services.AddHangfire(config =>
             {
-                t.UseLiteDbStorage(Configuration["Hangfire:LiteDb"], hangfireOptions);
-                t.UseHeartbeatPage(checkInterval: TimeSpan.FromSeconds(1));
-                t.UseSerilogLogProvider();
+                config.UseStorage(HangfireProvider.GetMysqlStorage());
+                // config.UseStorage(HangfireProvider.GetSqliteStorage());
+                // config.UseStorage(HangfireProvider.GetLiteDbStorage());
+
+                config.UseSimpleAssemblyNameTypeSerializer()
+                    .UseHeartbeatPage(checkInterval: TimeSpan.FromSeconds(10))
+                    .UseSerilogLogProvider()
+                    .UseRecommendedSerializerSettings();
             });
         }
 
@@ -200,12 +198,12 @@ namespace WinTenBot
 
                 app.UseHangfireDashboard(hangfireBaseUrl, dashboardOptions);
             }
-            
+
             var serverOptions = new BackgroundJobServerOptions
             {
                 WorkerCount = Environment.ProcessorCount * 20
             };
-            
+
             app.UseHangfireServer(serverOptions, additionalProcesses: new[]
             {
                 new ProcessMonitor(checkInterval: TimeSpan.FromSeconds(1))
@@ -214,7 +212,7 @@ namespace WinTenBot
             app.Run(async context => { await context.Response.WriteAsync("Hello World!"); });
 
             app.UseSerilogRequestLogging();
-            
+
             BotScheduler.StartScheduler();
 
             Log.Information("App is ready.");
@@ -226,9 +224,9 @@ namespace WinTenBot
                     .Use<ExceptionHandler>()
                     // .Use<CustomUpdateLogger>()
                     .UseWhen<WebhookLogger>(When.Webhook)
-                    
+
                     .UseWhen<NewUpdateHandler>(When.NewUpdate)
-                    
+
                     //.UseWhen<UpdateMembersList>(When.MembersChanged)
                     .UseWhen<NewChatMembersEvent>(When.NewChatMembers)
                     .UseWhen<LeftChatMemberEvent>(When.LeftChatMember)
@@ -242,7 +240,6 @@ namespace WinTenBot
                     .UseWhen<MediaReceivedHandler>(When.MediaReceived)
                     .UseWhen(When.NewMessage, msgBranch => msgBranch
                         .UseWhen(When.NewTextMessage, txtBranch => txtBranch
-                                .UseWhen<CallTagsReceivedHandler>(When.CallTagReceived)
                                 .UseWhen<PingHandler>(When.PingReceived)
                                 .UseWhen(When.NewCommand, cmdBranch => cmdBranch
                                     .UseCommand<AdminCommand>("admin")
@@ -285,11 +282,12 @@ namespace WinTenBot
                                 )
                                 .Use<GenericMessageHandler>()
 
-                            //.Use<NLP>()
+                        //.Use<NLP>()
                         )
                         // .UseWhen<StickerHandler>(When.StickerMessage)
                         .UseWhen<WeatherReporter>(When.LocationMessage)
                     )
+
                     .UseWhen<CallbackQueryHandler>(When.CallbackQuery)
 
                 //.Use<UnhandledUpdateReporter>()
