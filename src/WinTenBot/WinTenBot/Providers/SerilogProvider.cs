@@ -5,7 +5,7 @@ using Serilog.Sinks.SystemConsole.Themes;
 
 namespace WinTenBot.Providers
 {
-    public class SerilogProvider
+    public static class SerilogProvider
     {
         public static void InitializeSerilog()
         {
@@ -15,9 +15,9 @@ namespace WinTenBot.Providers
             var rollingInterval = RollingInterval.Day;
 
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Verbose()
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Verbose)
-                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Verbose)
+                .MinimumLevel.Debug()
+                .MinimumLevel.Override("Microsoft",LogEventLevel.Debug)
+                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Debug)
                 .Enrich.FromLogContext()
                 .WriteTo.Console(theme: SystemConsoleTheme.Colored, outputTemplate: outputConsoleTemplate)
                 .WriteTo.File(logPath, rollingInterval: rollingInterval, flushToDiskInterval: flushInterval)
