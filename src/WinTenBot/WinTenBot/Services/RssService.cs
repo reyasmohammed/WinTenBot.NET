@@ -21,24 +21,19 @@ namespace WinTenBot.Services
         public RssService(Message message = null)
         {
             _message = message;
-
-            // RssMigration.MigrateRssHistory();
         }
 
         public async Task<bool> IsExistInHistory(Dictionary<string, object> where)
         {
-            // var isExist = await baseTable.IfTableExistAsync();
-            // await isExist.MigrateRssHistory();
-            // await baseTable.MigrateLocalStorage();
-
-
             var data = await new Query(baseTable)
                 .Where(where)
                 .ExecForSqLite(true)
                 .GetAsync();
 
-            Log.Information($"Check RSS History: {data.Count().ToBool()}");
-            return data.Any();
+            var isExist = data.Any();
+            Log.Information($"Check RSS History: {isExist}");
+            
+            return isExist;
         }
 
         public async Task<bool> IsExistRssAsync(string urlFeed)
@@ -48,10 +43,11 @@ namespace WinTenBot.Services
                 .Where("url_feed", urlFeed)
                 .ExecForMysql()
                 .GetAsync();
+            
+            var isExist = data.Any();
+            Log.Information($"Check RSS Setting: {isExist}");
 
-            Log.Information($"Check RSS Setting: {data.Count().ToBool()}");
-
-            return data.Any();
+            return isExist;
         }
 
         public async Task<bool> SaveRssSettingAsync(Dictionary<string, object> data)
@@ -64,10 +60,6 @@ namespace WinTenBot.Services
 
         public async Task<bool> SaveRssHistoryAsync(Dictionary<string, object> data)
         {
-            // var isExist = await baseTable.IfTableExistAsync();
-            // await isExist.MigrateRssHistory();
-            // await baseTable.MigrateLocalStorage();
-
             var insert = await new Query(baseTable)
                 .ExecForSqLite(true)
                 .InsertAsync(data);
@@ -83,12 +75,9 @@ namespace WinTenBot.Services
                 .GetAsync();
 
             var mapped = data.ToJson().MapObject<List<RssSetting>>();
-            // Log.Information(mapped.ToJson());
+            Log.Information("RSSData: " + mapped.ToJson(true));
 
-            Log.Information($"Get RSS Settings: {data.Count()}");
             return mapped;
-
-            // return data.ToJson().ToDataTable();
         }
 
         public async Task<List<RssSetting>> GetListChatIdAsync()
@@ -103,8 +92,6 @@ namespace WinTenBot.Services
 
             Log.Information($"Get List ChatID: {data.Count()}");
             return mapped;
-
-            // return data.ToJson().ToDataTable();
         }
 
         public async Task<bool> DeleteRssAsync(string urlFeed)
