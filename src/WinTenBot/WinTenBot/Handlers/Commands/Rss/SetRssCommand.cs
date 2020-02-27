@@ -5,6 +5,7 @@ using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
+using WinTenBot.Scheduler;
 using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Rss
@@ -19,18 +20,20 @@ namespace WinTenBot.Handlers.Commands.Rss
         {
             _requestProvider = new RequestProvider(context);
             _rssService = new RssService(_requestProvider.Message);
+            var chatId = _requestProvider.Message.Chat.Id;
 
             var url = _requestProvider.Message.Text.GetTextWithoutCmd();
             if (url != null)
             {
-                await _requestProvider.AppendTextAsync($"Sedang memeriksa {url}");
+                await _requestProvider.AppendTextAsync($"URL: {url}");
+                
                 if (url.CheckUrlValid())
                 {
-                    await _requestProvider.AppendTextAsync($"Sedang memvalidasi {url}");
+                    await _requestProvider.AppendTextAsync($"Sedang mengecek apakah berisi RSS");
                     var isValid = await url.IsValidUrlFeed();
                     if (!isValid)
                     {
-                        await _requestProvider.AppendTextAsync("Sedang mencari kemungkinan RSS yang valid");
+                        await _requestProvider.AppendTextAsync("Sedang mencari kemungkinan tautan RSS yang valid");
                         var foundUrl = await url.GetBaseUrl().FindUrlFeed();
                         Log.Information($"Found URL Feed: {foundUrl}");
 
@@ -54,7 +57,7 @@ namespace WinTenBot.Handlers.Commands.Rss
 
                     if (!isFeedExist)
                     {
-                        await _requestProvider.SendTextAsync($"Sedang menyimpan..");
+                        await _requestProvider.AppendTextAsync($"Sedang menyimpan..");
 
                         var data = new Dictionary<string, object>()
                         {
@@ -64,16 +67,20 @@ namespace WinTenBot.Handlers.Commands.Rss
                         };
 
                         await _rssService.SaveRssSettingAsync(data);
-                        await _requestProvider.EditAsync($"Url: {url} berhasil di simpan");
+
+                        await _requestProvider.AppendTextAsync("Memastikan Scheduler sudah berjalan");
+                        chatId.ToString().RegisterScheduler();
+                        
+                        await _requestProvider.AppendTextAsync($"Tautan berhasil di simpan");
                     }
                     else
                     {
-                        await _requestProvider.SendTextAsync($"Url: {url} sudah di simpan");
+                        await _requestProvider.AppendTextAsync($"Tautan sudah di simpan");
                     }
                 }
                 else
                 {
-                    await _requestProvider.SendTextAsync("Url tersebut sepertinya tidak valid");
+                    await _requestProvider.AppendTextAsync("Url tersebut sepertinya tidak valid");
                 }
             }
             else

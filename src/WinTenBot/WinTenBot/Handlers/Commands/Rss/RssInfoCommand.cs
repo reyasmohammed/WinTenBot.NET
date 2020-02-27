@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Model;
@@ -23,8 +24,9 @@ namespace WinTenBot.Handlers.Commands.Rss
             {
                 await _requestProvider.SendTextAsync("🔄 Sedang meload data..");
                 var rssData = await _rssService.GetRssSettingsAsync(chatId);
+                var rssCount = rssData.Count();
 
-                var sendText = $"📚 <b>List RSS</b>: {rssData.Count} Items.";
+                var sendText = $"📚 <b>List RSS</b>: {rssCount} Items.";
                 int num = 1;
                 foreach (RssSetting rss in rssData)
                 {
@@ -32,7 +34,7 @@ namespace WinTenBot.Handlers.Commands.Rss
                     sendText += $"\n{num++}. {rss.UrlFeed}";
                 }
 
-                if (rssData.Count == 0)
+                if (rssCount == 0)
                 {
                     sendText += "\n\nSepertinya kamu belum menambahkan RSS disini. " +
                                 "Kamu dapat menambahkan RSS dengan jumlah tidak terbatas!" +
