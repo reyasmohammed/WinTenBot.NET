@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Serilog;
 using SqlKata;
@@ -47,7 +48,7 @@ namespace WinTenBot.Helpers
             var text = message;
             if (withoutCmd && message.StartsWith("/"))
             {
-                text =  message.TrimStart(partsMsg[0].ToCharArray());
+                text = message.TrimStart(partsMsg[0].ToCharArray());
             }
 
             return text.Trim();
@@ -65,11 +66,11 @@ namespace WinTenBot.Helpers
                 var trimmedChatId = message.Chat.Id.ToString().Substring(4);
                 messageLink = $"https://t.me/c/{trimmedChatId}/{messageId}";
             }
-            
+
             Log.Information($"MessageLink: {messageLink}");
             return messageLink;
         }
-        
+
         public static async Task<bool> IsMustDelete(string words)
         {
             var isMust = false;
@@ -86,21 +87,21 @@ namespace WinTenBot.Helpers
                 {
                     var forFilter = wordFilter.Word;
                     var isGlobal = wordFilter.IsGlobal;
-                    
+
                     if (forFilter == word.ToLower())
                     {
                         isMust = true;
                     }
-                    
+
                     // Log.Debug($"Is ({isGlobal}) '{word}' == '{forFilter}' ? {isMust}");
-                    
-                    if(isMust) break;
+
+                    if (isMust) break;
                 }
             }
 
             return isMust;
         }
-        
+
         public static async Task CheckMessage(this RequestProvider requestProvider, Message message)
         {
             try
@@ -122,7 +123,7 @@ namespace WinTenBot.Helpers
             }
             catch (Exception ex)
             {
-                Log.Error(ex,"Error checking message");
+                Log.Error(ex, "Error checking message");
             }
         }
 
@@ -159,7 +160,50 @@ namespace WinTenBot.Helpers
             }
             catch (Exception ex)
             {
-                Log.Error(ex,"Error when getting Notes");
+                Log.Error(ex, "Error when getting Notes");
+            }
+        }
+
+        public static async Task CheckHastagMessageAsync(this RequestProvider requestProvider)
+        {
+            var tagsService = new TagsService();
+            Message msg = requestProvider.Message;
+
+            if(!msg.Text.Contains("#")){
+                Log.Information($"Message {msg.MessageId} is not contains any Hashtag.");
+                return;
+            }
+
+            Log.Information("Tags Received..");
+            var partsText = msg.Text.Split(new char[] { ' ', '\n', ',' })
+                .Where(x => x.Contains("#"));
+
+            var limitedTags = partsText.Take(5);
+
+            //            int count = 1;
+            foreach (var split in limitedTags)
+            {
+                Log.Information("Processing : " + split.TrimStart('#'));
+
+                var tagData = await tagsService.GetTagByTag(msg.Chat.Id, split.TrimStart('#'));
+                var json = tagData.ToJson();
+                Log.Information(json);
+
+                var content = tagData[0].Content;
+                var buttonStr = tagData[0].BtnData;
+
+                InlineKeyboardMarkup buttonMarkup = null;
+                if (buttonStr != "")
+                {
+                    buttonMarkup = buttonStr.ToReplyMarkup(2);
+                }
+
+                await requestProvider.SendTextAsync(content, buttonMarkup);
+            }
+
+            if (partsText.Count() > limitedTags.Count())
+            {
+                await requestProvider.SendTextAsync("Due performance reason, we limit 5 batch call tags");
             }
         }
     }

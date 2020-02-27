@@ -33,33 +33,23 @@ namespace WinTenBot.Handlers
             shouldAwaitTasks.Add(_requestProvider.CheckCasBanAsync(fromUser));
             shouldAwaitTasks.Add(_requestProvider.CheckSpamWatchAsync(fromUser));
             shouldAwaitTasks.Add(_requestProvider.CheckUsername(message));
-            
+
             nonAwaitTasks.Add(_requestProvider.AfkCheck(message));
             nonAwaitTasks.Add(_requestProvider.FindNotesAsync(message));
+            nonAwaitTasks.Add(_requestProvider.CheckHastagMessageAsync());
             nonAwaitTasks.Add(_requestProvider.HitActivity());
-
-            // actions.Add(async () => await _requestProvider.AfkCheck(message));
-            // actions.Add(async () => await _requestProvider.CheckCasBanAsync(message.From));
-            // actions.Add(async () => await _requestProvider.CheckUsername(message));
-            // actions.Add(async () => await _requestProvider.FindNotesAsync(message));
-            // actions.Add(async () => await _requestProvider.HitActivity());
 
             if (context.Update.CallbackQuery == null)
             {
-                // actions.Add(async () => await _requestProvider.CheckMessage(message));
                 shouldAwaitTasks.Add(_requestProvider.CheckMessage(message));
             }
 
             if (!_requestProvider.IsPrivateChat())
             {
-                // actions.Add(async () => await _requestProvider.EnsureChatRestriction());
-                // actions.Add(async () => await _requestProvider.CheckGlobalBanAsync(message));
-
                 shouldAwaitTasks.Add(_requestProvider.EnsureChatRestriction());
                 shouldAwaitTasks.Add(_requestProvider.CheckGlobalBanAsync(message));
             }
 
-            // Parallel.Invoke(actions.ToArray());
             await Task.WhenAll(shouldAwaitTasks);
             
 #pragma warning disable 4014
