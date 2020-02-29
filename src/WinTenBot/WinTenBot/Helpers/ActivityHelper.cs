@@ -10,7 +10,7 @@ namespace WinTenBot.Helpers
 {
     public static class ActivityHelper
     {
-        public static async Task HitActivity(this RequestProvider requestProvider)
+        public static async Task HitActivityAsync(this RequestProvider requestProvider)
         {
             Log.Information("Starting Hit Activity");
 
@@ -40,7 +40,7 @@ namespace WinTenBot.Helpers
 
         public static void HitActivityBackground(this RequestProvider requestProvider)
         {
-            BackgroundJob.Enqueue(() => HitActivity(requestProvider));
+            BackgroundJob.Enqueue(() => HitActivityAsync(requestProvider));
 
             Log.Information("Hit Activity scheduled in Background");
         }

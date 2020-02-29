@@ -54,7 +54,7 @@ namespace WinTenBot.Helpers
             return isRestricted;
         }
 
-        public static async Task<bool> EnsureChatRestriction(this RequestProvider requestProvider)
+        public static async Task<bool> EnsureChatRestrictionAsync(this RequestProvider requestProvider)
         {
             Log.Information("Starting ensure Chat Restriction");
 

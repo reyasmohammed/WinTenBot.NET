@@ -30,24 +30,24 @@ namespace WinTenBot.Handlers
             var shouldAwaitTasks = new List<Task>();
             var nonAwaitTasks = new List<Task>();
 
-            shouldAwaitTasks.Add(_requestProvider.CheckCasBanAsync(fromUser));
-            shouldAwaitTasks.Add(_requestProvider.CheckSpamWatchAsync(fromUser));
-            shouldAwaitTasks.Add(_requestProvider.CheckUsername(message));
+            shouldAwaitTasks.Add(_requestProvider.CheckCasBanAsync());
+            shouldAwaitTasks.Add(_requestProvider.CheckSpamWatchAsync());
+            shouldAwaitTasks.Add(_requestProvider.CheckUsernameAsync());
 
-            nonAwaitTasks.Add(_requestProvider.AfkCheck(message));
-            nonAwaitTasks.Add(_requestProvider.FindNotesAsync(message));
-            nonAwaitTasks.Add(_requestProvider.CheckHastagMessageAsync());
-            nonAwaitTasks.Add(_requestProvider.HitActivity());
+            nonAwaitTasks.Add(_requestProvider.AfkCheckAsync());
+            nonAwaitTasks.Add(_requestProvider.FindNotesAsync());
+            nonAwaitTasks.Add(_requestProvider.FindTagsAsync());
+            nonAwaitTasks.Add(_requestProvider.HitActivityAsync());
 
             if (context.Update.CallbackQuery == null)
             {
-                shouldAwaitTasks.Add(_requestProvider.CheckMessage(message));
+                shouldAwaitTasks.Add(_requestProvider.CheckMessageAsync());
             }
 
             if (!_requestProvider.IsPrivateChat())
             {
-                shouldAwaitTasks.Add(_requestProvider.EnsureChatRestriction());
-                shouldAwaitTasks.Add(_requestProvider.CheckGlobalBanAsync(message));
+                shouldAwaitTasks.Add(_requestProvider.EnsureChatRestrictionAsync());
+                shouldAwaitTasks.Add(_requestProvider.CheckGlobalBanAsync());
             }
 
             await Task.WhenAll(shouldAwaitTasks);

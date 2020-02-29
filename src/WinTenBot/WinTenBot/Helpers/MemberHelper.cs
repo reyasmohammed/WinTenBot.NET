@@ -84,10 +84,11 @@ namespace WinTenBot.Helpers
         //     return message.From.Id.IsSudoer();
         // }
 
-        public static async Task CheckUsername(this RequestProvider requestProvider, Message message)
+        public static async Task CheckUsernameAsync(this RequestProvider requestProvider)
         {
             Log.Information("Starting check Username");
 
+            var message = requestProvider.Message;
             var fromUser = message.From;
             var noUsername = fromUser.IsNoUsername();
             Log.Information($"{fromUser} IsNoUsername: {noUsername}");
@@ -99,15 +100,15 @@ namespace WinTenBot.Helpers
 
                 await requestProvider.SendTextAsync($"{fromUser} belum memasang username." +
                                                     $"\nPeringatan {updatedStep}/1000");
-
             }
         }
 
-        public static async Task AfkCheck(this RequestProvider requestProvider, Message message)
+        public static async Task AfkCheckAsync(this RequestProvider requestProvider)
         {
             Log.Information("Starting check AFK");
 
             var afkService = new AfkService();
+            var message = requestProvider.Message;
 
             if (message.ReplyToMessage != null)
             {
@@ -134,14 +135,18 @@ namespace WinTenBot.Helpers
                 await afkService.UpdateCacheAsync();
             }
         }
-        
-        public static async Task CheckGlobalBanAsync(this RequestProvider requestProvider, Message message)
+
+        public static async Task<bool> CheckGlobalBanAsync(this RequestProvider requestProvider, User userTarget = null)
         {
             Log.Information("Starting check Global Ban");
-            
+
+            var message = requestProvider.Message;
             var user = message.From;
+
+            if (userTarget != null) user = userTarget;
+
             var messageId = message.MessageId;
-            
+
             var isBan = await user.Id.CheckGBan();
             Log.Information($"IsBan: {isBan}");
             if (isBan)
@@ -150,13 +155,17 @@ namespace WinTenBot.Helpers
                 await requestProvider.KickMemberAsync(user);
                 await requestProvider.UnbanMemberAsync(user);
             }
+
+            return isBan;
         }
         
-        public static async Task<bool> CheckCasBanAsync(this RequestProvider requestProvider, User user)
+        public static async Task<bool> CheckCasBanAsync(this RequestProvider requestProvider)
         {
             bool isBan;
             Log.Information("Starting check in Cas Ban");
-
+            
+            var message = requestProvider.Message;
+            var user = message.From;
             isBan = await user.IsCasBanAsync();
             Log.Information($"{user} is CAS ban: {isBan}");
             if (isBan)
@@ -166,17 +175,20 @@ namespace WinTenBot.Helpers
                 await requestProvider.KickMemberAsync(user);
                 await requestProvider.UnbanMemberAsync(user);
             }
+
             return isBan;
         }
 
-        public static async Task<bool> CheckSpamWatchAsync(this RequestProvider requestProvider, User user)
+        public static async Task<bool> CheckSpamWatchAsync(this RequestProvider requestProvider)
         {
             bool isBan;
             Log.Information("Starting Run SpamWatch");
-
+            
+            var message = requestProvider.Message;
+            var user = message.From;
             var spamWatch = await user.Id.CheckSpamWatch();
             isBan = spamWatch.IsBan;
-            
+
             Log.Information($"{user} is SpamWatch Ban => {isBan}");
 
             if (isBan)
@@ -201,14 +213,14 @@ namespace WinTenBot.Helpers
                 {"from_id", message.From.Id},
                 {"first_name", message.From.FirstName},
                 {"last_name", message.From.LastName},
-                {"step_count",1 },
+                {"step_count", 1},
                 {"chat_id", message.Chat.Id},
-                {"created_at", DateTime.UtcNow }
+                {"created_at", DateTime.UtcNow}
             };
 
             var warnHistory = await new Query(tableName)
-                .Where("from_id",data["from_id"])
-                .ExecForSqLite()
+                .Where("from_id", data["from_id"])
+                .ExecForSqLite(true)
                 .GetAsync();
 
             var exist = warnHistory.Any();
@@ -226,15 +238,15 @@ namespace WinTenBot.Helpers
 
                 var update = new Dictionary<string, object>()
                 {
-                    {"step_count", newStep },
-                    {"updated_at", DateTime.UtcNow }
+                    {"step_count", newStep},
+                    {"updated_at", DateTime.UtcNow}
                 };
 
                 var insertHit = await new Query(tableName)
-                    .Where("from_id",data["from_id"])
+                    .Where("from_id", data["from_id"])
                     .ExecForSqLite()
                     .UpdateAsync(update);
-                
+
                 Log.Information($"Update step: {insertHit}");
             }
             else
@@ -242,12 +254,12 @@ namespace WinTenBot.Helpers
                 var insertHit = await new Query(tableName)
                     .ExecForSqLite()
                     .InsertAsync(data);
-                //
+
                 Log.Information($"Insert Hit: {insertHit}");
             }
 
             var updatedHistory = await new Query(tableName)
-                .Where("from_id",data["from_id"])
+                .Where("from_id", data["from_id"])
                 .ExecForSqLite()
                 .GetAsync();
 

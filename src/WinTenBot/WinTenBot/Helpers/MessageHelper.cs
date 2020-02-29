@@ -102,12 +102,13 @@ namespace WinTenBot.Helpers
             return isMust;
         }
 
-        public static async Task CheckMessage(this RequestProvider requestProvider, Message message)
+        public static async Task CheckMessageAsync(this RequestProvider requestProvider)
         {
             try
             {
                 Log.Information("Starting check Message");
 
+                var message = requestProvider.Message;
                 var text = message.Text;
                 if (!text.IsNullOrEmpty())
                 {
@@ -127,14 +128,15 @@ namespace WinTenBot.Helpers
             }
         }
 
-        public static async Task FindNotesAsync(this RequestProvider requestProvider, Message msg)
+        public static async Task FindNotesAsync(this RequestProvider requestProvider)
         {
             try
             {
                 Log.Information("Starting find Notes in Cloud");
                 InlineKeyboardMarkup inlineKeyboardMarkup = null;
                 var notesService = new NotesService();
-
+                
+                var msg = requestProvider.Message;
                 var selectedNotes = await notesService.GetNotesBySlug(msg.Chat.Id, msg.Text);
                 if (selectedNotes.Count > 0)
                 {
@@ -164,7 +166,7 @@ namespace WinTenBot.Helpers
             }
         }
 
-        public static async Task CheckHastagMessageAsync(this RequestProvider requestProvider)
+        public static async Task FindTagsAsync(this RequestProvider requestProvider)
         {
             var tagsService = new TagsService();
             Message msg = requestProvider.Message;
