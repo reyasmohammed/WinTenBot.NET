@@ -9,11 +9,12 @@ namespace WinTenBot.Handlers.Commands.Group
 {
     public class KickCommand : CommandBase
     {
-        private RequestProvider _requestProvider;
+        private TelegramProvider _telegramProvider;
 
-        public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args, CancellationToken cancellationToken)
+        public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
+            CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
+            _telegramProvider = new TelegramProvider(context);
 
             var kickTargets = new List<User>();
 
@@ -43,9 +44,9 @@ namespace WinTenBot.Handlers.Commands.Group
                 }
             }
 
-            await _requestProvider.DeleteAsync(msg.MessageId);
+            await _telegramProvider.DeleteAsync(msg.MessageId);
 
-            var isAdmin = await _requestProvider.IsAdminGroup();
+            var isAdmin = await _telegramProvider.IsAdminGroup();
 
             if (kickTargets[0].Id != msg.From.Id && isAdmin)
             {
@@ -56,8 +57,8 @@ namespace WinTenBot.Handlers.Commands.Group
                     var sendText = string.Empty;
 
                     // await _chatProcessor.AppendTextAsync($"Sedang menendang {idTarget}");
-                    isKicked = await _requestProvider.KickMemberAsync(target);
-                    await _requestProvider.UnbanMemberAsync(target);
+                    isKicked = await _telegramProvider.KickMemberAsync(target);
+                    await _telegramProvider.UnbanMemberAsync(target);
 
                     if (isKicked)
                     {
@@ -70,16 +71,16 @@ namespace WinTenBot.Handlers.Commands.Group
                         sendText = $"Gagal menendang {idTarget}";
                     }
 
-                    await _requestProvider.AppendTextAsync(sendText);
+                    await _telegramProvider.AppendTextAsync(sendText);
                 }
 
                 if (isKicked)
                 {
-                    await _requestProvider.AppendTextAsync($"Sebanyak {kickTargets.Count} berhasil di tendang.");
+                    await _telegramProvider.AppendTextAsync($"Sebanyak {kickTargets.Count} berhasil di tendang.");
                 }
                 else
                 {
-                    await _requestProvider.AppendTextAsync("Gagal menendang bbrp anggota");
+                    await _telegramProvider.AppendTextAsync("Gagal menendang bbrp anggota");
                 }
             }
             else if (kickTargets[0].Id == fromId)
@@ -87,22 +88,22 @@ namespace WinTenBot.Handlers.Commands.Group
                 var idTarget = kickTargets[0];
                 var isKicked = false;
                 // await _chatProcessor.AppendTextAsync($"Sedang menendang {idTarget}");
-                isKicked = await _requestProvider.KickMemberAsync(idTarget);
+                isKicked = await _telegramProvider.KickMemberAsync(idTarget);
                 if (isKicked)
                 {
                     var sendText = $"{idTarget} berhasil di tendang ";
                     sendText += idTarget.Id == fromId ? $"oleh Self-kick" : $".";
-                    await _requestProvider.AppendTextAsync(sendText);
+                    await _telegramProvider.AppendTextAsync(sendText);
                 }
                 else
                 {
                     var sendTexts = $"Tendang {idTarget} gagal.";
-                    await _requestProvider.SendTextAsync(sendTexts);
+                    await _telegramProvider.SendTextAsync(sendTexts);
                 }
             }
             else
             {
-                await _requestProvider.SendTextAsync("Hanya admin yang bisa mengeksekusi");
+                await _telegramProvider.SendTextAsync("Hanya admin yang bisa mengeksekusi");
             }
         }
     }

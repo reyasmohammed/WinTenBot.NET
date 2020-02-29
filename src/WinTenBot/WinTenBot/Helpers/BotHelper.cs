@@ -1,10 +1,10 @@
-﻿using Serilog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Serilog;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
@@ -16,16 +16,16 @@ namespace WinTenBot.Helpers
 {
     public static class BotHelper
     {
-        public static async Task<string> GetUrlStart(this RequestProvider requestProvider, string param)
+        public static async Task<string> GetUrlStart(this TelegramProvider telegramProvider, string param)
         {
-            var bot = await requestProvider.Client.GetMeAsync();
+            var bot = await telegramProvider.Client.GetMeAsync();
             var username = bot.Username;
             return $"https://t.me/{username}?{param}";
         }
-        
-        public static async Task<User> GetBotUser(this RequestProvider requestProvider)
+
+        public static async Task<User> GetBotUser(this TelegramProvider telegramProvider)
         {
-            return await requestProvider.Client.GetMeAsync();
+            return await telegramProvider.Client.GetMeAsync();
         }
 
         public static async Task<bool> IsBotAdded(this User[] users)
@@ -38,6 +38,7 @@ namespace WinTenBot.Helpers
         {
             return Bot.GlobalConfiguration["CommonConfig:IsRestricted"].ToBool();
         }
+
         public static bool CheckRestriction(this long chatId)
         {
             var isRestricted = false;
@@ -48,25 +49,27 @@ namespace WinTenBot.Helpers
             Log.Information($@"Global Restriction: {globalRestrict}");
             if (match == null && globalRestrict)
             {
-                isRestricted =  true;
+                isRestricted = true;
             }
+
             Log.Information($"ChatId: {chatId} IsRestricted: {isRestricted}");
             return isRestricted;
         }
 
-        public static async Task<bool> EnsureChatRestrictionAsync(this RequestProvider requestProvider)
+        public static async Task<bool> EnsureChatRestrictionAsync(this TelegramProvider telegramProvider)
         {
             Log.Information("Starting ensure Chat Restriction");
 
-            var chatId = requestProvider.Message.Chat.Id;
+            var message = telegramProvider.MessageOrEdited;
+            var chatId = message.Chat.Id;
 
             if (!chatId.CheckRestriction()) return false;
-            
+
             Log.Information("I must leave right now!");
             var msgOut = $"Sepertinya saya salah alamat, saya pamit dulu..";
 
-            await requestProvider.SendTextAsync(msgOut);
-            await requestProvider.LeaveChat(chatId);
+            await telegramProvider.SendTextAsync(msgOut);
+            await telegramProvider.LeaveChat(chatId);
             return true;
         }
 
@@ -83,7 +86,7 @@ namespace WinTenBot.Helpers
 
             var dirInfo = new DirectoryInfo(logsPath);
             var files = dirInfo.GetFiles();
-            var filteredFiles = files.Where(fileInfo => 
+            var filteredFiles = files.Where(fileInfo =>
                 fileInfo.CreationTimeUtc < DateTime.UtcNow.AddDays(-1)).ToArray();
 
             if (filteredFiles.Length > 0)

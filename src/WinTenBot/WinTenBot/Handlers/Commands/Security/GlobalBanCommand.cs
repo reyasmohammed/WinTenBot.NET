@@ -11,8 +11,8 @@ namespace WinTenBot.Handlers.Commands.Security
 {
     public class GlobalBanCommand : CommandBase
     {
-        private RequestProvider _requestProvider;
         private ElasticSecurityService _elasticSecurityService;
+        private TelegramProvider _telegramProvider;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
@@ -23,7 +23,7 @@ namespace WinTenBot.Handlers.Commands.Security
             var partedText = msg.Text.Split(" ");
             var param1 = partedText.ValueOfIndex(1);
 
-            _requestProvider = new RequestProvider(context);
+            _telegramProvider = new TelegramProvider(context);
             _elasticSecurityService = new ElasticSecurityService(msg);
 
             if (fromId.IsSudoer())
@@ -31,9 +31,9 @@ namespace WinTenBot.Handlers.Commands.Security
                 switch (param1)
                 {
                     case "sync":
-                        await _requestProvider.SendTextAsync("Memperbarui cache..");
+                        await _telegramProvider.SendTextAsync("Memperbarui cache..");
                         await _elasticSecurityService.UpdateCacheAsync();
-                        await _requestProvider.EditAsync("Selesai memperbarui..");
+                        await _telegramProvider.EditAsync("Selesai memperbarui..");
 
                         break;
 
@@ -42,51 +42,50 @@ namespace WinTenBot.Handlers.Commands.Security
                         {
                             var repMsg = msg.ReplyToMessage;
                             var userId = repMsg.From.Id;
-                    
+
                             Log.Information("Execute Global Ban");
-                            await _requestProvider.SendTextAsync("Mempersiapkan..");
-                            await _requestProvider.DeleteAsync(msg.MessageId);
+                            await _telegramProvider.SendTextAsync("Mempersiapkan..");
+                            await _telegramProvider.DeleteAsync(msg.MessageId);
 
                             var isBan = await _elasticSecurityService.IsExist(userId);
                             Log.Information($"IsBan: {isBan}");
                             if (isBan)
                             {
-                                await _requestProvider.EditAsync("Pengguna sudah di ban");
+                                await _telegramProvider.EditAsync("Pengguna sudah di ban");
                             }
                             else
                             {
                                 var data = new Dictionary<string, object>()
                                 {
-                                    {"user_id",userId},
+                                    {"user_id", userId},
                                     {"banned_by", fromId},
                                     {"banned_from", chatId}
                                 };
 
-                                await _requestProvider.EditAsync("Menyimpan informasi..");
+                                await _telegramProvider.EditAsync("Menyimpan informasi..");
                                 var save = await _elasticSecurityService.SaveBanAsync(data);
                                 Log.Information($"SaveBan: {save}");
 
-                                await _requestProvider.EditAsync("Menulis ke Cache..");
+                                await _telegramProvider.EditAsync("Menulis ke Cache..");
                                 await _elasticSecurityService.UpdateCacheAsync();
 
-                                await _requestProvider.EditAsync("Misi berhasil.");
+                                await _telegramProvider.EditAsync("Misi berhasil.");
                             }
-                    
                         }
                         else
                         {
-                            await _requestProvider.SendTextAsync("Balas seseorang yang mau di ban");
-
+                            await _telegramProvider.SendTextAsync("Balas seseorang yang mau di ban");
                         }
+
                         break;
                 }
             }
             else
             {
-                await _requestProvider.SendTextAsync("Unauthorized");
+                await _telegramProvider.SendTextAsync("Unauthorized");
             }
-            
-            await _requestProvider.DeleteAsync(delay:3000);
+
+            await _telegramProvider.DeleteAsync(delay: 3000);
         }
     }
 }

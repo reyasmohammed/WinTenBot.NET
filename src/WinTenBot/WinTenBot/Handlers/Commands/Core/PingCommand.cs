@@ -10,33 +10,33 @@ namespace WinTenBot.Handlers.Commands.Core
 {
     internal class PingCommand : CommandBase
     {
-        private RequestProvider _requestProvider;
+        private TelegramProvider _telegramProvider;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
+            _telegramProvider = new TelegramProvider(context);
 
-            var msg = context.Update.Message;
+            var msg = _telegramProvider.MessageOrEdited;
 
             var keyboard = new InlineKeyboardMarkup(
                 InlineKeyboardButton.WithCallbackData("Ping", "PONG")
             );
 
-            await _requestProvider.AppendTextAsync("ℹ️ Pong!!");
+            await _telegramProvider.AppendTextAsync("ℹ️ Pong!!");
             var isSudoer = msg.From.Id.IsSudoer();
 
             if (msg.Chat.Type == ChatType.Private && isSudoer)
             {
                 // await "\n<b>Engine info.</b>".AppendTextAsync();
-                await _requestProvider.AppendTextAsync("🎛 <b>Engine info.</b>");
+                await _telegramProvider.AppendTextAsync("🎛 <b>Engine info.</b>");
 
                 // var getWebHookInfo = await _chatProcessor.Client.GetWebhookInfoAsync(cancellationToken);
-                var getWebHookInfo = await _requestProvider.Client.GetWebhookInfoAsync(cancellationToken);
+                var getWebHookInfo = await _telegramProvider.Client.GetWebhookInfoAsync(cancellationToken);
                 if (getWebHookInfo.Url == "")
                 {
                     // sendText += "\n\n<i>Bot run in Poll mode.</i>";
-                    await _requestProvider.AppendTextAsync("\n<i>Bot run in Poll mode.</i>", keyboard);
+                    await _telegramProvider.AppendTextAsync("\n<i>Bot run in Poll mode.</i>", keyboard);
                 }
                 else
                 {
@@ -48,8 +48,8 @@ namespace WinTenBot.Handlers.Commands.Core
                                    $"\nMaxConnection: {getWebHookInfo.MaxConnections}" +
                                    $"\nLast Error: {getWebHookInfo.LastErrorDate}" +
                                    $"\nError Message: {getWebHookInfo.LastErrorMessage}";
-                    
-                    await _requestProvider.AppendTextAsync(hookInfo, keyboard);
+
+                    await _telegramProvider.AppendTextAsync(hookInfo, keyboard);
                 }
             }
 

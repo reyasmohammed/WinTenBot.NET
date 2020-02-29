@@ -8,12 +8,12 @@ namespace WinTenBot.Handlers.Commands.Core
 {
     public class InfoCommand : CommandBase
     {
-        private RequestProvider _requestProvider;
+        private TelegramProvider _telegramProvider;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
+            _telegramProvider = new TelegramProvider(context);
 
             // Message msg = context.Update.Message;
 
@@ -47,7 +47,7 @@ namespace WinTenBot.Handlers.Commands.Core
                 }
             });
 
-            await _requestProvider.SendTextAsync(sendText, inlineKeyboard);
+            await _telegramProvider.SendTextAsync(sendText, inlineKeyboard);
 
             // await context.Bot.Client.SendTextMessageAsync(
             //     msg.Chat,

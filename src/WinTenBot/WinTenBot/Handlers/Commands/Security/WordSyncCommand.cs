@@ -8,26 +8,25 @@ namespace WinTenBot.Handlers.Commands.Security
 {
     public class WordSyncCommand : CommandBase
     {
-        private RequestProvider _requestProvider;
+        private TelegramProvider _telegramProvider;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
+            _telegramProvider = new TelegramProvider(context);
 
-            var isSudoer = _requestProvider.IsSudoer();
-            var isAdmin = await _requestProvider.IsAdminGroup();
+            var isSudoer = _telegramProvider.IsSudoer();
+            var isAdmin = await _telegramProvider.IsAdminGroup();
 
             if (isSudoer)
             {
-                await _requestProvider.DeleteAsync(_requestProvider.Message.MessageId);
-                
-                await _requestProvider.AppendTextAsync("Sedang mengsinkronkan Word Filter");
-                await DataHelper.SyncWordToLocalAsync();
-                await _requestProvider.AppendTextAsync("Selesai mengsinkronkan.");
-                
-                await _requestProvider.DeleteAsync(delay:3000);
+                await _telegramProvider.DeleteAsync(_telegramProvider.Message.MessageId);
 
+                await _telegramProvider.AppendTextAsync("Sedang mengsinkronkan Word Filter");
+                await DataHelper.SyncWordToLocalAsync();
+                await _telegramProvider.AppendTextAsync("Selesai mengsinkronkan.");
+
+                await _telegramProvider.DeleteAsync(delay: 3000);
             }
         }
     }

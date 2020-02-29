@@ -10,13 +10,13 @@ namespace WinTenBot.Handlers.Commands.Security
 {
     public class WordFilterCommand : CommandBase
     {
-        private RequestProvider _requestProvider;
+        private TelegramProvider _telegramProvider;
         private WordFilterService _wordFilterService;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
+            _telegramProvider = new TelegramProvider(context);
             _wordFilterService = new WordFilterService(context.Update.Message);
 
             var msg = context.Update.Message;
@@ -26,21 +26,21 @@ namespace WinTenBot.Handlers.Commands.Security
             var word = partedMsg.ValueOfIndex(0);
             var isGlobalBlock = false;
 
-            var isSudoer = _requestProvider.IsSudoer();
-            var isAdmin = await _requestProvider.IsAdminGroup();
+            var isSudoer = _telegramProvider.IsSudoer();
+            var isAdmin = await _telegramProvider.IsAdminGroup();
             if (isSudoer || isAdmin)
             {
                 var where = new Dictionary<string, object>() {{"word", word}};
-                
+
                 if (paramOption == "-g" && isSudoer)
                 {
                     isGlobalBlock = true;
-                    await _requestProvider.SendTextAsync("Kata ini akan di blokir dengan mode Group-wide!");
+                    await _telegramProvider.SendTextAsync("Kata ini akan di blokir dengan mode Group-wide!");
                 }
 
                 if (!isSudoer)
                 {
-                    await _requestProvider.SendTextAsync("Hanya Sudoer yang dapat memblokir Kata mode Group-wide!");
+                    await _telegramProvider.SendTextAsync("Hanya Sudoer yang dapat memblokir Kata mode Group-wide!");
                 }
 
                 if (paramOption != "-g")
@@ -55,16 +55,16 @@ namespace WinTenBot.Handlers.Commands.Security
                     {
                         var save = await _wordFilterService.SaveWordAsync(word, isGlobalBlock);
 
-                        await _requestProvider.SendTextAsync(save.ToJson());
+                        await _telegramProvider.SendTextAsync(save.ToJson());
                     }
                     else
                     {
-                        await _requestProvider.SendTextAsync("Sudah");
+                        await _telegramProvider.SendTextAsync("Sudah");
                     }
                 }
                 else
                 {
-                    await _requestProvider.SendTextAsync("Apa kata?");
+                    await _telegramProvider.SendTextAsync("Apa kata?");
                 }
             }
         }

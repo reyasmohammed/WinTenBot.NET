@@ -13,29 +13,120 @@ using WinTenBot.Model;
 
 namespace WinTenBot.Providers
 {
-    public class RequestProvider
+    public class TelegramProvider
     {
-        public IUpdateContext Context { get; set; }
-        private string AppendText { get; set; }
-        public ITelegramBotClient Client { get; set; }
-        public Message Message { get; set; }
-        public int SentMessageId { get; private set; }
-        public int EditedMessageId { get; private set; }
-        public int CallBackMessageId { get; set; }
-        private string TimeInit { get; set; }
-        private string TimeProc { get; set; }
-
-        public RequestProvider(IUpdateContext updateContext)
+        public TelegramProvider(IUpdateContext updateContext)
         {
             Context = updateContext;
             Client = updateContext.Bot.Client;
             Message = updateContext.Update.CallbackQuery != null
                 ? updateContext.Update.CallbackQuery.Message
                 : updateContext.Update.Message;
+
+            EditedMessage = updateContext.Update.EditedMessage;
+            MessageOrEdited = updateContext.Update.Message ?? updateContext.Update.EditedMessage;
+
             if (Message != null)
             {
                 TimeInit = Message.Date.GetDelay();
             }
+        }
+
+        public IUpdateContext Context { get; set; }
+        private string AppendText { get; set; }
+        public ITelegramBotClient Client { get; set; }
+        public Message Message { get; set; }
+        public Message EditedMessage { get; set; }
+        public Message MessageOrEdited { get; set; }
+        public int SentMessageId { get; internal set; }
+        public int EditedMessageId { get; private set; }
+        public int CallBackMessageId { get; set; }
+        private string TimeInit { get; set; }
+        private string TimeProc { get; set; }
+
+        public async Task<bool> IsAdminGroup()
+        {
+            var chatId = Message.Chat.Id;
+            var userId = Message.From.Id;
+            var isAdmin = false;
+
+            if (!IsPrivateChat())
+            {
+                var admins = await Client.GetChatAdministratorsAsync(chatId);
+                foreach (var admin in admins)
+                {
+                    if (userId == admin.User.Id)
+                    {
+                        isAdmin = true;
+                    }
+                }
+            }
+
+            return isAdmin;
+        }
+
+        public async Task<bool> IsAdminOrPrivateChat()
+        {
+            var isAdmin = await IsAdminGroup();
+            var isPrivateChat = IsPrivateChat();
+
+            return isAdmin || isPrivateChat;
+        }
+
+        public bool IsSudoer()
+        {
+            return Message.From.Id.IsSudoer();
+        }
+
+        public bool IsPrivateChat()
+        {
+            return MessageOrEdited.Chat.Type == ChatType.Private;
+        }
+
+        public async Task<string> GetMentionAdminsStr()
+        {
+            var admins = await Client.GetChatAdministratorsAsync(Message.Chat.Id);
+            var adminStr = string.Empty;
+            foreach (var admin in admins)
+            {
+                var user = admin.User;
+                var nameLink = MemberHelper.GetNameLink(user.Id, "&#8203;");
+
+                adminStr += $"{nameLink}";
+            }
+
+            return adminStr;
+        }
+
+        public async Task LeaveChat(long chatId = 0)
+        {
+            try
+            {
+                var chatTarget = chatId;
+                if (chatId == 0)
+                {
+                    chatTarget = Message.Chat.Id;
+                }
+
+                Log.Information($"Leaving from {chatTarget}");
+                await Client.LeaveChatAsync(chatTarget);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error LeaveChat.");
+            }
+        }
+
+        public async Task<long> GetMemberCount()
+        {
+            var member = await Client.GetChatMembersCountAsync(Message.Chat.Id);
+            return member;
+        }
+
+        public async Task<Chat> GetChat()
+        {
+            var chat = await Bot.Client.GetChatAsync(Message.Chat.Id);
+            return chat;
         }
 
 
@@ -71,7 +162,7 @@ namespace WinTenBot.Providers
             }
             catch (ApiRequestException apiRequestException)
             {
-                Log.Error(apiRequestException,$"SendMessage Ex1");
+                Log.Error(apiRequestException, $"SendMessage Ex1");
 
                 try
                 {
@@ -149,7 +240,7 @@ namespace WinTenBot.Providers
             }
             catch (Exception e)
             {
-                Log.Error(e,"Error EditMessage");
+                Log.Error(e, "Error EditMessage");
             }
         }
 
@@ -171,79 +262,38 @@ namespace WinTenBot.Providers
 
         public async Task DeleteAsync(int messageId = -1, int delay = 0)
         {
-            var msgId = messageId != -1 ? messageId : SentMessageId;
             Thread.Sleep(delay);
 
             try
             {
-                Log.Information($"Delete MsgId: {msgId} on ChatId: {Message.Chat.Id}");
-                await Client.DeleteMessageAsync(Message.Chat.Id, msgId);
+                var chatId = MessageOrEdited.Chat.Id;
+                var msgId = messageId != -1 ? messageId : SentMessageId;
+
+                Log.Information($"Delete MsgId: {msgId} on ChatId: {chatId}");
+                await Client.DeleteMessageAsync(chatId, msgId);
             }
             catch (ChatNotFoundException chatNotFoundException)
             {
-                Log.Error(chatNotFoundException,$"Error Delete NotFound");
+                Log.Error(chatNotFoundException, $"Error Delete NotFound");
             }
             catch (Exception ex)
             {
-                Log.Error(ex,$"Error Delete Message");
+                Log.Error(ex, $"Error Delete Message");
             }
+        }
+
+        public void ResetTime()
+        {
+            Log.Information("Resetting time..");
+
+            var msgDate = Message.Date;
+            var currentDate = DateTime.UtcNow;
+            msgDate = msgDate.AddSeconds(-currentDate.Second);
+            msgDate = msgDate.AddMilliseconds(-currentDate.Millisecond);
+            TimeInit = msgDate.GetDelay();
         }
 
         #endregion Message
-
-        public async Task<bool> IsAdminGroup()
-        {
-            var chatId = Message.Chat.Id;
-            var userId = Message.From.Id;
-            var isAdmin = false;
-
-            if (!IsPrivateChat())
-            {
-                var admins = await Client.GetChatAdministratorsAsync(chatId);
-                foreach (var admin in admins)
-                {
-                    if (userId == admin.User.Id)
-                    {
-                        isAdmin = true;
-                    }
-                }
-            }
-
-            return isAdmin;
-        }
-
-        public async Task<bool> IsAdminOrPrivateChat()
-        {
-            var isAdmin = await IsAdminGroup();
-            var isPrivateChat = IsPrivateChat();
-
-            return isAdmin || isPrivateChat;
-        }
-
-        public bool IsSudoer()
-        {
-            return Message.From.Id.IsSudoer();
-        }
-
-        public bool IsPrivateChat()
-        {
-            return Message.Chat.Type == ChatType.Private;
-        }
-
-        public async Task<string> GetMentionAdminsStr()
-        {
-            var admins = await Client.GetChatAdministratorsAsync(Message.Chat.Id);
-            var adminStr = string.Empty;
-            foreach (var admin in admins)
-            {
-                var user = admin.User;
-                var nameLink = MemberHelper.GetNameLink(user.Id, "&#8203;");
-
-                adminStr += $"{nameLink}";
-            }
-
-            return adminStr;
-        }
 
         #region Member Exec
 
@@ -251,7 +301,7 @@ namespace WinTenBot.Providers
         {
             bool isKicked;
             var idTarget = user.Id;
-            
+
             Log.Information($"Kick {idTarget} from {Message.Chat.Id}");
             try
             {
@@ -260,7 +310,7 @@ namespace WinTenBot.Providers
             }
             catch (Exception ex)
             {
-                Log.Error(ex,"Error Kick Member");
+                Log.Error(ex, "Error Kick Member");
                 isKicked = false;
             }
 
@@ -277,7 +327,7 @@ namespace WinTenBot.Providers
             }
             catch (Exception ex)
             {
-                Log.Error(ex,"UnBan Member");
+                Log.Error(ex, "UnBan Member");
                 await SendTextAsync(ex.Message);
             }
         }
@@ -302,7 +352,7 @@ namespace WinTenBot.Providers
             }
             catch (ApiRequestException apiRequestException)
             {
-                Log.Error(apiRequestException,"Error Promote Member");
+                Log.Error(apiRequestException, "Error Promote Member");
                 requestResult.IsSuccess = false;
                 requestResult.ErrorCode = apiRequestException.ErrorCode;
                 requestResult.ErrorMessage = apiRequestException.Message;
@@ -334,48 +384,17 @@ namespace WinTenBot.Providers
                 requestResult.IsSuccess = false;
                 requestResult.ErrorCode = apiRequestException.ErrorCode;
                 requestResult.ErrorMessage = apiRequestException.Message;
-                
-                Log.Error(apiRequestException,"Error Demote Member");
+
+                Log.Error(apiRequestException, "Error Demote Member");
             }
             catch (Exception ex)
             {
-                Log.Error(ex,"Demote Member Ex");
+                Log.Error(ex, "Demote Member Ex");
             }
 
             return requestResult;
         }
 
         #endregion
-
-        public async Task LeaveChat(long chatId = 0)
-        {
-            try
-            {
-                var chatTarget = chatId;
-                if (chatId == 0)
-                {
-                    chatTarget = Message.Chat.Id;
-                }
-
-                Log.Information($"Leaving from {chatTarget}");
-                await Client.LeaveChatAsync(chatTarget);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex,"Error LeaveChat.");
-            }
-        }
-
-        public async Task<long> GetMemberCount()
-        {
-            var member = await Client.GetChatMembersCountAsync(Message.Chat.Id);
-            return member;
-        }
-
-        public async Task<Chat> GetChat()
-        {
-            var chat = await Bot.Client.GetChatAsync(Message.Chat.Id);
-            return chat;
-        }
     }
 }

@@ -7,11 +7,12 @@ namespace WinTenBot.Handlers.Commands.Chat
 {
     public class IdCommand : CommandBase
     {
-        private RequestProvider _requestProvider;
+        private TelegramProvider _telegramProvider;
 
-        public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args, CancellationToken cancellationToken)
+        public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
+            CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
+            _telegramProvider = new TelegramProvider(context);
             var msg = context.Update.Message;
 
             if (msg.ReplyToMessage != null)
@@ -36,7 +37,7 @@ namespace WinTenBot.Handlers.Commands.Chat
                        $"Username: @{username}\n" +
                        $"Language: {userLang.ToUpper()}";
 
-            await _requestProvider.SendTextAsync(text);
+            await _telegramProvider.SendTextAsync(text);
             //            await context.Bot.Client.SendTextMessageAsync(
             //                msg.Chat,
             //                text,

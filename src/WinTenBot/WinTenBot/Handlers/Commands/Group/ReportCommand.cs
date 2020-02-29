@@ -10,18 +10,18 @@ namespace WinTenBot.Handlers.Commands.Group
 {
     public class ReportCommand : CommandBase
     {
-        private RequestProvider _requestProvider;
+        private TelegramProvider _telegramProvider;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
+            _telegramProvider = new TelegramProvider(context);
             var msg = context.Update.Message;
             var sendText = "Balas pesan yg mau di report";
 
             if (msg.Chat.Type == ChatType.Private)
             {
-                await _requestProvider.SendTextAsync("Report hanya untuk grup saja");
+                await _telegramProvider.SendTextAsync("Report hanya untuk grup saja");
                 return;
             }
 
@@ -31,7 +31,7 @@ namespace WinTenBot.Handlers.Commands.Group
 
                 if (msg.From.Id != repMsg.From.Id)
                 {
-                    var mentionAdmins = await _requestProvider.GetMentionAdminsStr();
+                    var mentionAdmins = await _telegramProvider.GetMentionAdminsStr();
 
                     sendText = $"Ada laporan nich." +
                                $"\n{msg.GetFromNameLink()} melaporkan {repMsg.GetFromNameLink()}" +
@@ -50,8 +50,8 @@ namespace WinTenBot.Handlers.Commands.Group
                             InlineKeyboardButton.WithCallbackData("Ke Pesan", "PONG"),
                         }
                     });
-                    
-                    await _requestProvider.SendTextAsync(sendText);
+
+                    await _telegramProvider.SendTextAsync(sendText);
                     return;
                 }
 
@@ -59,7 +59,7 @@ namespace WinTenBot.Handlers.Commands.Group
             }
 
 
-            await _requestProvider.SendTextAsync(sendText);
+            await _telegramProvider.SendTextAsync(sendText);
         }
     }
 }

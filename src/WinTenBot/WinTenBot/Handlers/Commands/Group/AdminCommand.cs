@@ -9,14 +9,15 @@ namespace WinTenBot.Handlers.Commands.Group
 {
     public class AdminCommand : CommandBase
     {
-        private RequestProvider _requestProvider;
+        private TelegramProvider _telegramProvider;
 
-        public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args, CancellationToken cancellationToken)
+        public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
+            CancellationToken cancellationToken)
         {
             var msg = context.Update.Message;
-            _requestProvider = new RequestProvider(context);
+            _telegramProvider = new TelegramProvider(context);
 
-            await _requestProvider.SendTextAsync("🍽 Loading..");
+            await _telegramProvider.SendTextAsync("🍽 Loading..");
             //            var admins = context.Update.Message.Chat.AllMembersAreAdministrators;
             var admins = await context.Bot.Client.GetChatAdministratorsAsync(msg.Chat.Id, cancellationToken);
             var creatorStr = string.Empty;
@@ -45,7 +46,7 @@ namespace WinTenBot.Handlers.Commands.Group
                            $"\n👥️ <b>Administrators</b>" +
                            $"\n{adminStr}";
 
-            await _requestProvider.EditAsync(sendText);
+            await _telegramProvider.EditAsync(sendText);
         }
     }
 }

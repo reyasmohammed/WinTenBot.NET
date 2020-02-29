@@ -11,18 +11,20 @@ namespace WinTenBot.Handlers.Commands.Rss
     public class RssInfoCommand : CommandBase
     {
         private RssService _rssService;
-        private RequestProvider _requestProvider;
-        public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args, CancellationToken cancellationToken)
+        private TelegramProvider _telegramProvider;
+
+        public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
+            CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
+            _telegramProvider = new TelegramProvider(context);
             _rssService = new RssService(context.Update.Message);
 
-            var chatId = _requestProvider.Message.Chat.Id.ToString();
-            var isAdmin = await _requestProvider.IsAdminGroup();
+            var chatId = _telegramProvider.Message.Chat.Id.ToString();
+            var isAdmin = await _telegramProvider.IsAdminGroup();
 
-            if (isAdmin || _requestProvider.IsPrivateChat())
+            if (isAdmin || _telegramProvider.IsPrivateChat())
             {
-                await _requestProvider.SendTextAsync("🔄 Sedang meload data..");
+                await _telegramProvider.SendTextAsync("🔄 Sedang meload data..");
                 var rssData = await _rssService.GetRssSettingsAsync(chatId);
                 var rssCount = rssData.Count();
 
@@ -41,11 +43,11 @@ namespace WinTenBot.Handlers.Commands.Rss
                                 "\nGunakan <code>/setrss https://link_rss_nya</code> untuk menambahkan.";
                 }
 
-                await _requestProvider.EditAsync(sendText);
+                await _telegramProvider.EditAsync(sendText);
             }
             else
             {
-                await _requestProvider.SendTextAsync("Kamu bukan admin, atau kamu bisa mengaturnya di japri ");
+                await _telegramProvider.SendTextAsync("Kamu bukan admin, atau kamu bisa mengaturnya di japri ");
             }
         }
     }

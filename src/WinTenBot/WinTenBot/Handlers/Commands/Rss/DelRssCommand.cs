@@ -10,20 +10,20 @@ namespace WinTenBot.Handlers.Commands.Rss
     public class DelRssCommand : CommandBase
     {
         private RssService _rssService;
-        private RequestProvider _requestProvider;
+        private TelegramProvider _telegramProvider;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
+            _telegramProvider = new TelegramProvider(context);
             _rssService = new RssService(context.Update.Message);
 
-            var isAdminOrPrivateChat = await _requestProvider.IsAdminOrPrivateChat();
+            var isAdminOrPrivateChat = await _telegramProvider.IsAdminOrPrivateChat();
             if (isAdminOrPrivateChat)
             {
-                var urlFeed = _requestProvider.Message.Text.GetTextWithoutCmd();
+                var urlFeed = _telegramProvider.Message.Text.GetTextWithoutCmd();
 
-                await _requestProvider.SendTextAsync($"Sedang menghapus {urlFeed}");
+                await _telegramProvider.SendTextAsync($"Sedang menghapus {urlFeed}");
 
                 var delete = await _rssService.DeleteRssAsync(urlFeed);
 
@@ -31,7 +31,7 @@ namespace WinTenBot.Handlers.Commands.Rss
                     ? "berhasil."
                     : "gagal. Mungkin RSS tersebut sudah di hapus atau belum di tambahkan";
 
-                await _requestProvider.EditAsync($"Hapus {urlFeed} {success}");
+                await _telegramProvider.EditAsync($"Hapus {urlFeed} {success}");
             }
         }
     }

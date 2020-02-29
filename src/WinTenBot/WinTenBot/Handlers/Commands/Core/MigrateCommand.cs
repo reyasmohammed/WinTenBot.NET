@@ -7,17 +7,18 @@ namespace WinTenBot.Handlers.Commands.Core
 {
     public class MigrateCommand : CommandBase
     {
-        private RequestProvider _requestProvider;
+        private TelegramProvider _telegramProvider;
 
-        public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args, CancellationToken cancellationToken)
+        public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
+            CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
+            _telegramProvider = new TelegramProvider(context);
 
-            await _requestProvider.SendTextAsync("Migrate starting..");
+            await _telegramProvider.SendTextAsync("Migrate starting..");
 
             Thread.Sleep(3000);
 
-            await _requestProvider.EditAsync("Migrate finish..");
+            await _telegramProvider.EditAsync("Migrate finish..");
         }
     }
 }

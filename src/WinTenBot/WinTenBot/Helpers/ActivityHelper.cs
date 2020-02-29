@@ -10,12 +10,12 @@ namespace WinTenBot.Helpers
 {
     public static class ActivityHelper
     {
-        public static async Task HitActivityAsync(this RequestProvider requestProvider)
+        public static async Task HitActivityAsync(this TelegramProvider telegramProvider)
         {
             Log.Information("Starting Hit Activity");
 
-            var message = requestProvider.Message;
-            var botUser = await requestProvider.GetBotUser();
+            var message = telegramProvider.MessageOrEdited;
+            var botUser = await telegramProvider.GetBotUser();
             var data = new Dictionary<string, object>()
             {
                 {"via_bot", botUser.Username},
@@ -38,9 +38,9 @@ namespace WinTenBot.Helpers
             Log.Information($"Insert Hit: {insertHit}");
         }
 
-        public static void HitActivityBackground(this RequestProvider requestProvider)
+        public static void HitActivityBackground(this TelegramProvider telegramProvider)
         {
-            BackgroundJob.Enqueue(() => HitActivityAsync(requestProvider));
+            BackgroundJob.Enqueue(() => HitActivityAsync(telegramProvider));
 
             Log.Information("Hit Activity scheduled in Background");
         }

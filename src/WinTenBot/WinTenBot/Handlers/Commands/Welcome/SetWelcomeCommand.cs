@@ -12,19 +12,19 @@ namespace WinTenBot.Handlers.Commands.Welcome
 {
     public class SetWelcomeCommand : CommandBase
     {
-        private RequestProvider _requestProvider;
         private SettingsService _settingsService;
+        private TelegramProvider _telegramProvider;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
+            _telegramProvider = new TelegramProvider(context);
             var msg = context.Update.Message;
             _settingsService = new SettingsService(msg);
 
             if (msg.Chat.Type == ChatType.Private)
             {
-                await _requestProvider.SendTextAsync("Welcome hanya untuk grup saja");
+                await _telegramProvider.SendTextAsync("Welcome hanya untuk grup saja");
                 return;
             }
 
@@ -33,7 +33,7 @@ namespace WinTenBot.Handlers.Commands.Welcome
             string[] commands = {"message", "msg", "button", "btn"};
             Log.Information(partsMsg.ToJson());
 
-            var isAdmin = await _requestProvider.IsAdminGroup();
+            var isAdmin = await _telegramProvider.IsAdminGroup();
             if (isAdmin)
             {
                 if (msg.ReplyToMessage != null)
@@ -42,24 +42,24 @@ namespace WinTenBot.Handlers.Commands.Welcome
                     if (repMsg.GetFileId() != "")
                     {
                         var mediaType = repMsg.Type.ToString().ToLower();
-                        await _requestProvider.SendTextAsync("Sedang menyimpan Welcome Media..");
+                        await _telegramProvider.SendTextAsync("Sedang menyimpan Welcome Media..");
                         await _settingsService.UpdateCell("welcome_media", repMsg.GetFileId());
                         await _settingsService.UpdateCell("welcome_media_type", mediaType);
                         Log.Information("Save media success..");
 
-                        await _requestProvider.EditAsync("Welcome Media berhasil di simpan.");
+                        await _telegramProvider.EditAsync("Welcome Media berhasil di simpan.");
                         return;
                     }
                     else
                     {
-                        await _requestProvider.SendTextAsync("Media tidak terdeteksi di pesan yg di reply tersebut.");
+                        await _telegramProvider.SendTextAsync("Media tidak terdeteksi di pesan yg di reply tersebut.");
                         return;
                     }
                 }
-                
+
                 var missParamText = $"Parameter yg di dukung {string.Join(", ", commands)}" +
-                               $"\nContoh: <code>/setwelcome message</code>";
-                
+                                    $"\nContoh: <code>/setwelcome message</code>";
+
                 if (partsMsg.Length > 1)
                 {
                     if (commands.Contains(partsMsg[1]))
@@ -77,25 +77,24 @@ namespace WinTenBot.Handlers.Commands.Welcome
                             // Log.Information(columnTarget);
                             // Log.Information(data);
 
-                            await _requestProvider.SendTextAsync("Sedang menyimpan Welcome Message..");
+                            await _telegramProvider.SendTextAsync("Sedang menyimpan Welcome Message..");
 
                             await _settingsService.UpdateCell(columnTarget, data);
-                            await _requestProvider.EditAsync($"Welcome {target} berhasil di simpan!");
+                            await _telegramProvider.EditAsync($"Welcome {target} berhasil di simpan!");
                         }
                         else
                         {
-                            await _requestProvider.SendTextAsync("Masukan Pesan atau tombol yang akan di tetapkan");
+                            await _telegramProvider.SendTextAsync("Masukan Pesan atau tombol yang akan di tetapkan");
                         }
                     }
                     else
                     {
-                       
-                        await _requestProvider.SendTextAsync(missParamText);
+                        await _telegramProvider.SendTextAsync(missParamText);
                     }
                 }
                 else
                 {
-                    await _requestProvider.SendTextAsync(missParamText);
+                    await _telegramProvider.SendTextAsync(missParamText);
                 }
             }
         }

@@ -10,8 +10,8 @@ namespace WinTenBot.Handlers.Commands.Group
 {
     public class AfkCommand : CommandBase
     {
-        private RequestProvider _requestProvider;
         private AfkService _afkService;
+        private TelegramProvider _telegramProvider;
 
         public AfkCommand()
         {
@@ -21,7 +21,7 @@ namespace WinTenBot.Handlers.Commands.Group
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
+            _telegramProvider = new TelegramProvider(context);
             var msg = context.Update.Message;
 
             var data = new Dictionary<string, object>()
@@ -32,7 +32,7 @@ namespace WinTenBot.Handlers.Commands.Group
             };
 
             var sendText = $"{msg.GetFromNameLink()} Sedang afk.";
-            
+
             if (msg.Text.GetTextWithoutCmd() != "")
             {
                 var afkReason = msg.Text.GetTextWithoutCmd();
@@ -41,10 +41,9 @@ namespace WinTenBot.Handlers.Commands.Group
                 sendText += $"\n<i>{afkReason}</i>";
             }
 
-            await _requestProvider.SendTextAsync(sendText);
+            await _telegramProvider.SendTextAsync(sendText);
             await _afkService.SaveAsync(data);
             await _afkService.UpdateCacheAsync();
-
         }
     }
 }

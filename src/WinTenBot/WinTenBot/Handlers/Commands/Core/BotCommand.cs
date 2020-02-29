@@ -6,26 +6,27 @@ using WinTenBot.Providers;
 
 namespace WinTenBot.Handlers.Commands.Core
 {
-    public class BotCommand:CommandBase
+    public class BotCommand : CommandBase
     {
-        private RequestProvider _requestProvider;
-        public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args, CancellationToken cancellationToken)
+        private TelegramProvider _telegramProvider;
+
+        public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
+            CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
-            var isSudoer = _requestProvider.IsSudoer();
+            _telegramProvider = new TelegramProvider(context);
+            var isSudoer = _telegramProvider.IsSudoer();
             if (!isSudoer) return;
 
-            var param1 = _requestProvider.Message.Text.Split(" ").ValueOfIndex(1);
+            var param1 = _telegramProvider.Message.Text.Split(" ").ValueOfIndex(1);
             switch (param1)
             {
                 case "migrate":
-                    await _requestProvider.SendTextAsync("Migrating ");
+                    await _telegramProvider.SendTextAsync("Migrating ");
                     MigrationHelper.MigrateMysql();
                     MigrationHelper.MigrateSqlite();
-                    await _requestProvider.SendTextAsync("Migrate complete ");
+                    await _telegramProvider.SendTextAsync("Migrate complete ");
 
                     break;
-                
             }
         }
     }

@@ -9,10 +9,12 @@ namespace WinTenBot.Handlers.Commands.Core
 {
     public class DebugCommand : CommandBase
     {
-        private RequestProvider _requestProvider;
-        public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args, CancellationToken cancellationToken)
+        private TelegramProvider _telegramProvider;
+
+        public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
+            CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
+            _telegramProvider = new TelegramProvider(context);
 
             var msg = context.Update.Message;
             var json = msg.ToJson(true);
@@ -20,7 +22,7 @@ namespace WinTenBot.Handlers.Commands.Core
             Log.Information(json.Length.ToString());
 
             var sendText = $"Debug:\n {json}";
-            await _requestProvider.SendTextAsync(sendText);
+            await _telegramProvider.SendTextAsync(sendText);
         }
     }
 }

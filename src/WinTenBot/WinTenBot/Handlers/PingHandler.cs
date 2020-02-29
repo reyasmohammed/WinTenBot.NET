@@ -10,24 +10,24 @@ namespace WinTenBot.Handlers
 {
     internal class PingHandler : IUpdateHandler
     {
-        private RequestProvider _requestProvider;
+        private TelegramProvider _telegramProvider;
 
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
+            _telegramProvider = new TelegramProvider(context);
             var msg = context.Update.Message;
-            
+
             var keyboard = new InlineKeyboardMarkup(
                 InlineKeyboardButton.WithCallbackData("Ping", "PONG")
             );
-            
+
             var sendText = "ℹ️ Pong!!";
             var isSudoer = msg.From.Id.IsSudoer();
-            
+
             if (msg.Chat.Type == ChatType.Private && isSudoer)
             {
                 sendText += "\n🎛 <b>Engine info.</b>";
-                var getWebHookInfo = await _requestProvider.Client.GetWebhookInfoAsync(cancellationToken);
+                var getWebHookInfo = await _telegramProvider.Client.GetWebhookInfoAsync(cancellationToken);
                 if (getWebHookInfo.Url == "")
                 {
                     sendText += "\n\n<i>Bot run in Poll mode.</i>";
@@ -44,8 +44,8 @@ namespace WinTenBot.Handlers
                                 $"\nError Message: {getWebHookInfo.LastErrorMessage}";
                 }
             }
-            
-            await _requestProvider.SendTextAsync(sendText, keyboard);
+
+            await _telegramProvider.SendTextAsync(sendText, keyboard);
         }
     }
 }

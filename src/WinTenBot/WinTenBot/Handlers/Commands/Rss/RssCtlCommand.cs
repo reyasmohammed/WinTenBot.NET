@@ -10,34 +10,34 @@ namespace WinTenBot.Handlers.Commands.Rss
 {
     public class RssCtlCommand : CommandBase
     {
-        private RequestProvider _requestProvider;
+        private TelegramProvider _telegramProvider;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
+            _telegramProvider = new TelegramProvider(context);
             var msg = context.Update.Message;
 
-            var isSudoer = _requestProvider.IsSudoer();
+            var isSudoer = _telegramProvider.IsSudoer();
             if (isSudoer)
             {
                 var partedMsg = msg.Text.Split(" ");
                 var param1 = partedMsg.ValueOfIndex(1);
                 Log.Debug($"RssCtl Param1: {param1}");
 
-                await _requestProvider.AppendTextAsync("Access Granted");
+                await _telegramProvider.AppendTextAsync("Access Granted");
                 switch (param1)
                 {
                     case "start":
-                        await _requestProvider.AppendTextAsync("Starting RSS Service");
+                        await _telegramProvider.AppendTextAsync("Starting RSS Service");
                         RssScheduler.InitScheduler();
-                        await _requestProvider.AppendTextAsync("Start successfully.");
+                        await _telegramProvider.AppendTextAsync("Start successfully.");
                         break;
 
                     case "stop":
-                        await _requestProvider.AppendTextAsync("Stopping RSS Service");
+                        await _telegramProvider.AppendTextAsync("Stopping RSS Service");
                         HangfireHelper.DeleteAllJobs();
-                        await _requestProvider.AppendTextAsync("Stop successfully.");
+                        await _telegramProvider.AppendTextAsync("Stop successfully.");
                         break;
                 }
             }

@@ -10,14 +10,16 @@ namespace WinTenBot.Handlers.Commands.Core
 {
     public class OutCommand : CommandBase
     {
-        private RequestProvider _requestProvider;
-        public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args, CancellationToken cancellationToken)
+        private TelegramProvider _telegramProvider;
+
+        public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
+            CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
+            _telegramProvider = new TelegramProvider(context);
             var msg = context.Update.Message;
             var partsMsg = msg.Text.GetTextWithoutCmd().Split("|").ToArray();
 
-            var isSudoer = _requestProvider.IsSudoer();
+            var isSudoer = _telegramProvider.IsSudoer();
             if (isSudoer)
             {
                 var sendText = "Maaf, saya harus keluar";
@@ -26,16 +28,16 @@ namespace WinTenBot.Handlers.Commands.Core
                 {
                     sendText += $"\n{partsMsg[1]}";
                 }
+
                 var chatId = partsMsg[0].ToInt64();
                 Log.Information($"Target out: {chatId}");
-                await _requestProvider.SendTextAsync(sendText, customChatId: chatId);
-                await _requestProvider.LeaveChat(chatId);
+                await _telegramProvider.SendTextAsync(sendText, customChatId: chatId);
+                await _telegramProvider.LeaveChat(chatId);
             }
             else
             {
-                await _requestProvider.SendTextAsync("Kamu tidak punya hak akses.");
+                await _telegramProvider.SendTextAsync("Kamu tidak punya hak akses.");
             }
         }
     }
-
 }

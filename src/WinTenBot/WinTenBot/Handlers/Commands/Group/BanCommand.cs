@@ -7,12 +7,14 @@ using WinTenBot.Providers;
 
 namespace WinTenBot.Handlers.Commands.Group
 {
-    public class BanCommand:CommandBase
+    public class BanCommand : CommandBase
     {
-            private RequestProvider _requestProvider;
-        public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args, CancellationToken cancellationToken)
+        private TelegramProvider _telegramProvider;
+
+        public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
+            CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
+            _telegramProvider = new TelegramProvider(context);
 
             var kickTargets = new List<User>();
 
@@ -37,9 +39,9 @@ namespace WinTenBot.Handlers.Commands.Group
                 }
             }
 
-            await _requestProvider.DeleteAsync(msg.MessageId);
+            await _telegramProvider.DeleteAsync(msg.MessageId);
 
-            var isAdmin = await _requestProvider.IsAdminGroup();
+            var isAdmin = await _telegramProvider.IsAdminGroup();
 
             if (kickTargets[0].Id != msg.From.Id && isAdmin)
             {
@@ -48,8 +50,8 @@ namespace WinTenBot.Handlers.Commands.Group
                 {
                     var idTarget = target.Id;
                     var sendText = string.Empty;
-                    
-                    isKicked = await _requestProvider.KickMemberAsync(target);
+
+                    isKicked = await _telegramProvider.KickMemberAsync(target);
 
                     if (isKicked)
                     {
@@ -62,39 +64,39 @@ namespace WinTenBot.Handlers.Commands.Group
                         sendText = $"Gagal memblokir {idTarget}";
                     }
 
-                    await _requestProvider.AppendTextAsync(sendText);
+                    await _telegramProvider.AppendTextAsync(sendText);
                 }
 
                 if (isKicked)
                 {
-                    await _requestProvider.AppendTextAsync($"Sebanyak {kickTargets.Count} berhasil di blokir.");
+                    await _telegramProvider.AppendTextAsync($"Sebanyak {kickTargets.Count} berhasil di blokir.");
                 }
                 else
                 {
-                    await _requestProvider.AppendTextAsync("Gagal memblokir bbrp anggota");
+                    await _telegramProvider.AppendTextAsync("Gagal memblokir bbrp anggota");
                 }
             }
             else if (kickTargets[0].Id == fromId)
             {
                 var idTarget = kickTargets[0];
                 var isKicked = false;
-                
-                isKicked = await _requestProvider.KickMemberAsync(idTarget);
+
+                isKicked = await _telegramProvider.KickMemberAsync(idTarget);
                 if (isKicked)
                 {
                     var sendText = $"{idTarget} berhasil di blokir ";
                     sendText += idTarget.Id == fromId ? $"oleh Self-ban" : $".";
-                    await _requestProvider.AppendTextAsync(sendText);
+                    await _telegramProvider.AppendTextAsync(sendText);
                 }
                 else
                 {
                     var sendTexts = $"Blokir {idTarget} gagal.";
-                    await _requestProvider.SendTextAsync(sendTexts);
+                    await _telegramProvider.SendTextAsync(sendTexts);
                 }
             }
             else
             {
-                await _requestProvider.SendTextAsync("Hanya admin yang bisa mengeksekusi");
+                await _telegramProvider.SendTextAsync("Hanya admin yang bisa mengeksekusi");
             }
         }
     }

@@ -13,7 +13,7 @@ namespace WinTenBot.Handlers.Commands.Tags
     {
         private readonly TagsService _tagsService;
         private SettingsService _settingsService;
-        private RequestProvider _requestProvider;
+        private TelegramProvider _telegramProvider;
 
         public TagsCommand()
         {
@@ -24,14 +24,14 @@ namespace WinTenBot.Handlers.Commands.Tags
             CancellationToken cancellationToken)
         {
             Message msg = context.Update.Message;
-            _requestProvider = new RequestProvider(context);
+            _telegramProvider = new TelegramProvider(context);
             _settingsService = new SettingsService(msg);
 
             var id = msg.From.Id;
             var sendText = "Under maintenance";
-            
-            await _requestProvider.DeleteAsync(msg.MessageId);
-            await _requestProvider.SendTextAsync("🔄 Loading tags..");
+
+            await _telegramProvider.DeleteAsync(msg.MessageId);
+            await _telegramProvider.SendTextAsync("🔄 Loading tags..");
             var tagsData = await _tagsService.GetTagsByGroupAsync("*", msg.Chat.Id);
             var tagsStr = string.Empty;
 
@@ -43,8 +43,8 @@ namespace WinTenBot.Handlers.Commands.Tags
             sendText = $"#️⃣<b> {tagsData.Count} Tags</b>\n" +
                        $"\n{tagsStr}";
 
-            await _requestProvider.EditAsync(sendText);
-            
+            await _telegramProvider.EditAsync(sendText);
+
             //            var jsonSettings = TextHelper.ToJson(currentSetting);
             //            Log.Information($"CurrentSettings: {jsonSettings}");
 
@@ -54,14 +54,13 @@ namespace WinTenBot.Handlers.Commands.Tags
             var lastTagsMsgId = currentSetting.LastTagsMessageId;
             Log.Information($"LastTagsMsgId: {lastTagsMsgId}");
 
-            await _requestProvider.DeleteAsync(lastTagsMsgId.ToInt());
+            await _telegramProvider.DeleteAsync(lastTagsMsgId.ToInt());
             await _tagsService.UpdateCacheAsync(msg);
-            await _settingsService.UpdateCell("last_tags_message_id", _requestProvider.SentMessageId);
+            await _settingsService.UpdateCell("last_tags_message_id", _telegramProvider.SentMessageId);
 
 
 //            var json = TextHelper.ToJson(tagsData);
             //                Console.WriteLine(json);
-        
         }
     }
 }

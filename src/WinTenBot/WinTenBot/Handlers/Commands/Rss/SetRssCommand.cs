@@ -13,27 +13,27 @@ namespace WinTenBot.Handlers.Commands.Rss
     public class SetRssCommand : CommandBase
     {
         private RssService _rssService;
-        private RequestProvider _requestProvider;
+        private TelegramProvider _telegramProvider;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
-            _rssService = new RssService(_requestProvider.Message);
-            var chatId = _requestProvider.Message.Chat.Id;
+            _telegramProvider = new TelegramProvider(context);
+            _rssService = new RssService(_telegramProvider.Message);
+            var chatId = _telegramProvider.Message.Chat.Id;
 
-            var url = _requestProvider.Message.Text.GetTextWithoutCmd();
+            var url = _telegramProvider.Message.Text.GetTextWithoutCmd();
             if (url != null)
             {
-                await _requestProvider.AppendTextAsync($"URL: {url}");
-                
+                await _telegramProvider.AppendTextAsync($"URL: {url}");
+
                 if (url.CheckUrlValid())
                 {
-                    await _requestProvider.AppendTextAsync($"Sedang mengecek apakah berisi RSS");
+                    await _telegramProvider.AppendTextAsync($"Sedang mengecek apakah berisi RSS");
                     var isValid = await url.IsValidUrlFeed();
                     if (!isValid)
                     {
-                        await _requestProvider.AppendTextAsync("Sedang mencari kemungkinan tautan RSS yang valid");
+                        await _telegramProvider.AppendTextAsync("Sedang mencari kemungkinan tautan RSS yang valid");
                         var foundUrl = await url.GetBaseUrl().FindUrlFeed();
                         Log.Information($"Found URL Feed: {foundUrl}");
 
@@ -46,7 +46,7 @@ namespace WinTenBot.Handlers.Commands.Rss
                             var notfoundRss = $"Kami tidak dapat memvalidasi {url} adalah Link RSS yang valid, " +
                                               $"dan mencoba mencari di {url.GetBaseUrl()} tetap tidak dapat menemukan.";
 
-                            await _requestProvider.EditAsync(notfoundRss);
+                            await _telegramProvider.EditAsync(notfoundRss);
                             return;
                         }
                     }
@@ -57,35 +57,35 @@ namespace WinTenBot.Handlers.Commands.Rss
 
                     if (!isFeedExist)
                     {
-                        await _requestProvider.AppendTextAsync($"Sedang menyimpan..");
+                        await _telegramProvider.AppendTextAsync($"Sedang menyimpan..");
 
                         var data = new Dictionary<string, object>()
                         {
                             {"url_feed", url},
-                            {"chat_id", _requestProvider.Message.Chat.Id},
-                            {"from_id", _requestProvider.Message.From.Id}
+                            {"chat_id", _telegramProvider.Message.Chat.Id},
+                            {"from_id", _telegramProvider.Message.From.Id}
                         };
 
                         await _rssService.SaveRssSettingAsync(data);
 
-                        await _requestProvider.AppendTextAsync("Memastikan Scheduler sudah berjalan");
+                        await _telegramProvider.AppendTextAsync("Memastikan Scheduler sudah berjalan");
                         chatId.ToString().RegisterScheduler();
-                        
-                        await _requestProvider.AppendTextAsync($"Tautan berhasil di simpan");
+
+                        await _telegramProvider.AppendTextAsync($"Tautan berhasil di simpan");
                     }
                     else
                     {
-                        await _requestProvider.AppendTextAsync($"Tautan sudah di simpan");
+                        await _telegramProvider.AppendTextAsync($"Tautan sudah di simpan");
                     }
                 }
                 else
                 {
-                    await _requestProvider.AppendTextAsync("Url tersebut sepertinya tidak valid");
+                    await _telegramProvider.AppendTextAsync("Url tersebut sepertinya tidak valid");
                 }
             }
             else
             {
-                await _requestProvider.SendTextAsync("Apa url Feednya?");
+                await _telegramProvider.SendTextAsync("Apa url Feednya?");
             }
         }
     }

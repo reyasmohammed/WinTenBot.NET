@@ -11,16 +11,16 @@ namespace WinTenBot.Handlers
 {
     public class CallbackQueryHandler : IUpdateHandler
     {
-        private RequestProvider _requestProvider;
+        private TelegramProvider _telegramProvider;
 
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
+            _telegramProvider = new TelegramProvider(context);
             CallbackQuery cq = context.Update.CallbackQuery;
-            _requestProvider.CallBackMessageId = cq.Message.MessageId;
+            _telegramProvider.CallBackMessageId = cq.Message.MessageId;
 
-            Log.Information(cq.ToJson());
-            Log.Information($"CallBackData: {cq.Data}");
+            Log.Information("CallbackQuery" + cq.ToJson(true));
+            // Log.Information($"CallBackData: {cq.Data}");
 
             var partsCallback = cq.Data.SplitText(" ");
             Log.Information($"Callbacks: {partsCallback.ToJson()}");
@@ -48,9 +48,9 @@ namespace WinTenBot.Handlers
                     }
 
                     var keyboard = await $"Storage/Buttons/{jsonButton}.json".JsonToButton();
-                    
 
-                    await _requestProvider.EditMessageCallback(sendText, keyboard);
+
+                    await _telegramProvider.EditMessageCallback(sendText, keyboard);
 
                     // var a = new HelpCallbackQuery(cq);
                     break;

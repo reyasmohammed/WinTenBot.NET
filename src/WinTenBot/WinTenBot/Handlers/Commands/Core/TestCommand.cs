@@ -1,6 +1,6 @@
-﻿using Serilog;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
@@ -11,20 +11,20 @@ namespace WinTenBot.Handlers.Commands.Core
     public class TestCommand : CommandBase
     {
         private RssService _rssService;
-        private RequestProvider _requestProvider;
+        private TelegramProvider _telegramProvider;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
+            _telegramProvider = new TelegramProvider(context);
             _rssService = new RssService(context.Update.Message);
 
-            var chatId = _requestProvider.Message.Chat.Id;
+            var chatId = _telegramProvider.Message.Chat.Id;
 
-            if (_requestProvider.Message.From.Id.IsSudoer())
+            if (_telegramProvider.Message.From.Id.IsSudoer())
             {
                 Log.Information("Test started..");
-                await _requestProvider.SendTextAsync("Sedang mengetes sesuatu");
+                await _telegramProvider.SendTextAsync("Sedang mengetes sesuatu");
 
                 // var data = await new Query("rss_history")
                 //     .Where("chat_id", chatId)
@@ -49,8 +49,9 @@ namespace WinTenBot.Handlers.Commands.Core
                 // await BotHelper.ClearLog();
                 await SyncHelper.SyncGBanToLocal();
 
-                await _requestProvider.EditAsync("Selesai ngetest");
+                await _telegramProvider.EditAsync("Selesai ngetest");
             }
+
             // else
             // {
             //     await _requestProvider.SendTextAsync("Unauthorized.");

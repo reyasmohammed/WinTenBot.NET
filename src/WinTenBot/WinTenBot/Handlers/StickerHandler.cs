@@ -9,15 +9,16 @@ namespace WinTenBot.Handlers
 {
     class StickerHandler : IUpdateHandler
     {
-        private RequestProvider _requestProvider;
+        private TelegramProvider _telegramProvider;
+
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
-            
+            _telegramProvider = new TelegramProvider(context);
+
             Message msg = context.Update.Message;
             Sticker incomingSticker = msg.Sticker;
 
-            var chat = await _requestProvider.GetChat();
+            var chat = await _telegramProvider.GetChat();
             var stickerSetName = chat.StickerSetName ?? "EvilMinds";
             StickerSet evilMindsSet = await context.Bot.Client.GetStickerSetAsync(stickerSetName, cancellationToken);
 

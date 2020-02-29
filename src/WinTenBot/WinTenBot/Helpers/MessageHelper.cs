@@ -102,20 +102,20 @@ namespace WinTenBot.Helpers
             return isMust;
         }
 
-        public static async Task CheckMessageAsync(this RequestProvider requestProvider)
+        public static async Task CheckMessageAsync(this TelegramProvider telegramProvider)
         {
             try
             {
                 Log.Information("Starting check Message");
 
-                var message = requestProvider.Message;
+                var message = telegramProvider.MessageOrEdited;
                 var text = message.Text;
                 if (!text.IsNullOrEmpty())
                 {
                     var isMustDelete = await IsMustDelete(text);
                     Log.Information($"Message {message.MessageId} IsMustDelete: {isMustDelete}");
 
-                    if (isMustDelete) await requestProvider.DeleteAsync(message.MessageId);
+                    if (isMustDelete) await telegramProvider.DeleteAsync(message.MessageId);
                 }
                 else
                 {
@@ -128,15 +128,15 @@ namespace WinTenBot.Helpers
             }
         }
 
-        public static async Task FindNotesAsync(this RequestProvider requestProvider)
+        public static async Task FindNotesAsync(this TelegramProvider telegramProvider)
         {
             try
             {
                 Log.Information("Starting find Notes in Cloud");
                 InlineKeyboardMarkup inlineKeyboardMarkup = null;
                 var notesService = new NotesService();
-                
-                var msg = requestProvider.Message;
+
+                var msg = telegramProvider.MessageOrEdited;
                 var selectedNotes = await notesService.GetNotesBySlug(msg.Chat.Id, msg.Text);
                 if (selectedNotes.Count > 0)
                 {
@@ -147,7 +147,7 @@ namespace WinTenBot.Helpers
                         inlineKeyboardMarkup = btnData.ToReplyMarkup(2);
                     }
 
-                    await requestProvider.SendTextAsync(content, inlineKeyboardMarkup);
+                    await telegramProvider.SendTextAsync(content, inlineKeyboardMarkup);
                     inlineKeyboardMarkup = null;
 
                     foreach (var note in selectedNotes)
@@ -166,18 +166,19 @@ namespace WinTenBot.Helpers
             }
         }
 
-        public static async Task FindTagsAsync(this RequestProvider requestProvider)
+        public static async Task FindTagsAsync(this TelegramProvider telegramProvider)
         {
             var tagsService = new TagsService();
-            Message msg = requestProvider.Message;
+            Message msg = telegramProvider.MessageOrEdited;
 
-            if(!msg.Text.Contains("#")){
+            if (!msg.Text.Contains("#"))
+            {
                 Log.Information($"Message {msg.MessageId} is not contains any Hashtag.");
                 return;
             }
 
             Log.Information("Tags Received..");
-            var partsText = msg.Text.Split(new char[] { ' ', '\n', ',' })
+            var partsText = msg.Text.Split(new char[] {' ', '\n', ','})
                 .Where(x => x.Contains("#"));
 
             var limitedTags = partsText.Take(5);
@@ -200,12 +201,12 @@ namespace WinTenBot.Helpers
                     buttonMarkup = buttonStr.ToReplyMarkup(2);
                 }
 
-                await requestProvider.SendTextAsync(content, buttonMarkup);
+                await telegramProvider.SendTextAsync(content, buttonMarkup);
             }
 
             if (partsText.Count() > limitedTags.Count())
             {
-                await requestProvider.SendTextAsync("Due performance reason, we limit 5 batch call tags");
+                await telegramProvider.SendTextAsync("Due performance reason, we limit 5 batch call tags");
             }
         }
     }

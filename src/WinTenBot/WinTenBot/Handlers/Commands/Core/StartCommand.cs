@@ -10,12 +10,13 @@ namespace WinTenBot.Handlers.Commands.Core
 {
     class StartCommand : CommandBase
     {
-        private RequestProvider _requestProvider;
+        private TelegramProvider _telegramProvider;
 
-        public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args, CancellationToken cancellationToken)
+        public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
+            CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
-            
+            _telegramProvider = new TelegramProvider(context);
+
             var botName = Bot.GlobalConfiguration["Engines:ProductName"];
             var botVer = Bot.GlobalConfiguration["Engines:Version"];
             var botCompany = Bot.GlobalConfiguration["Engines:Company"];
@@ -25,15 +26,15 @@ namespace WinTenBot.Handlers.Commands.Core
                               $"\nAdalah bot debugging, manajemen grup yang di lengkapi dengan alat keamanan. " +
                               $"Agar fungsi saya bekerja dengan fitur penuh, jadikan saya admin dengan level standard. " +
                               $"\nSaran dan fitur bisa di ajukan di @WinTenGroup atau @TgBotID.";
-            
+
             // var urlStart = await "help".GetUrlStart();
-            var urlStart = await _requestProvider.GetUrlStart("start=help");
-            var urlAddTo = await _requestProvider.GetUrlStart("startgroup=new");
+            var urlStart = await _telegramProvider.GetUrlStart("start=help");
+            var urlAddTo = await _telegramProvider.GetUrlStart("startgroup=new");
             var keyboard = new InlineKeyboardMarkup(
                 InlineKeyboardButton.WithUrl("Dapatkan bantuan", urlStart)
             );
-        
-            if (_requestProvider.IsPrivateChat())
+
+            if (_telegramProvider.IsPrivateChat())
             {
                 keyboard = new InlineKeyboardMarkup(new[]
                 {
@@ -48,8 +49,8 @@ namespace WinTenBot.Handlers.Commands.Core
                     }
                 });
             }
-            
-            await _requestProvider.SendTextAsync(sendText,keyboard);
+
+            await _telegramProvider.SendTextAsync(sendText, keyboard);
         }
     }
 }

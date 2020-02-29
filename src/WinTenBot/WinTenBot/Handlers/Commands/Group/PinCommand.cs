@@ -7,13 +7,13 @@ namespace WinTenBot.Handlers.Commands.Group
 {
     public class PinCommand : CommandBase
     {
-        private RequestProvider _requestProvider;
+        private TelegramProvider _telegramProvider;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
-            var msg = context.Update.Message;
+            _telegramProvider = new TelegramProvider(context);
+            var msg = _telegramProvider.MessageOrEdited;
             var client = context.Bot.Client;
 
             var sendText = "Balas pesan yang akan di pin";
@@ -26,7 +26,7 @@ namespace WinTenBot.Handlers.Commands.Group
 //                ConsoleHelper.WriteLine(pin.);
             }
 
-            await _requestProvider.SendTextAsync(sendText);
+            await _telegramProvider.SendTextAsync(sendText);
         }
     }
 }

@@ -13,12 +13,12 @@ namespace WinTenBot.Handlers.Commands.Welcome
     public class WelcomeCommand : CommandBase
     {
         private SettingsService _settingsService;
-        private RequestProvider _requestProvider;
+        private TelegramProvider _telegramProvider;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _requestProvider = new RequestProvider(context);
+            _telegramProvider = new TelegramProvider(context);
             var msg = context.Update.Message;
             _settingsService = new SettingsService(msg);
 
@@ -55,16 +55,16 @@ namespace WinTenBot.Handlers.Commands.Welcome
 //                sendText += " " + string.Join(", ",args);
                 if (welcomeMediaType != "")
                 {
-                    await _requestProvider.SendMediaAsync(welcomeMedia, welcomeMediaType, welcomeMessage, keyboard);
+                    await _telegramProvider.SendMediaAsync(welcomeMedia, welcomeMediaType, welcomeMessage, keyboard);
                 }
                 else
                 {
-                    await _requestProvider.SendTextAsync(sendText, keyboard);
+                    await _telegramProvider.SendTextAsync(sendText, keyboard);
                 }
             }
             else
             {
-                await _requestProvider.SendTextAsync(sendText);
+                await _telegramProvider.SendTextAsync(sendText);
             }
         }
     }

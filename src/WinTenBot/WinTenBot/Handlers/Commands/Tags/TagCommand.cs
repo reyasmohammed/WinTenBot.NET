@@ -12,8 +12,8 @@ namespace WinTenBot.Handlers.Commands.Tags
 {
     public class TagCommand : CommandBase
     {
-        private RequestProvider _requestProvider;
         private TagsService _tagsService;
+        private TelegramProvider _telegramProvider;
 
         public TagCommand()
         {
@@ -24,7 +24,7 @@ namespace WinTenBot.Handlers.Commands.Tags
             CancellationToken cancellationToken)
         {
             var msg = context.Update.Message;
-            _requestProvider = new RequestProvider(context);
+            _telegramProvider = new TelegramProvider(context);
             var isSudoer = msg.From.Id.IsSudoer();
 
             var sendText = "ℹ Simpan tag ke Cloud Tags" +
@@ -47,7 +47,7 @@ namespace WinTenBot.Handlers.Commands.Tags
 
                 if (args[0].Length >= 3)
                 {
-                    await _requestProvider.SendTextAsync("📖 Mengumpulkan informasi..");
+                    await _telegramProvider.SendTextAsync("📖 Mengumpulkan informasi..");
 //                    Log.Information(TextHelper.ToJson(msg.ReplyToMessage));
 
                     var content = msg.ReplyToMessage.Text;
@@ -65,24 +65,24 @@ namespace WinTenBot.Handlers.Commands.Tags
                             {"content", content}
                         };
 
-                        await _requestProvider.EditAsync("📝 Menyimpan tag data..");
+                        await _telegramProvider.EditAsync("📝 Menyimpan tag data..");
                         await _tagsService.SaveTag(data);
 
 //                        var keyboard = new InlineKeyboardMarkup(
 //                            InlineKeyboardButton.WithCallbackData("OK", "tag finish-create")
 //                        );
 
-                        await _requestProvider.EditAsync("✅ Tag berhasil di simpan..");
+                        await _telegramProvider.EditAsync("✅ Tag berhasil di simpan..");
 
                         await _tagsService.UpdateCacheAsync(msg);
                         return;
                     }
 
-                    await _requestProvider.EditAsync(
+                    await _telegramProvider.EditAsync(
                         "✅ Tag sudah ada. Silakan ganti Tag jika ingin isi konten berbeda");
                 }
 
-                await _requestProvider.EditAsync("Slug Tag minimal 3 karakter");
+                await _telegramProvider.EditAsync("Slug Tag minimal 3 karakter");
             }
             else
             {
@@ -91,7 +91,7 @@ namespace WinTenBot.Handlers.Commands.Tags
                     Console.WriteLine(arg);
                 }
 
-                await _requestProvider.SendTextAsync(sendText);
+                await _telegramProvider.SendTextAsync(sendText);
             }
         }
     }
