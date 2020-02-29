@@ -22,7 +22,7 @@ namespace WinTenBot.Providers
                 PrepareSchemaIfNecessary = true,
                 DashboardJobListLimit = 50000,
                 TransactionTimeout = TimeSpan.FromMinutes(1),
-                TablesPrefix = "Hangfire"
+                TablesPrefix = "Hangfire_"
             };
             var storage = new MySqlStorage(connectionString, options);
             return storage;
@@ -39,7 +39,7 @@ namespace WinTenBot.Providers
             var storage = new SQLiteStorage(connectionString, options);
             return storage;
         }
-        
+
         public static LiteDbStorage GetLiteDbStorage()
         {
             var connectionString = Bot.GlobalConfiguration["Hangfire:LiteDb"];
