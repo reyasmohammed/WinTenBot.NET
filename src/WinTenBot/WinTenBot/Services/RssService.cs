@@ -13,10 +13,13 @@ namespace WinTenBot.Services
 {
     public class RssService
     {
+        private Message _message;
         private string baseTable = "rss_history";
         private string rssSettingTable = "rss_settings";
 
-        private Message _message;
+        public RssService()
+        {
+        }
 
         public RssService(Message message = null)
         {
@@ -32,7 +35,7 @@ namespace WinTenBot.Services
 
             var isExist = data.Any();
             Log.Information($"Check RSS History: {isExist}");
-            
+
             return isExist;
         }
 
@@ -43,7 +46,7 @@ namespace WinTenBot.Services
                 .Where("url_feed", urlFeed)
                 .ExecForMysql()
                 .GetAsync();
-            
+
             var isExist = data.Any();
             Log.Information($"Check RSS Setting: {isExist}");
 
@@ -92,6 +95,16 @@ namespace WinTenBot.Services
 
             Log.Information($"Get List ChatID: {data.Count()}");
             return mapped;
+        }
+
+        public async Task<List<RssHistory>> GetRssHistory(Dictionary<string, object> where)
+        {
+            var query = await new Query(baseTable)
+                .ExecForSqLite()
+                .Where(where)
+                .GetAsync();
+
+            return query.ToJson().MapObject<List<RssHistory>>();
         }
 
         public async Task<bool> DeleteRssAsync(string urlFeed)

@@ -34,69 +34,71 @@ namespace WinTenBot.Helpers
                 Log.Information($"Processing {rssUrl} for {chatId}.");
                 try
                 {
-                    var rssFeeds = await FeedReader.ReadAsync(rssUrl);
-                    var rssTitle = rssFeeds.Title;
+                    await ExecuteUrlAsync(chatId, rssUrl);
 
-                    var castLimit = 1;
-                    var castStep = 0;
-
-                    foreach (var rssFeed in rssFeeds.Items)
-                    {
-                        // Prevent flood in first time;
-                        if (castLimit == castStep)
-                        {
-                            Log.Information($"Send stopped due limit {castLimit} for prevent flooding in first time");
-                            break;
-                        }
-
-                        var titleLink = $"{rssTitle} - {rssFeed.Title}".MkUrl(rssFeed.Link);
-                        var category = rssFeed.Categories.MkJoin(", ");
-                        var sendText = $"{titleLink}" +
-                                       $"\nTags: {category}";
-
-                        var where = new Dictionary<string, object>()
-                        {
-                            {"chat_id", chatId},
-                            {"url", rssFeed.Link}
-                        };
-
-                        var isExist = await rssService.IsExistInHistory(where);
-                        if (!isExist)
-                        {
-                            Log.Information($"Sending feed to {chatId}");
-
-                            try
-                            {
-                                await Bot.Client.SendTextMessageAsync(chatId, sendText, ParseMode.Html);
-
-                                var data = new Dictionary<string, object>()
-                                {
-                                    {"url", rssFeed.Link},
-                                    {"rss_source", rssUrl},
-                                    {"chat_id", chatId},
-                                    {"title", rssFeed.Title},
-                                    {"publish_date", rssFeed.PublishingDate.ToString()},
-                                    {"author", rssFeed.Author},
-                                    {"created_at", DateTime.Now.ToString(CultureInfo.InvariantCulture)}
-                                };
-
-                                Log.Information($"Writing to RSS History");
-                                await rssService.SaveRssHistoryAsync(data);
-
-                                castStep++;
-                                newRssCount++;
-                            }
-                            catch (ChatNotFoundException chatNotFoundException)
-                            {
-                                Log.Information($"May Bot not added in {chatId}.");
-                                Log.Error(chatNotFoundException, "Chat Not Found");
-                            }
-                        }
-                        else
-                        {
-                            Log.Information($"This feed has sent to {chatId}");
-                        }
-                    }
+                    // var rssFeeds = await FeedReader.ReadAsync(rssUrl);
+                    // var rssTitle = rssFeeds.Title;
+                    //
+                    // var castLimit = 1;
+                    // var castStep = 0;
+                    //
+                    // foreach (var rssFeed in rssFeeds.Items)
+                    // {
+                    //     // Prevent flood in first time;
+                    //     if (castLimit == castStep)
+                    //     {
+                    //         Log.Information($"Send stopped due limit {castLimit} for prevent flooding in first time");
+                    //         break;
+                    //     }
+                    //
+                    //     var titleLink = $"{rssTitle} - {rssFeed.Title}".MkUrl(rssFeed.Link);
+                    //     var category = rssFeed.Categories.MkJoin(", ");
+                    //     var sendText = $"{titleLink}" +
+                    //                    $"\nTags: {category}";
+                    //
+                    //     var where = new Dictionary<string, object>()
+                    //     {
+                    //         {"chat_id", chatId},
+                    //         {"url", rssFeed.Link}
+                    //     };
+                    //
+                    //     var isExist = await rssService.IsExistInHistory(where);
+                    //     if (!isExist)
+                    //     {
+                    //         Log.Information($"Sending feed to {chatId}");
+                    //
+                    //         try
+                    //         {
+                    //             await Bot.Client.SendTextMessageAsync(chatId, sendText, ParseMode.Html);
+                    //
+                    //             var data = new Dictionary<string, object>()
+                    //             {
+                    //                 {"url", rssFeed.Link},
+                    //                 {"rss_source", rssUrl},
+                    //                 {"chat_id", chatId},
+                    //                 {"title", rssFeed.Title},
+                    //                 {"publish_date", rssFeed.PublishingDate.ToString()},
+                    //                 {"author", rssFeed.Author},
+                    //                 {"created_at", DateTime.Now.ToString(CultureInfo.InvariantCulture)}
+                    //             };
+                    //
+                    //             Log.Information($"Writing to RSS History");
+                    //             await rssService.SaveRssHistoryAsync(data);
+                    //
+                    //             castStep++;
+                    //             newRssCount++;
+                    //         }
+                    //         catch (ChatNotFoundException chatNotFoundException)
+                    //         {
+                    //             Log.Information($"May Bot not added in {chatId}.");
+                    //             Log.Error(chatNotFoundException, "Chat Not Found");
+                    //         }
+                    //     }
+                    //     else
+                    //     {
+                    //         Log.Information($"This feed has sent to {chatId}");
+                    //     }
+                    // }
                 }
                 catch (Exception ex)
                 {
@@ -112,6 +114,99 @@ namespace WinTenBot.Helpers
             Log.Information($"RSS Scheduler finished. New RSS Count: {newRssCount}");
 
             return newRssCount;
+        }
+
+        public static async Task ExecuteUrlAsync(string chatId, string rssUrl)
+        {
+            int newRssCount = 0;
+            var rssService = new RssService();
+
+            var rssFeeds = await FeedReader.ReadAsync(rssUrl);
+            var rssTitle = rssFeeds.Title;
+
+            // var castLimit = 10;
+            // var castStep = 0;
+
+            foreach (var rssFeed in rssFeeds.Items)
+            {
+                // Prevent flood in first time;
+                // if (castLimit == castStep)
+                // {
+                //     Log.Information($"Send stopped due limit {castLimit} for prevent flooding in first time");
+                //     break;
+                // }
+
+                var whereHistory = new Dictionary<string, object>()
+                {
+                    ["chat_id"] = chatId,
+                    ["rss_source"] = rssUrl
+                };
+
+                var rssHistory = await rssService.GetRssHistory(whereHistory);
+                var lastRssHistory = rssHistory.LastOrDefault();
+                var lastArticleDate = DateTime.Parse(lastRssHistory.PublishDate);
+                var currentArticleDate = rssFeed.PublishingDate.Value;
+
+                Log.Information($"LastArticleDate: {lastArticleDate}");
+                Log.Information($"CurrentArticleDate: {currentArticleDate}");
+
+                if (currentArticleDate < lastArticleDate)
+                {
+                    Log.Information($"Current article is older than last article. Stopped.");
+                    break;
+                }
+
+                Log.Information("Prepare sending article.");
+
+                var titleLink = $"{rssTitle} - {rssFeed.Title}".MkUrl(rssFeed.Link);
+                var category = rssFeed.Categories.MkJoin(", ");
+                var sendText = $"{rssTitle} - {rssFeed.Title}" +
+                               $"\n{rssFeed.Link}" +
+                               $"\nTags: {category}";
+
+                var where = new Dictionary<string, object>()
+                {
+                    {"chat_id", chatId},
+                    {"url", rssFeed.Link}
+                };
+
+                var isExist = await rssService.IsExistInHistory(where);
+                if (!isExist)
+                {
+                    Log.Information($"Sending feed to {chatId}");
+
+                    try
+                    {
+                        await Bot.Client.SendTextMessageAsync(chatId, sendText, ParseMode.Html);
+
+                        var data = new Dictionary<string, object>()
+                        {
+                            {"url", rssFeed.Link},
+                            {"rss_source", rssUrl},
+                            {"chat_id", chatId},
+                            {"title", rssFeed.Title},
+                            {"publish_date", rssFeed.PublishingDate.ToString()},
+                            {"author", rssFeed.Author},
+                            {"created_at", DateTime.Now.ToString(CultureInfo.InvariantCulture)}
+                        };
+
+                        Log.Information($"Writing to RSS History");
+                        await rssService.SaveRssHistoryAsync(data);
+
+                        // castStep++;
+                        newRssCount++;
+                    }
+                    catch (ChatNotFoundException chatNotFoundException)
+                    {
+                        Log.Information($"May Bot not added in {chatId}.");
+                        Log.Error(chatNotFoundException, "Chat Not Found");
+                    }
+                }
+                else
+                {
+                    Log.Information($"This feed has sent to {chatId}");
+                }
+            }
         }
 
         public static async Task<string> FindUrlFeed(this string url)
@@ -139,7 +234,6 @@ namespace WinTenBot.Helpers
             try
             {
                 var feed = await FeedReader.ReadAsync(url);
-                // ConsoleHelper.WriteLine(feed.ToJson());
                 isValid = true;
             }
             catch (Exception ex)
