@@ -9,6 +9,11 @@ namespace WinTenBot.Helpers
 //            return bool.Parse(obj);
             return Convert.ToBoolean(obj);
         }
+        
+        public static bool ToBool(this string obj)
+        {
+            return Convert.ToBoolean(obj);
+        }
 
         public static int ToInt(this object obj)
         {
