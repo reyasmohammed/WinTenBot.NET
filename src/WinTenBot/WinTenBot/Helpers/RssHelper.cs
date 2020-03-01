@@ -15,7 +15,7 @@ namespace WinTenBot.Helpers
 {
     public static class RssHelper
     {
-        public static async Task<int> ExecBroadcasterAsync(string chatId)
+        public static async Task<int> ExecBroadcasterAsync(long chatId)
         {
             Log.Information("Starting RSS Scheduler.");
             int newRssCount = 0;
@@ -116,7 +116,7 @@ namespace WinTenBot.Helpers
             return newRssCount;
         }
 
-        public static async Task ExecuteUrlAsync(string chatId, string rssUrl)
+        public static async Task ExecuteUrlAsync(long chatId, string rssUrl)
         {
             int newRssCount = 0;
             var rssService = new RssService();
