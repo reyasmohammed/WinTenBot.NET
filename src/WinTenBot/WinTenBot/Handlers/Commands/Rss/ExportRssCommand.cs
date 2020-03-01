@@ -26,6 +26,14 @@ namespace WinTenBot.Handlers.Commands.Rss
             var msgText = msg.Text;
             var dateDate = DateTime.UtcNow.ToString("yyyy-MM-dd");
 
+            var isAdminOrPrivate = await _telegramProvider.IsAdminOrPrivateChat();
+            if (!isAdminOrPrivate)
+            {
+                var send = "Maaf, hanya Admin yang dapat mengekspor daftar RSS";
+                await _telegramProvider.SendTextAsync(send);
+                return;
+            }
+
             var rssSettings = await _rssService.GetRssSettingsAsync();
             Log.Information($"RssSettings: {rssSettings.ToJson(true)}");
 
