@@ -6,6 +6,7 @@ using Serilog;
 using SqlKata;
 using SqlKata.Execution;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Model;
 using WinTenBot.Providers;
 using WinTenBot.Services;
@@ -36,12 +37,8 @@ namespace WinTenBot.Helpers
 
             var admins = await client.GetChatAdministratorsAsync(chatId);
             foreach (var admin in admins)
-            {
                 if (userId == admin.User.Id)
-                {
                     isAdmin = true;
-                }
-            }
 
             return isAdmin;
         }
@@ -98,8 +95,14 @@ namespace WinTenBot.Helpers
                 var updateResult = await UpdateWarnUsernameStat(message);
                 var updatedStep = updateResult.StepCount;
 
-                await telegramProvider.SendTextAsync($"{fromUser} belum memasang username." +
-                                                     $"\nPeringatan {updatedStep}/1000");
+                var sendText = $"{fromUser} belum memasang username." +
+                               $"\nPeringatan {updatedStep}/1000";
+
+                var keyboard = new InlineKeyboardMarkup(
+                    InlineKeyboardButton.WithUrl("Cara Pasang Username", "https://t.me/WinTenDev/29")
+                );
+
+                await telegramProvider.SendTextAsync(sendText, keyboard);
             }
         }
 
@@ -123,12 +126,9 @@ namespace WinTenBot.Helpers
             {
                 await telegramProvider.SendTextAsync($"{message.GetFromNameLink()} sudah tidak afk");
 
-                var data = new Dictionary<string, object>()
+                var data = new Dictionary<string, object>
                 {
-                    {"chat_id", message.Chat.Id},
-                    {"user_id", message.From.Id},
-                    {"is_afk", 0},
-                    {"afk_reason", ""}
+                    {"chat_id", message.Chat.Id}, {"user_id", message.From.Id}, {"is_afk", 0}, {"afk_reason", ""}
                 };
 
                 await afkService.SaveAsync(data);
@@ -195,7 +195,7 @@ namespace WinTenBot.Helpers
             if (isBan)
             {
                 var sendText = $"{user} is banned in SpamWatch!" +
-                               $"\nFed: @SpamWatch" +
+                               "\nFed: @SpamWatch" +
                                $"\nReason: {spamWatch.Reason}";
                 await telegramProvider.SendTextAsync(sendText);
                 await telegramProvider.KickMemberAsync(user);
@@ -209,13 +209,10 @@ namespace WinTenBot.Helpers
         {
             var tableName = "warn_username_history";
 
-            var data = new Dictionary<string, object>()
+            var data = new Dictionary<string, object>
             {
-                {"from_id", message.From.Id},
-                {"first_name", message.From.FirstName},
-                {"last_name", message.From.LastName},
-                {"step_count", 1},
-                {"chat_id", message.Chat.Id},
+                {"from_id", message.From.Id}, {"first_name", message.From.FirstName},
+                {"last_name", message.From.LastName}, {"step_count", 1}, {"chat_id", message.Chat.Id},
                 {"created_at", DateTime.UtcNow}
             };
 
@@ -237,10 +234,9 @@ namespace WinTenBot.Helpers
                 var newStep = warnHistories.StepCount + 1;
                 Log.Information($"New step for {message.From} is {newStep}");
 
-                var update = new Dictionary<string, object>()
+                var update = new Dictionary<string, object>
                 {
-                    {"step_count", newStep},
-                    {"updated_at", DateTime.UtcNow}
+                    {"step_count", newStep}, {"updated_at", DateTime.UtcNow}
                 };
 
                 var insertHit = await new Query(tableName)
