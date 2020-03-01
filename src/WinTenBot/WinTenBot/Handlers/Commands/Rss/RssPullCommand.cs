@@ -19,7 +19,7 @@ namespace WinTenBot.Handlers.Commands.Rss
             // var chatId = ChatHelper.Message.Chat.Id.ToString();
             // var isAdmin = await ChatHelper.IsAdminGroup();
 
-            var chatId = response.Message.Chat.Id.ToString();
+            var chatId = response.Message.Chat.Id;
             var isAdmin = await response.IsAdminGroup();
 
             if (isAdmin || response.IsPrivateChat())

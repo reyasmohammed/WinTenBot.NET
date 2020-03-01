@@ -69,7 +69,7 @@ namespace WinTenBot.Handlers.Commands.Rss
                         await _rssService.SaveRssSettingAsync(data);
 
                         await _telegramProvider.AppendTextAsync("Memastikan Scheduler sudah berjalan");
-                        chatId.ToString().RegisterScheduler();
+                        chatId.RegisterScheduler();
 
                         await _telegramProvider.AppendTextAsync($"Tautan berhasil di simpan");
                     }

@@ -19,7 +19,7 @@ namespace WinTenBot.Handlers.Commands.Rss
             _telegramProvider = new TelegramProvider(context);
             _rssService = new RssService(context.Update.Message);
 
-            var chatId = _telegramProvider.Message.Chat.Id.ToString();
+            var chatId = _telegramProvider.Message.Chat.Id;
             var isAdmin = await _telegramProvider.IsAdminGroup();
 
             if (isAdmin || _telegramProvider.IsPrivateChat())
