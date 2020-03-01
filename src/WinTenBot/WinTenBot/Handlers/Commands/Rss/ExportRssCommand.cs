@@ -23,6 +23,7 @@ namespace WinTenBot.Handlers.Commands.Rss
             var msg = _telegramProvider.Message;
             var chatId = msg.Chat.Id;
             var msgId = msg.MessageId;
+            var msgText = msg.Text;
             var dateDate = DateTime.UtcNow.ToString("yyyy-MM-dd");
 
             var rssSettings = await _rssService.GetRssSettingsAsync();
@@ -37,11 +38,21 @@ namespace WinTenBot.Handlers.Commands.Rss
             Log.Information($"ListUrl: \n{listRss}");
 
             var listRssStr = listRss.ToString().Trim();
+            var sendText = "Daftar RSS ini tidak terenkripsi, dapat di pulihkan di obrolan mana saja. " +
+                           "Tambahkan parameter -e agar daftar RSS terenkripsi.";
+
+            if (msgText.Contains("-e"))
+            {
+                Log.Information("List RSS will be encrypted.");
+                listRssStr = listRssStr.AesEncrypt();
+                sendText = "Daftar RSS ini terenkripsi, hanya dapat di pulihkan di obrolan ini!";
+            }
+
             var filePath = $"{chatId}/rss-feed_{dateDate}_{msgId}.txt";
             await listRssStr.WriteTextAsync(filePath);
 
             var fileSend = IoHelper.BaseDirectory + $"/{filePath}";
-            await _telegramProvider.SendMediaAsync(fileSend, "local-document");
+            await _telegramProvider.SendMediaAsync(fileSend, "local-document", sendText);
 
             fileSend.DeleteFile();
         }
