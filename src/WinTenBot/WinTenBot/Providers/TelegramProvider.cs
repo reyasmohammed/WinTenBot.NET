@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
@@ -7,9 +8,11 @@ using Telegram.Bot.Exceptions;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Helpers;
 using WinTenBot.Model;
+using File = System.IO.File;
 
 namespace WinTenBot.Providers
 {
@@ -192,6 +195,17 @@ namespace WinTenBot.Providers
                 case "document":
                     await Client.SendDocumentAsync(Message.Chat.Id, fileId, caption, ParseMode.Html,
                         replyMarkup: replyMarkup, replyToMessageId: replyToMsgId);
+                    break;
+
+                case "local-document":
+                    var fileName = Path.GetFileName(fileId);
+                    await using (var fs = File.OpenRead(fileId))
+                    {
+                        InputOnlineFile inputOnlineFile = new InputOnlineFile(fs, fileName);
+                        await Client.SendDocumentAsync(Message.Chat.Id, inputOnlineFile, caption, ParseMode.Html,
+                            replyMarkup: replyMarkup, replyToMessageId: replyToMsgId);
+                    }
+
                     break;
 
                 case "photo":
