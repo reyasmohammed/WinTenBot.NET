@@ -201,5 +201,16 @@ namespace WinTenBot.Helpers
             return str.IsNullOrEmpty() ? str : chars.Aggregate(str, (current, c) => 
                 current.Replace($"{c}", ""));
         }
+        
+        public static string StripMargin(this string s)
+        {
+            return Regex.Replace(s, @"[ \t]+\|", string.Empty);
+        }
+        
+        public static string StripLeadingWhitespace(this string s)
+        {
+            Regex r = new Regex(@"^\s+", RegexOptions.Multiline);
+            return r.Replace(s, string.Empty);
+        }
     }
 }
