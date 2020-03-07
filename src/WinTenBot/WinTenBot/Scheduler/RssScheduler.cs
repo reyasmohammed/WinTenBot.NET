@@ -23,7 +23,7 @@ namespace WinTenBot.Scheduler
                 var listChatId = await rssService.GetListChatIdAsync();
                 foreach (RssSetting row in listChatId)
                 {
-                    var chatId = row.ChatId;
+                    var chatId = row.ChatId.ToInt64();
                     var recurringId = $"{chatId}-{baseId}";
 
                     Log.Information($"Creating Jobs for {chatId}");
@@ -37,7 +37,7 @@ namespace WinTenBot.Scheduler
             });
         }
 
-        public static void RegisterScheduler(this string chatId)
+        public static void RegisterScheduler(this long chatId)
         {
             Log.Information("Initializing RSS Scheduler.");
 
