@@ -70,8 +70,13 @@ namespace WinTenBot.Services
             return insert.ToBool();
         }
 
-        public async Task<List<RssSetting>> GetRssSettingsAsync(string chatId)
+        public async Task<List<RssSetting>> GetRssSettingsAsync(long chatId = -1)
         {
+            if (chatId == -1)
+            {
+                chatId = _message.Chat.Id;
+            }
+
             var data = await new Query(rssSettingTable)
                 .Where("chat_id", chatId)
                 .ExecForMysql()
