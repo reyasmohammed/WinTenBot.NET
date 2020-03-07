@@ -26,6 +26,21 @@ namespace WinTenBot.Helpers
             return  isSudoer;
         }
         
+        public static bool IsSudoer(this TelegramProvider telegramProvider)
+        {
+            bool isSudoer = false;
+            var userId = telegramProvider.Message.From.Id;
+            var sudoers = Bot.GlobalConfiguration.GetSection("Sudoers").Get<List<string>>();
+            var match = sudoers.FirstOrDefault(x => x == userId.ToString());
+            
+            if (match != null)
+            {
+                isSudoer = true;
+            }
+            Log.Information($"UserId: {userId} IsSudoer: {isSudoer}");
+            return  isSudoer;
+        }
+        
         public static async Task<bool> IsAdminOrPrivateChat(this TelegramProvider telegramProvider)
         {
             var isAdmin = await IsAdminGroup(telegramProvider);
