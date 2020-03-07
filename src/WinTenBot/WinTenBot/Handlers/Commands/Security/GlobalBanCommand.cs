@@ -32,7 +32,9 @@ namespace WinTenBot.Handlers.Commands.Security
                 {
                     case "sync":
                         await _telegramProvider.SendTextAsync("Memperbarui cache..");
-                        await _elasticSecurityService.UpdateCacheAsync();
+                        // await _elasticSecurityService.UpdateCacheAsync();
+                        await SyncHelper.SyncGBanToLocalAsync();
+
                         await _telegramProvider.EditAsync("Selesai memperbarui..");
 
                         break;
@@ -67,7 +69,9 @@ namespace WinTenBot.Handlers.Commands.Security
                                 Log.Information($"SaveBan: {save}");
 
                                 await _telegramProvider.EditAsync("Menulis ke Cache..");
-                                await _elasticSecurityService.UpdateCacheAsync();
+                                // await _elasticSecurityService.UpdateCacheAsync();
+                                await SyncHelper.SyncGBanToLocalAsync();
+                                
 
                                 await _telegramProvider.EditAsync("Misi berhasil.");
                             }
