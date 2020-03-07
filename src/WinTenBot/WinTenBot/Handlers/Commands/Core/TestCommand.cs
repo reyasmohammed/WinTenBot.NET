@@ -47,7 +47,7 @@ namespace WinTenBot.Handlers.Commands.Core
 
                 // await RssHelper.SyncRssHistoryToCloud();
                 // await BotHelper.ClearLog();
-                await SyncHelper.SyncGBanToLocal();
+                await SyncHelper.SyncGBanToLocalAsync();
 
                 await _telegramProvider.EditAsync("Selesai ngetest");
             }

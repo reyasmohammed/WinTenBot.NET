@@ -62,7 +62,7 @@ namespace WinTenBot.Helpers
             Log.Information($"RSS History migrated.");
         }
 
-        public static async Task SyncGBanToLocal(bool cleanSync = false)
+        public static async Task SyncGBanToLocalAsync(bool cleanSync = false)
         {
             Log.Information("Getting FBam data..");
             var cloudQuery = await new Query("fbans")
