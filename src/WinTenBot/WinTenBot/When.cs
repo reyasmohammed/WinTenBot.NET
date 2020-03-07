@@ -15,6 +15,13 @@ namespace WinTenBot
         
         public static bool NewMessage(IUpdateContext context) =>
             context.Update.Message != null;
+        
+        public static bool EditedMessage(IUpdateContext context) =>
+            context.Update.EditedMessage != null;
+
+        public static bool NewOrEditedMessage(IUpdateContext context) =>
+            context.Update.Message != null ||
+            context.Update.EditedMessage != null;
 
         public static bool NewTextMessage(IUpdateContext context) =>
             context.Update.Message?.Text != null;
@@ -23,7 +30,8 @@ namespace WinTenBot
             context.Update.Message?.Entities?.FirstOrDefault()?.Type == MessageEntityType.BotCommand;
 
         public static bool PingReceived(IUpdateContext context) =>
-            context.Update.Message.Text.ToLower() == "ping";
+            context.Update.Message?.Text.ToLower() == "ping" ||
+        context.Update.Message?.Text.ToLower() == "/ping";
         
         public static bool CallTagReceived(IUpdateContext context) =>
             context.Update.Message.Text.Contains('#');
