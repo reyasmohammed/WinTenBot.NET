@@ -107,7 +107,9 @@ namespace WinTenBot
                 .AddScoped<DelRssCommand>()
                 .AddScoped<RssInfoCommand>()
                 .AddScoped<RssPullCommand>()
-                .AddScoped<RssCtlCommand>();
+                .AddScoped<RssCtlCommand>()
+                .AddScoped<ExportRssCommand>()
+                .AddScoped<ImportRssCommand>();
 
             services.AddScoped<AdminCommand>()
                 .AddScoped<PinCommand>()
@@ -251,9 +253,12 @@ namespace WinTenBot
                                     .UseCommand<DelBanCommand>("dban")
                                     .UseCommand<DelRssCommand>("delrss")
                                     .UseCommand<DemoteCommand>("demote")
+                                    .UseCommand<ExportRssCommand>("exportrss")
+                                    .UseCommand<GlobalBanCommand>("fban")
                                     .UseCommand<GlobalBanCommand>("gban")
                                     .UseCommand<HelpCommand>("help")
                                     .UseCommand<IdCommand>("id")
+                                    .UseCommand<ImportRssCommand>("importrss")
                                     .UseCommand<InfoCommand>("info")
                                     .UseCommand<KickCommand>("kick")
                                     .UseCommand<MediaFilterCommand>("mfil")

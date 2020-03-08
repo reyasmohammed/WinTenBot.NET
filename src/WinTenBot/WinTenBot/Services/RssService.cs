@@ -124,5 +124,11 @@ namespace WinTenBot.Services
 
             return delete.ToBool();
         }
+
+        public async void DeleteDuplicateAsync()
+        {
+            var duplicate = rssSettingTable.MysqlDeleteDuplicateRowAsync("url_feed");
+            Log.Information($"Delete duplicate on {rssSettingTable} {duplicate}");
+        }
     }
 }
