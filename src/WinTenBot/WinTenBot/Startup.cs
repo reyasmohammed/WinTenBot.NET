@@ -146,8 +146,8 @@ namespace WinTenBot
             services.AddHangfireServer();
             services.AddHangfire(config =>
             {
-                config.UseStorage(HangfireProvider.GetMysqlStorage());
-                // config.UseStorage(HangfireProvider.GetSqliteStorage());
+                // config.UseStorage(HangfireProvider.GetMysqlStorage());
+                config.UseStorage(HangfireProvider.GetSqliteStorage());
                 // config.UseStorage(HangfireProvider.GetLiteDbStorage());
 
                 config.UseSimpleAssemblyNameTypeSerializer()
