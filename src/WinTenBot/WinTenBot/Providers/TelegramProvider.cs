@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -308,6 +308,27 @@ namespace WinTenBot.Providers
         }
 
         #endregion Message
+
+        public async Task<string> DownloadFileAsync(string fileName)
+        {
+            var fileId = Message.GetFileId();
+            if (fileId.IsNullOrEmpty()) fileId = Message.ReplyToMessage.GetFileId();
+            Log.Information($"Downloading file {fileId}");
+
+
+            var file = await Client.GetFileAsync(fileId);
+
+            Log.Information($"DownloadFile: {file.ToJson(true)}");
+
+            fileName = $"Storage/Cache/{fileName}".EnsureDirectory();
+            using (var fileStream = File.OpenWrite(fileName))
+            {
+                await Client.DownloadFileAsync(filePath: file.FilePath, destination: fileStream);
+                Log.Information($"File saved to {fileName}");
+            }
+
+            return fileName;
+        }
 
         #region Member Exec
 
