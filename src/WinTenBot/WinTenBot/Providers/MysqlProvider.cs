@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using Serilog;
 using SqlKata;
 using SqlKata.Compilers;
 using SqlKata.Execution;
+using WinTenBot.Helpers;
 using WinTenBot.Model;
 
 namespace WinTenBot.Providers
@@ -74,6 +75,22 @@ namespace WinTenBot.Providers
                 factory.Logger = sqlResult => { Log.Debug($"MySqlExec: {sqlResult}"); };
             }
             return factory.Select(sql, param);
+        }
+
+        public static int MysqlDeleteDuplicateRowAsync(this string tableName, string columnKey)
+        {
+            Log.Information($"Deleting duplicate rows on {tableName}");
+            
+            var sql = $@"DELETE t1 FROM {tableName} t1
+                            INNER JOIN {tableName} t2
+                            WHERE 
+                            t1.id < t2.id AND 
+                            t1.{columnKey} = t2.{columnKey};".StripLeadingWhitespace();
+
+            var exec = sql.ExecForMysqlNonQuery(sql);
+            Log.Information($"Deleted: {exec} rows.");
+
+            return exec;
         }
     }
 }
