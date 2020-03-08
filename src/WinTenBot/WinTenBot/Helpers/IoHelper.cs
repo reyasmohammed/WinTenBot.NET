@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Serilog;
@@ -27,8 +27,9 @@ namespace WinTenBot.Helpers
 
         public static string EnsureDirectory(this string dirPath)
         {
-            if (!dirPath.IsNullOrEmpty())
-                Directory.CreateDirectory(dirPath);
+            var path = Path.GetDirectoryName(dirPath);
+            if (!path.IsNullOrEmpty())
+                Directory.CreateDirectory(path);
 
             return dirPath;
         }
