@@ -41,19 +41,27 @@ namespace WinTenBot.Helpers
 
         public static bool CheckRestriction(this long chatId)
         {
-            var isRestricted = false;
-            var globalRestrict = IsRestricted();
-            var sudoers = Bot.GlobalConfiguration.GetSection("RestrictArea").Get<List<string>>();
-            var match = sudoers.FirstOrDefault(x => x == chatId.ToString());
-
-            Log.Information($@"Global Restriction: {globalRestrict}");
-            if (match == null && globalRestrict)
+            try
             {
-                isRestricted = true;
-            }
+                var isRestricted = false;
+                var globalRestrict = IsRestricted();
+                var sudoers = Bot.GlobalConfiguration.GetSection("RestrictArea").Get<List<string>>();
+                var match = sudoers.FirstOrDefault(x => x == chatId.ToString());
 
-            Log.Information($"ChatId: {chatId} IsRestricted: {isRestricted}");
-            return isRestricted;
+                Log.Information($@"Global Restriction: {globalRestrict}");
+                if (match == null && globalRestrict)
+                {
+                    isRestricted = true;
+                }
+
+                Log.Information($"ChatId: {chatId} IsRestricted: {isRestricted}");
+                return isRestricted;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error Chat Restriction.");
+                return false;
+            }
         }
 
         public static async Task<bool> EnsureChatRestrictionAsync(this TelegramProvider telegramProvider)
