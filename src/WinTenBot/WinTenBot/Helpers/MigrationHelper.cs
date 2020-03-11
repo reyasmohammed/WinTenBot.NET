@@ -43,6 +43,11 @@ namespace WinTenBot.Helpers
             }
         }
 
+        public static void MigrateAll(){
+            MigrateMysql();
+            MigrateSqlite();
+        }
+
         public static void RunMigration()
         {
             Parallel.Invoke(
