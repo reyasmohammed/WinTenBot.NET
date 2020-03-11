@@ -131,6 +131,8 @@ namespace WinTenBot
             services.AddScoped<SetWelcomeCommand>();
 
             services.AddScoped<SettingsCommand>()
+                .AddScoped<ResetSettingsCommand>();
+
             services.AddScoped<PingCommand>()
                 .AddScoped<DebugCommand>()
                 .AddScoped<StartCommand>()
