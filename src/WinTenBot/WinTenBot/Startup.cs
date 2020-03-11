@@ -44,7 +44,7 @@ namespace WinTenBot
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            
+
             Bot.GlobalConfiguration = Configuration;
             Bot.DbConnectionString = Configuration["CommonConfig:ConnectionString"];
 
@@ -67,11 +67,9 @@ namespace WinTenBot
                 .AddTransient<ZiziBot>()
                 .Configure<BotOptions<ZiziBot>>(Configuration.GetSection("ZiziBot"))
                 .Configure<CustomBotOptions<ZiziBot>>(Configuration.GetSection("ZiziBot"))
-
                 .AddTransient<MacOsBot>()
                 .Configure<BotOptions<MacOsBot>>(Configuration.GetSection("MacOsBot"))
                 .Configure<CustomBotOptions<MacOsBot>>(Configuration.GetSection("MacOsBot"))
-
                 .AddScoped<NewUpdateHandler>()
                 .AddScoped<GenericMessageHandler>()
                 .AddScoped<WebhookLogger>()
@@ -143,7 +141,7 @@ namespace WinTenBot
             services.AddScoped<OutCommand>();
 
             services.AddScoped<QrCommand>();
-            
+
 
             services.AddHangfireServer();
             services.AddHangfire(config =>
@@ -230,7 +228,6 @@ namespace WinTenBot
                     .Use<ExceptionHandler>()
                     // .Use<CustomUpdateLogger>()
                     .UseWhen<WebhookLogger>(When.Webhook)
-
                     .UseWhen<NewUpdateHandler>(When.NewUpdate)
 
                     //.UseWhen<UpdateMembersList>(When.MembersChanged)
@@ -244,7 +241,7 @@ namespace WinTenBot
                     //    )
                     .UseWhen<PinnedMessageEvent>(When.NewPinnedMessage)
                     .UseWhen<MediaReceivedHandler>(When.MediaReceived)
-                    .UseWhen(When.NewMessage, msgBranch => msgBranch
+                    .UseWhen(When.NewOrEditedMessage, msgBranch => msgBranch
                         .UseWhen(When.NewTextMessage, txtBranch => txtBranch
                                 .UseWhen<PingHandler>(When.PingReceived)
                                 .UseWhen(When.NewCommand, cmdBranch => cmdBranch
@@ -292,12 +289,11 @@ namespace WinTenBot
                                 )
                                 .Use<GenericMessageHandler>()
 
-                        //.Use<NLP>()
+                            //.Use<NLP>()
                         )
                         // .UseWhen<StickerHandler>(When.StickerMessage)
                         .UseWhen<WeatherReporter>(When.LocationMessage)
                     )
-
                     .UseWhen<CallbackQueryHandler>(When.CallbackQuery)
 
                 //.Use<UnhandledUpdateReporter>()
