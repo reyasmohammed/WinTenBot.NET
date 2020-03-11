@@ -8,6 +8,7 @@ using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
+using WinTenBot.Enums;
 using WinTenBot.Helpers;
 using WinTenBot.Model;
 using WinTenBot.Providers;
@@ -113,7 +114,7 @@ namespace WinTenBot.Handlers.Events
                 {
                     await _telegramProvider.SendMediaAsync(
                         chatSettings.WelcomeMedia,
-                        chatSettings.WelcomeMediaType,
+                        MediaType.Document,
                         sendText,
                         keyboard);
                 }

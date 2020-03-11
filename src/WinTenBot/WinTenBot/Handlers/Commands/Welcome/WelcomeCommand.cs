@@ -1,9 +1,10 @@
-﻿using System.Linq;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
+using WinTenBot.Enums;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
 using WinTenBot.Services;
@@ -34,11 +35,17 @@ namespace WinTenBot.Handlers.Commands.Welcome
                 var welcomeButton = settings.WelcomeButton;
                 var welcomeMedia = settings.WelcomeMedia;
                 var welcomeMediaType = settings.WelcomeMediaType;
-                var splitWelcomeButton = welcomeButton.Split(',').ToList<string>();
+                // var splitWelcomeButton = welcomeButton.Split(',').ToList<string>();
 
-                var keyboard = welcomeButton.ToReplyMarkup(2);
+                // var keyboard = welcomeButton.ToReplyMarkup(2);
+                InlineKeyboardMarkup keyboard = null;
+                if (!welcomeButton.IsNullOrEmpty())
+                {
+                    keyboard = welcomeButton.ToReplyMarkup(2);
+                }
+                
                 sendText = $"👥 <b>{chatTitle}</b>\n";
-                if (welcomeMessage == "")
+                if (welcomeMessage.IsNullOrEmpty())
                 {
                     sendText += "Tidak ada konfigurasi pesan welcome, pesan default akan di terapkan";
                 }
@@ -47,15 +54,10 @@ namespace WinTenBot.Handlers.Commands.Welcome
                     sendText += welcomeMessage;
                 }
 
-//                if (args[0] == "anu")
-//                {
-//                    sendText += " anu";
-//                }
-
 //                sendText += " " + string.Join(", ",args);
-                if (welcomeMediaType != "")
+                if (!welcomeMediaType.IsNullOrEmpty())
                 {
-                    await _telegramProvider.SendMediaAsync(welcomeMedia, welcomeMediaType, welcomeMessage, keyboard);
+                    await _telegramProvider.SendMediaAsync(welcomeMedia, MediaType.Document, welcomeMessage, keyboard);
                 }
                 else
                 {
