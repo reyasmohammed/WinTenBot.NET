@@ -270,7 +270,7 @@ namespace WinTenBot
                                     .UseCommand<NotesCommand>("filters")
                                     .UseCommand<OutCommand>("out")
                                     .UseCommand<PinCommand>("pin")
-                                    .UseCommand<PingCommand>("ping")
+                                    // .UseCommand<PingCommand>("ping")
                                     .UseCommand<PromoteCommand>("promote")
                                     .UseCommand<QrCommand>("qr")
                                     .UseCommand<ReportCommand>("report")
