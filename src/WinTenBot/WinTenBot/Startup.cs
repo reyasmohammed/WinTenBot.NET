@@ -132,6 +132,7 @@ namespace WinTenBot
             services.AddScoped<WelcomeCommand>();
             services.AddScoped<SetWelcomeCommand>();
 
+            services.AddScoped<SettingsCommand>()
             services.AddScoped<PingCommand>()
                 .AddScoped<DebugCommand>()
                 .AddScoped<StartCommand>()
@@ -278,6 +279,7 @@ namespace WinTenBot
                                     .UseCommand<RssPullCommand>("rsspull")
                                     .UseCommand<RulesCommand>("rules")
                                     .UseCommand<SetRssCommand>("setrss")
+                                    .UseCommand<SettingsCommand>("settings")
                                     .UseCommand<SetWelcomeCommand>("setwelcome")
                                     .UseCommand<StartCommand>("start")
                                     .UseCommand<TagCommand>("tag")

@@ -1,4 +1,4 @@
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Framework.Abstractions;
@@ -56,6 +56,11 @@ namespace WinTenBot.Handlers
                     break;
 
                 case "verification":
+                    break;
+
+                case "setting":
+                    var settingsCallback = new SettingsCallback(_telegramProvider);
+                    Log.Information($"SettingsCallback: {settingsCallback.ToJson(true)}");
                     break;
             }
 
