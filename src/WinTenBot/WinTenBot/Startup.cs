@@ -27,6 +27,7 @@ using WinTenBot.Handlers.Commands.Security;
 using WinTenBot.Handlers.Commands.Tags;
 using WinTenBot.Handlers.Commands.Welcome;
 using WinTenBot.Handlers.Events;
+using WinTenBot.Helpers;
 using WinTenBot.Interfaces;
 using WinTenBot.Model;
 using WinTenBot.Options;
@@ -216,6 +217,8 @@ namespace WinTenBot
             app.UseSerilogRequestLogging();
 
             BotScheduler.StartScheduler();
+
+            MigrationHelper.MigrateAll();
 
             Log.Information("App is ready.");
         }
