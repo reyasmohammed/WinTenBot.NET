@@ -15,11 +15,12 @@ namespace WinTenBot.Services
     public class SettingsService
     {
         private string baseTable = "group_settings";
-        private Message Message { get; set; }
+        public Message Message { get; set; }
+        
+        public SettingsService(){}
 
         public SettingsService(Message message)
         {
-            // Chat = chat;
             Message = message;
         }
 
@@ -63,14 +64,20 @@ namespace WinTenBot.Services
 
             var selectColumns = new[]
             {
-                "id", "enable_word_filter_per_group", "enable_word_filter_group_wide","enable_warn_username",
-                "enable_welcome_message","enable_welcome_message","enable_badword_filter","enable_anti_malfiles"
+                "id", 
+                "enable_word_filter_per_group", 
+                "enable_word_filter_group_wide",
+                "enable_warn_username", 
+                "enable_welcome_message",
+                "enable_anti_malfiles",
+                "enable_human_verification",
+                "enable_reply_notification"
             };
 
             var data = await new Query(baseTable)
                 .Select(selectColumns)
                 .Where(where)
-                .ExecForMysql()
+                .ExecForMysql(true)
                 .GetAsync();
 
             // Log.Debug($"PreTranspose: {data.ToJson()}");
@@ -92,18 +99,31 @@ namespace WinTenBot.Services
             {
                 var textOrig = row["id"].ToString();
                 var value = row[rowId].ToString();
+                
+                Log.Debug($"Orig: {textOrig}, Value: {value}");
 
                 var boolVal = value.ToBool();
 
                 var forCallbackData = textOrig;
-                var btnText = textOrig
-                    .Replace("enable_", "")
-                    .Replace("_"," ");
-                
-                if (boolVal)
+                var forCaptionText = textOrig;
+
+                if (!boolVal)
                 {
                     forCallbackData = textOrig.Replace("enable", "disable");
                 }
+                
+                if (boolVal)
+                {
+                    forCaptionText = textOrig.Replace("enable", "✅");
+                }
+                else
+                {
+                    forCaptionText = textOrig.Replace("enable", "🚫");
+                }
+
+                var btnText = forCaptionText
+                    .Replace("enable_", "")
+                    .Replace("_"," ");
 
                 // listBtn.Add(new CallBackButton()
                 // {
@@ -130,7 +150,7 @@ namespace WinTenBot.Services
 
             // MatrixHelper.TransposeMatrix<List<ChatSetting>(mapped);
             Log.Debug($"ListBtn: {listBtn.ToJson()}");
-            listBtn.ToJson(true).ToFile("settings_listbtn.json");
+            // listBtn.ToJson(true).ToFile("settings_listbtn.json");
 
             return listBtn;
         }
@@ -152,7 +172,7 @@ namespace WinTenBot.Services
                 Log.Information($"Inserting new data for {Message.Chat}");
 
                 insert = await new Query(baseTable)
-                    .ExecForMysql()
+                    .ExecForMysql(true)
                     .InsertAsync(data);
             }
             else
@@ -161,7 +181,7 @@ namespace WinTenBot.Services
 
                 insert = await new Query(baseTable)
                     .Where(where)
-                    .ExecForMysql()
+                    .ExecForMysql(true)
                     .UpdateAsync(data);
             }
 
