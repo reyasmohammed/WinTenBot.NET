@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Framework.Abstractions;
+using WinTenBot.Enums;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
 using WinTenBot.Services;
@@ -60,7 +61,7 @@ namespace WinTenBot.Handlers.Commands.Rss
             await listRssStr.WriteTextAsync(filePath);
 
             var fileSend = IoHelper.BaseDirectory + $"/{filePath}";
-            await _telegramProvider.SendMediaAsync(fileSend, "local-document", sendText);
+            await _telegramProvider.SendMediaAsync(fileSend, MediaType.LocalDocument, sendText);
 
             fileSend.DeleteFile();
         }
