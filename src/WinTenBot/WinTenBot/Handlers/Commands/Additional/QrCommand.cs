@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
+using WinTenBot.Enums;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
 
@@ -47,7 +48,7 @@ namespace WinTenBot.Handlers.Commands.Additional
             var fileName = $"{msg.Chat.Id}_{msg.MessageId}.jpg";
 
             // urlQr.SaveUrlTo(fileName);
-            await _telegramProvider.SendMediaAsync(urlQr, "photo", replyMarkup: keyboard);
+            await _telegramProvider.SendMediaAsync(urlQr, MediaType.Photo, replyMarkup: keyboard);
         }
     }
 }
