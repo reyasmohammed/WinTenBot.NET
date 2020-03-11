@@ -49,45 +49,6 @@ namespace WinTenBot.Providers
         private string TimeInit { get; set; }
         private string TimeProc { get; set; }
 
-        public async Task<bool> IsAdminGroup()
-        {
-            var chatId = Message.Chat.Id;
-            var userId = Message.From.Id;
-            var isAdmin = false;
-
-            if (!IsPrivateChat())
-            {
-                var admins = await Client.GetChatAdministratorsAsync(chatId);
-                foreach (var admin in admins)
-                {
-                    if (userId == admin.User.Id)
-                    {
-                        isAdmin = true;
-                    }
-                }
-            }
-
-            return isAdmin;
-        }
-
-        public async Task<bool> IsAdminOrPrivateChat()
-        {
-            var isAdmin = await IsAdminGroup();
-            var isPrivateChat = IsPrivateChat();
-
-            return isAdmin || isPrivateChat;
-        }
-
-        public bool IsSudoer()
-        {
-            return Message.From.Id.IsSudoer();
-        }
-
-        public bool IsPrivateChat()
-        {
-            return MessageOrEdited.Chat.Type == ChatType.Private;
-        }
-
         public async Task<string> GetMentionAdminsStr()
         {
             var admins = await Client.GetChatAdministratorsAsync(Message.Chat.Id);
