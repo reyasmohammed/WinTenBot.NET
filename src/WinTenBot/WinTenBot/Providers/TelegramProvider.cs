@@ -10,6 +10,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
+using WinTenBot.Enums;
 using WinTenBot.Helpers;
 using WinTenBot.Model;
 using File = System.IO.File;
@@ -149,18 +150,18 @@ namespace WinTenBot.Providers
             if (send != null) SentMessageId = send.MessageId;
         }
 
-        public async Task SendMediaAsync(string fileId, string mediaType, string caption = "",
+        public async Task SendMediaAsync(string fileId, MediaType mediaType, string caption = "",
             IReplyMarkup replyMarkup = null, int replyToMsgId = -1)
         {
             Log.Information($"Sending media: {mediaType}, fileId: {fileId} to {Message.Chat.Id}");
-            switch (mediaType.ToLower())
+            switch (mediaType)
             {
-                case "document":
+                case MediaType.Document:
                     await Client.SendDocumentAsync(Message.Chat.Id, fileId, caption, ParseMode.Html,
                         replyMarkup: replyMarkup, replyToMessageId: replyToMsgId);
                     break;
 
-                case "local-document":
+                case MediaType.LocalDocument:
                     var fileName = Path.GetFileName(fileId);
                     await using (var fs = File.OpenRead(fileId))
                     {
@@ -171,7 +172,7 @@ namespace WinTenBot.Providers
 
                     break;
 
-                case "photo":
+                case MediaType.Photo:
                     await Client.SendPhotoAsync(Message.Chat.Id, fileId, caption, ParseMode.Html,
                         replyMarkup: replyMarkup, replyToMessageId: replyToMsgId);
                     break;
