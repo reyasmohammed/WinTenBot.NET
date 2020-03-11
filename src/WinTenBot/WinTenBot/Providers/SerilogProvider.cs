@@ -17,7 +17,7 @@ namespace WinTenBot.Providers
             var rollingInterval = RollingInterval.Day;
             // var logglyToken = Bot.GlobalConfiguration["CommonConfig:LogglyToken"];
             var logglyTags = "serilog,wintenbot";
-            var logglyBuffer = "Storage/Cache/Loggly";
+            var logglyBuffer = "Storage/Caches/Loggly";
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
