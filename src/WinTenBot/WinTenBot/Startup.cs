@@ -47,6 +47,7 @@ namespace WinTenBot
 
             Bot.GlobalConfiguration = Configuration;
             Bot.DbConnectionString = Configuration["CommonConfig:ConnectionString"];
+            SerilogProvider.LogglyToken = Configuration["CommonConfig:LogglyToken"];
 
             Log.Information($"ProductName: {Configuration["Engines:ProductName"]}");
             Log.Information($"Version: {Configuration["Engines:Version"]}");

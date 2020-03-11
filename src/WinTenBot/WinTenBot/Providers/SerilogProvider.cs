@@ -7,19 +7,25 @@ namespace WinTenBot.Providers
 {
     public static class SerilogProvider
     {
+        public static string LogglyToken { get; set; }
+        
         public static void InitializeSerilog()
         {
-            var outputConsoleTemplate = "[{Timestamp:HH:mm:ss.ffff} {Level:u3}] {Message:lj}{NewLine}{Exception}";
-            var logPath = "Storage/Logs/Logs-.log";
+            const string outputTemplate = "[{Timestamp:HH:mm:ss.ffff} {Level:u3}] {Message:lj}{NewLine}{Exception}";
+            var logPath = "Storage/Logs/ZiziBot-Logs-.log";
             var flushInterval = TimeSpan.FromSeconds(1);
             var rollingInterval = RollingInterval.Day;
+            // var logglyToken = Bot.GlobalConfiguration["CommonConfig:LogglyToken"];
+            var logglyTags = "serilog,wintenbot";
+            var logglyBuffer = "Storage/Cache/Loggly";
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .MinimumLevel.Override("Microsoft",LogEventLevel.Debug)
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Debug)
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Debug)
                 .Enrich.FromLogContext()
-                .WriteTo.Console(theme: SystemConsoleTheme.Colored, outputTemplate: outputConsoleTemplate)
+                .WriteTo.Loggly(customerToken: LogglyToken, tags: logglyTags, bufferBaseFilename: logglyBuffer)
+                .WriteTo.Console(theme: SystemConsoleTheme.Colored, outputTemplate: outputTemplate)
                 .WriteTo.File(logPath, rollingInterval: rollingInterval, flushToDiskInterval: flushInterval)
                 .CreateLogger();
         }
