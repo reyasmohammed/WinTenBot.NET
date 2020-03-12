@@ -118,9 +118,9 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="WelcomeNoSettings" xml:space="preserve">
-    <value>Tidak ada konfigurasi pesan welcome, pesan default akan di terapkan</value>
+    <value>Tidak ada konfigurasi pesan welcome, pesan default akan diterapkan.</value>
   </data>
   <data name="WelcomeOnlyGroup" xml:space="preserve">
-    <value>Perintah /welcome hanya untuk grup saja</value>
+    <value>Perintah /welcome hanya untuk grup saja.</value>
   </data>
 </root>
