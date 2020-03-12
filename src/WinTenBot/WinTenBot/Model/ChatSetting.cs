@@ -34,5 +34,8 @@ namespace WinTenBot.Model
         
         [JsonProperty("enable_word_filter_group_wide")]
         public bool? EnableWordFilterGroupWide { get; set; }
+        
+        [JsonProperty("enable_warn_username")]
+        public bool EnableWarnUsername { get; set; }
     }
 }

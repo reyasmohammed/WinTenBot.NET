@@ -84,10 +84,19 @@ namespace WinTenBot.Helpers
         public static async Task CheckUsernameAsync(this TelegramProvider telegramProvider)
         {
             Log.Information("Starting check Username");
-
+            
+            var warnLimit = 4;
             var message = telegramProvider.MessageOrEdited;
             var fromUser = message.From;
-            var warnLimit = 4;
+            
+            var settingService = new SettingsService(message);
+            var chatSettings = await settingService.GetSettingByGroup();
+            if (!chatSettings.EnableWarnUsername)
+            {
+                Log.Information("Warn Username is disabled in this Group!");
+                return;
+            }
+            
             var noUsername = fromUser.IsNoUsername();
             Log.Information($"{fromUser} IsNoUsername: {noUsername}");
 
