@@ -95,6 +95,9 @@ namespace WinTenBot.Helpers
             {
                 var updateResult = await UpdateWarnUsernameStat(message);
                 var updatedStep = updateResult.StepCount;
+                var lastMessageId = updateResult.LastWarnMessageId;
+
+                await telegramProvider.DeleteAsync(lastMessageId);
 
                 var sendText = $"{fromUser} belum memasang username." +
                                $"\nPeringatan ke {updatedStep} dari {warnLimit}";
@@ -103,7 +106,8 @@ namespace WinTenBot.Helpers
 
                 if (updatedStep > warnLimit)
                 {
-                    var sendWarn = $"Batas peringatan telah di lampaui, {fromUser} di tendang sekarang!";
+                    var sendWarn = $"Batas peringatan telah di lampaui." +
+                                   $"\n{fromUser} di tendang sekarang!";
                     await telegramProvider.SendTextAsync(sendWarn);
                     
                     await telegramProvider.KickMemberAsync(fromUser);
@@ -118,6 +122,7 @@ namespace WinTenBot.Helpers
                 );
 
                 await telegramProvider.SendTextAsync(sendText, keyboard);
+                await message.UpdateLastWarnMessageIdAsync(telegramProvider.SentMessageId);
             }
         }
 
@@ -299,6 +304,27 @@ namespace WinTenBot.Helpers
                 .UpdateAsync(update);
 
             Log.Information($"Update step: {insertHit}");
+        }
+
+        public static async Task UpdateLastWarnMessageIdAsync(this Message message, long messageId)
+        {
+            Log.Information("Updating last Warn MessageId.");
+            
+            var tableName = "warn_username_history";
+            var fromId = message.From.Id;
+
+            var update = new Dictionary<string, object>
+            {
+                {"last_warn_message_id", messageId}, 
+                {"updated_at", DateTime.UtcNow}
+            };
+
+            var insertHit = await new Query(tableName)
+                .Where("from_id", fromId)
+                .ExecForSqLite()
+                .UpdateAsync(update);
+
+            Log.Information($"Update lastWarn: {insertHit}");
         }
     }
 }

@@ -16,6 +16,9 @@ namespace WinTenBot.Model
         [JsonProperty("step_count")]
         public long StepCount { get; set; }
 
+        [JsonProperty("last_warn_message_id")] 
+        public int LastWarnMessageId { get; set; }
+
         [JsonProperty("chat_id")]
         public long ChatId { get; set; }
 
