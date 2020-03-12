@@ -87,6 +87,7 @@ namespace WinTenBot.Helpers
 
             var message = telegramProvider.MessageOrEdited;
             var fromUser = message.From;
+            var warnLimit = 4;
             var noUsername = fromUser.IsNoUsername();
             Log.Information($"{fromUser} IsNoUsername: {noUsername}");
 
@@ -96,7 +97,21 @@ namespace WinTenBot.Helpers
                 var updatedStep = updateResult.StepCount;
 
                 var sendText = $"{fromUser} belum memasang username." +
-                               $"\nPeringatan {updatedStep}/1000";
+                               $"\nPeringatan ke {updatedStep} dari {warnLimit}";
+
+                if (updatedStep == warnLimit) sendText += "\nIni peringatan terakhir!";
+
+                if (updatedStep > warnLimit)
+                {
+                    var sendWarn = $"Batas peringatan telah di lampaui, {fromUser} di tendang sekarang!";
+                    await telegramProvider.SendTextAsync(sendWarn);
+                    
+                    await telegramProvider.KickMemberAsync(fromUser);
+                    await telegramProvider.UnbanMemberAsync(fromUser);
+                    await ResetWarnUsernameStatAsync(message);
+                    
+                    return;
+                }
 
                 var keyboard = new InlineKeyboardMarkup(
                     InlineKeyboardButton.WithUrl("Cara Pasang Username", "https://t.me/WinTenDev/29")
@@ -211,8 +226,11 @@ namespace WinTenBot.Helpers
 
             var data = new Dictionary<string, object>
             {
-                {"from_id", message.From.Id}, {"first_name", message.From.FirstName},
-                {"last_name", message.From.LastName}, {"step_count", 1}, {"chat_id", message.Chat.Id},
+                {"from_id", message.From.Id},
+                {"first_name", message.From.FirstName},
+                {"last_name", message.From.LastName}, 
+                {"step_count", 1}, 
+                {"chat_id", message.Chat.Id},
                 {"created_at", DateTime.UtcNow}
             };
 
@@ -261,6 +279,26 @@ namespace WinTenBot.Helpers
                 .GetAsync();
 
             return updatedHistory.ToJson().MapObject<List<WarnUsernameHistory>>().First();
+        }
+
+        public static async Task ResetWarnUsernameStatAsync(Message message)
+        {
+            Log.Information("Resetting warn Username step.");
+            
+            var tableName = "warn_username_history";
+            var fromId = message.From.Id;
+
+            var update = new Dictionary<string, object>
+            {
+                {"step_count", 0}, {"updated_at", DateTime.UtcNow}
+            };
+
+            var insertHit = await new Query(tableName)
+                .Where("from_id", fromId)
+                .ExecForSqLite()
+                .UpdateAsync(update);
+
+            Log.Information($"Update step: {insertHit}");
         }
     }
 }

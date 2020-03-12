@@ -35,12 +35,12 @@ namespace WinTenBot.Handlers.Commands.Security
                 if (paramOption == "-g" && isSudoer)
                 {
                     isGlobalBlock = true;
-                    await _telegramProvider.SendTextAsync("Kata ini akan di blokir dengan mode Group-wide!");
+                    await _telegramProvider.AppendTextAsync("Kata ini akan di blokir dengan mode Group-wide!");
                 }
 
                 if (!isSudoer)
                 {
-                    await _telegramProvider.SendTextAsync("Hanya Sudoer yang dapat memblokir Kata mode Group-wide!");
+                    await _telegramProvider.AppendTextAsync("Hanya Sudoer yang dapat memblokir Kata mode Group-wide!");
                 }
 
                 if (paramOption != "-g")
@@ -50,22 +50,26 @@ namespace WinTenBot.Handlers.Commands.Security
 
                 if (word != "")
                 {
+                    await _telegramProvider.AppendTextAsync("Sedang menambahkan kata");
+                    
                     var isExist = await _wordFilterService.IsExistAsync(where);
                     if (!isExist)
                     {
                         var save = await _wordFilterService.SaveWordAsync(word, isGlobalBlock);
 
-                        await _telegramProvider.SendTextAsync(save.ToJson());
+                        await _telegramProvider.AppendTextAsync("Kata berhasil di tambahkan");
                     }
                     else
                     {
-                        await _telegramProvider.SendTextAsync("Sudah");
+                        await _telegramProvider.AppendTextAsync("Kata sudah di tambahkan");
                     }
                 }
                 else
                 {
                     await _telegramProvider.SendTextAsync("Apa kata?");
                 }
+
+                await _telegramProvider.DeleteAsync(delay: 3000);
             }
         }
     }

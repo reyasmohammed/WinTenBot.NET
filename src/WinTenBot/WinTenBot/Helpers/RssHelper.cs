@@ -144,16 +144,20 @@ namespace WinTenBot.Helpers
 
                 var rssHistory = await rssService.GetRssHistory(whereHistory);
                 var lastRssHistory = rssHistory.LastOrDefault();
-                var lastArticleDate = DateTime.Parse(lastRssHistory.PublishDate);
-                var currentArticleDate = rssFeed.PublishingDate.Value;
 
-                Log.Information($"LastArticleDate: {lastArticleDate}");
-                Log.Information($"CurrentArticleDate: {currentArticleDate}");
-
-                if (currentArticleDate < lastArticleDate)
+                if (rssHistory.Any())
                 {
-                    Log.Information($"Current article is older than last article. Stopped.");
-                    break;
+                    var lastArticleDate = DateTime.Parse(lastRssHistory.PublishDate);
+                    var currentArticleDate = rssFeed.PublishingDate.Value;
+                    
+                    if (currentArticleDate < lastArticleDate)
+                    {
+                        Log.Information($"Current article is older than last article. Stopped.");
+                        break;
+                    }
+                    
+                    Log.Information($"LastArticleDate: {lastArticleDate}");
+                    Log.Information($"CurrentArticleDate: {currentArticleDate}");
                 }
 
                 Log.Information("Prepare sending article.");
