@@ -19,7 +19,7 @@ namespace WinTenBot.Handlers.Events
             _elasticSecurityService = new ElasticSecurityService(msg);
             _telegramProvider = new TelegramProvider(context);
             var leftMember = msg.LeftChatMember;
-            var isBan = await _elasticSecurityService.IsExistInCache(leftMember.Id);
+            var isBan = await _elasticSecurityService.IsExist(leftMember.Id);
 
             if (!isBan)
             {
