@@ -36,8 +36,10 @@ namespace WinTenBot.Services
                 .ExecForMysql(true)
                 .Where(where)
                 .GetAsync();
-
-            return query.Any();
+            var isBan = query.Any();
+            Log.Information($"{userId} IsBan: {isBan}");
+            
+            return isBan;
         }
 
         public async Task<bool> IsExistInCache(int userId)

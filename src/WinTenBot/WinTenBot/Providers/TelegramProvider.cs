@@ -176,6 +176,10 @@ namespace WinTenBot.Providers
                     await Client.SendPhotoAsync(Message.Chat.Id, fileId, caption, ParseMode.Html,
                         replyMarkup: replyMarkup, replyToMessageId: replyToMsgId);
                     break;
+                
+                case MediaType.Video:
+                    await Client.SendVideoAsync(Message.Chat.Id, fileId, caption: caption, parseMode: ParseMode.Html);
+                    break;
 
                 default:
                     Log.Information($"Media unknown: {mediaType}");

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using WinTenBot.Enums;
 
 namespace WinTenBot.Model
 {
@@ -20,7 +21,7 @@ namespace WinTenBot.Model
         public string WelcomeMedia { get; set; }
         
         [JsonProperty("welcome_media_type")]
-        public string WelcomeMediaType { get; set; }
+        public MediaType WelcomeMediaType { get; set; }
         
         [JsonProperty("rules_text")]
         public string RulesText { get; set; }

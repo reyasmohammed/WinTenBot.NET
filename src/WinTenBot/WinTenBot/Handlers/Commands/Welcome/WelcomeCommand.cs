@@ -47,7 +47,13 @@ namespace WinTenBot.Handlers.Commands.Welcome
                 sendText = $"👥 <b>{chatTitle}</b>\n";
                 if (welcomeMessage.IsNullOrEmpty())
                 {
-                    sendText += "Tidak ada konfigurasi pesan welcome, pesan default akan di terapkan";
+                    var defaultWelcome = "Hai {allNewMember}" +
+                                         "\nSelamat datang di kontrakan {chatTitle}" +
+                                         "\nKamu adalah anggota ke-{memberCount}";
+                    sendText += "Tidak ada konfigurasi pesan welcome, pesan default akan di terapkan" +
+                                $"\n\n<code>{defaultWelcome}</code>" +
+                                $"\n\nUntuk bantuan silakan ketik /help" +
+                                $"\nBantuan pesan Welcome ke Bantuan > Grup > Welcome";
                 }
                 else
                 {
@@ -55,9 +61,9 @@ namespace WinTenBot.Handlers.Commands.Welcome
                 }
 
 //                sendText += " " + string.Join(", ",args);
-                if (!welcomeMediaType.IsNullOrEmpty())
+                if (!welcomeMediaType.ToString().IsNullOrEmpty())
                 {
-                    await _telegramProvider.SendMediaAsync(welcomeMedia, MediaType.Document, welcomeMessage, keyboard);
+                    await _telegramProvider.SendMediaAsync(welcomeMedia, MediaType.Document, sendText, keyboard);
                 }
                 else
                 {

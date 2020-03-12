@@ -59,8 +59,11 @@ namespace WinTenBot.Providers
                 .Where("user_id",userId)
                 .ExecForSqLite(true)
                 .GetAsync();
-
-            return query.Any();
+            
+            var isGBan = query.Any();
+            Log.Information($"UserId {userId} isGBan : {isGBan}");
+            
+            return isGBan;
         }
         
         public static async Task<bool> IsCasBanAsync(this User user)

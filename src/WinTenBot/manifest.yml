@@ -1,0 +1,9 @@
+﻿applications:
+  - name: zizibeta
+    random-route: false
+    no-route: true
+    host: zizibeta.us-south.cf.appdomain.cloud
+    memory: 256M
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true

@@ -41,9 +41,13 @@ namespace WinTenBot.Handlers.Commands.Welcome
                     var repMsg = msg.ReplyToMessage;
                     if (repMsg.GetFileId() != "")
                     {
-                        var mediaType = repMsg.Type.ToString().ToLower();
+                        var mediaFileId = repMsg.GetFileId();
+                        var mediaType = repMsg.Type;
+                        
                         await _telegramProvider.SendTextAsync("Sedang menyimpan Welcome Media..");
-                        await _settingsService.UpdateCell("welcome_media", repMsg.GetFileId());
+                        Log.Information($"MediaId: {mediaFileId}");
+
+                        await _settingsService.UpdateCell("welcome_media", mediaFileId);
                         await _settingsService.UpdateCell("welcome_media_type", mediaType);
                         Log.Information("Save media success..");
 

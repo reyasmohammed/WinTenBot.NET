@@ -28,7 +28,7 @@
     `warning_username_limit`           INT(20)          NULL     DEFAULT '7',
     `welcome_message`                  TEXT(65535)      NULL,
     `welcome_button`                   TEXT(65535)      NULL,
-    `welcome_media`                    VARCHAR(100)     NULL,
+    `welcome_media`                    VARCHAR(128)     NULL,
     `welcome_media_type`               VARCHAR(20)      NULL,
     `members_count`                    INT(11)          NULL     DEFAULT -1,
     `created_at`                       TIMESTAMP(0)     NULL     DEFAULT CURRENT_TIMESTAMP,
