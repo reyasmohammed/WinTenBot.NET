@@ -55,7 +55,7 @@ namespace WinTenBot.Handlers.Commands.Welcome
                 }
 
 //                sendText += " " + string.Join(", ",args);
-                if (!welcomeMediaType.IsNullOrEmpty())
+                if (!welcomeMediaType.ToString().IsNullOrEmpty())
                 {
                     await _telegramProvider.SendMediaAsync(welcomeMedia, MediaType.Document, welcomeMessage, keyboard);
                 }

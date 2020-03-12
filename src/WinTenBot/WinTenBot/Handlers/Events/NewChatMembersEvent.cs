@@ -110,11 +110,12 @@ namespace WinTenBot.Handlers.Events
                     keyboard = chatSettings.WelcomeButton.ToReplyMarkup(2);
                 }
 
-                if (!chatSettings.WelcomeMediaType.IsNullOrEmpty())
+                if (!chatSettings.WelcomeMediaType.ToString().IsNullOrEmpty())
                 {
+                    var mediaType = (MediaType) chatSettings.WelcomeMediaType;
                     await _telegramProvider.SendMediaAsync(
                         chatSettings.WelcomeMedia,
-                        MediaType.Document,
+                        mediaType,
                         sendText,
                         keyboard);
                 }
