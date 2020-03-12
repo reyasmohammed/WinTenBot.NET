@@ -4,34 +4,28 @@ using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 using WinTenBot.Providers;
-using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Events
 {
     public class LeftChatMemberEvent : IUpdateHandler
     {
-        private ElasticSecurityService _elasticSecurityService;
         private TelegramProvider _telegramProvider;
 
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
             Message msg = context.Update.Message;
-            _elasticSecurityService = new ElasticSecurityService(msg);
             _telegramProvider = new TelegramProvider(context);
             var leftMember = msg.LeftChatMember;
-            var isBan = await _elasticSecurityService.IsExist(leftMember.Id);
+            var leftUserId = leftMember.Id;
+            var isBan = await leftUserId.CheckGBan();
 
             if (!isBan)
             {
                 Log.Information("Left Chat Members...");
 
                 var chatTitle = msg.Chat.Title;
-
-                var newMembers = msg.LeftChatMember;
-                var leftFullName = newMembers.FirstName;
-
-
-                // var fromName = msg.From.FirstName;
+                var leftChatMember = msg.LeftChatMember;
+                var leftFullName = leftChatMember.FirstName;
 
                 var sendText = $"Sampai jumpa lagi {leftFullName} " +
                                $"\nKami di <b>{chatTitle}</b> menunggumu kembali.. :(";
