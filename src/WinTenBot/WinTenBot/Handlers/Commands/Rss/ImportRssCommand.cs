@@ -54,7 +54,7 @@ namespace WinTenBot.Handlers.Commands.Rss
             }
 
             await _telegramProvider.AppendTextAsync($"Memeriksa RSS duplikat");
-            _rssService.DeleteDuplicateAsync();
+            await _rssService.DeleteDuplicateAsync();
 
             await _telegramProvider.AppendTextAsync($"{rssLists.Length} RSS berhasil di import");
         }
