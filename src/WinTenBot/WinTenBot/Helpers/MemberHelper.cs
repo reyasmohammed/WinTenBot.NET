@@ -28,113 +28,6 @@ namespace WinTenBot.Helpers
             return $"<a href='tg://user?id={message.From.Id}'>{(firstName + " " + lastName).Trim()}</a>";
         }
 
-        public static async Task<bool> IsAdminGroup(this TelegramProvider telegramProvider, Message message)
-        {
-            var chatId = message.Chat.Id;
-            var userId = message.From.Id;
-            var isAdmin = false;
-            var client = telegramProvider.Client;
-
-            var admins = await client.GetChatAdministratorsAsync(chatId);
-            foreach (var admin in admins)
-                if (userId == admin.User.Id)
-                    isAdmin = true;
-
-            return isAdmin;
-        }
-
-        // public static async Task<bool> IsBanInCache(this User user)
-        // {
-        //     var filtered = new DataTable(null);
-        //     var data = await "fban_user.json".ReadCacheAsync();
-        //     var userId = user.Id;
-        //
-        //     ConsoleHelper.WriteLine($"Checking {user} in Global Ban Cache");
-        //     var search = data.AsEnumerable()
-        //         .Where(row => row.Field<string>("user_id") == userId.ToString());
-        //     if (search.Any())
-        //     {
-        //         filtered = search.CopyToDataTable();
-        //     }
-        //
-        //     ConsoleHelper.WriteLine($"Caches found: {filtered.ToJson()}");
-        //     return filtered.Rows.Count > 0;
-        // }
-
-        // public static async Task<bool> IsGBan(this User user)
-        // {
-        //     var query = await new Query("fban_user")
-        //         .Where("user_id",user.Id)
-        //         .ExecForSqLite(true)
-        //         .GetAsync();
-        //
-        //     return query.Any();
-        // }
-
-        public static bool IsNoUsername(this User user)
-        {
-            return user.Username == null;
-        }
-        // public static bool IsSudoer(this RequestProvider requestProvider)
-        // {
-        //     var message = requestProvider.Message;
-        //     return message.From.Id.IsSudoer();
-        // }
-
-        public static async Task CheckUsernameAsync(this TelegramProvider telegramProvider)
-        {
-            Log.Information("Starting check Username");
-            
-            var warnLimit = 4;
-            var message = telegramProvider.MessageOrEdited;
-            var fromUser = message.From;
-            
-            var settingService = new SettingsService(message);
-            var chatSettings = await settingService.GetSettingByGroup();
-            if (!chatSettings.EnableWarnUsername)
-            {
-                Log.Information("Warn Username is disabled in this Group!");
-                return;
-            }
-            
-            var noUsername = fromUser.IsNoUsername();
-            Log.Information($"{fromUser} IsNoUsername: {noUsername}");
-
-            if (noUsername)
-            {
-                var updateResult = await UpdateWarnUsernameStat(message);
-                var updatedStep = updateResult.StepCount;
-                var lastMessageId = updateResult.LastWarnMessageId;
-
-                await telegramProvider.DeleteAsync(lastMessageId);
-
-                var sendText = $"{fromUser} belum memasang username." +
-                               $"\nPeringatan ke {updatedStep} dari {warnLimit}";
-
-                if (updatedStep == warnLimit) sendText += "\nIni peringatan terakhir!";
-
-                if (updatedStep > warnLimit)
-                {
-                    var sendWarn = $"Batas peringatan telah di lampaui." +
-                                   $"\n{fromUser} di tendang sekarang!";
-                    await telegramProvider.SendTextAsync(sendWarn);
-                    
-                    await telegramProvider.KickMemberAsync(fromUser);
-                    await telegramProvider.UnbanMemberAsync(fromUser);
-                    await ResetWarnUsernameStatAsync(message);
-                    
-                    return;
-                }
-
-                var keyboard = new InlineKeyboardMarkup(
-                    InlineKeyboardButton.WithUrl("Cara Pasang Username", "https://t.me/WinTenDev/29")
-                );
-
-                await telegramProvider.SendTextAsync(sendText, keyboard);
-                await message.UpdateLastWarnMessageIdAsync(telegramProvider.SentMessageId);
-            }
-        }
-
         public static async Task AfkCheckAsync(this TelegramProvider telegramProvider)
         {
             Log.Information("Starting check AFK");
@@ -234,6 +127,67 @@ namespace WinTenBot.Helpers
             return isBan;
         }
 
+        #region Check Username
+
+        public static bool IsNoUsername(this User user)
+        {
+            return user.Username == null;
+        }
+
+        public static async Task CheckUsernameAsync(this TelegramProvider telegramProvider)
+        {
+            Log.Information("Starting check Username");
+            
+            var warnLimit = 4;
+            var message = telegramProvider.MessageOrEdited;
+            var fromUser = message.From;
+            
+            var settingService = new SettingsService(message);
+            var chatSettings = await settingService.GetSettingByGroup();
+            if (!chatSettings.EnableWarnUsername)
+            {
+                Log.Information("Warn Username is disabled in this Group!");
+                return;
+            }
+            
+            var noUsername = fromUser.IsNoUsername();
+            Log.Information($"{fromUser} IsNoUsername: {noUsername}");
+
+            if (noUsername)
+            {
+                var updateResult = await UpdateWarnUsernameStat(message);
+                var updatedStep = updateResult.StepCount;
+                var lastMessageId = updateResult.LastWarnMessageId;
+
+                await telegramProvider.DeleteAsync(lastMessageId);
+
+                var sendText = $"{fromUser} belum memasang username." +
+                               $"\nPeringatan ke {updatedStep} dari {warnLimit}";
+
+                if (updatedStep == warnLimit) sendText += "\nIni peringatan terakhir!";
+
+                if (updatedStep > warnLimit)
+                {
+                    var sendWarn = $"Batas peringatan telah di lampaui." +
+                                   $"\n{fromUser} di tendang sekarang!";
+                    await telegramProvider.SendTextAsync(sendWarn);
+                    
+                    await telegramProvider.KickMemberAsync(fromUser);
+                    await telegramProvider.UnbanMemberAsync(fromUser);
+                    await ResetWarnUsernameStatAsync(message);
+                    
+                    return;
+                }
+
+                var keyboard = new InlineKeyboardMarkup(
+                    InlineKeyboardButton.WithUrl("Cara Pasang Username", "https://t.me/WinTenDev/29")
+                );
+
+                await telegramProvider.SendTextAsync(sendText, keyboard);
+                await message.UpdateLastWarnMessageIdAsync(telegramProvider.SentMessageId);
+            }
+        }
+        
         private static async Task<WarnUsernameHistory> UpdateWarnUsernameStat(Message message)
         {
             var tableName = "warn_username_history";
@@ -335,5 +289,7 @@ namespace WinTenBot.Helpers
 
             Log.Information($"Update lastWarn: {insertHit}");
         }
+
+        #endregion
     }
 }
