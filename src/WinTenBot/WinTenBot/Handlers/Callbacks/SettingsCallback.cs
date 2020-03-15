@@ -28,7 +28,15 @@ namespace WinTenBot.Handlers.Callbacks
         private async Task ExecuteToggleAsync()
         {
             var chatId = CallbackQuery.Message.Chat.Id;
+            var fromId = CallbackQuery.From.Id;
             var msgId = CallbackQuery.Message.MessageId;
+
+            var isAdmin = await _telegramProvider.IsAdminGroup(fromId);
+            if (!isAdmin)
+            {
+                Log.Information("He is not admin.");
+                return;
+            }
             
             var callbackData = CallbackQuery.Data;
             var partedData = callbackData.Split(" ");

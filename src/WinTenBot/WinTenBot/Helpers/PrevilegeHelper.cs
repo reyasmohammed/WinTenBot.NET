@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Serilog;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using WinTenBot.Model;
 using WinTenBot.Providers;
@@ -55,25 +54,28 @@ namespace WinTenBot.Helpers
             return messageOrEdited.Chat.Type == ChatType.Private;
         }
         
-        public static async Task<bool> IsAdminGroup(this TelegramProvider telegramProvider)
+        public static async Task<bool> IsAdminGroup(this TelegramProvider telegramProvider, int userId = -1)
         {
             var message = telegramProvider.MessageOrEdited;
             var client = telegramProvider.Client;
             
             var chatId = message.Chat.Id;
-            var userId = message.From.Id;
+            var fromId = message.From.Id;
             var isAdmin = false;
-
+            
             if (IsPrivateChat(telegramProvider)) return false;
+            if (userId >= 0) fromId = userId;
             
             var admins = await client.GetChatAdministratorsAsync(chatId);
             foreach (var admin in admins)
             {
-                if (userId == admin.User.Id)
+                if (fromId == admin.User.Id)
                 {
                     isAdmin = true;
                 }
             }
+            
+            Log.Information($"UserId {fromId} IsAdmin: {isAdmin}");
 
             return isAdmin;
         }
