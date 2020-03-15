@@ -204,7 +204,7 @@ namespace WinTenBot.Helpers
 
             var warnHistory = await new Query(tableName)
                 .Where("from_id", data["from_id"])
-                .ExecForSqLite(true)
+                .ExecForMysql(true)
                 .GetAsync();
 
             var exist = warnHistory.Any();
@@ -227,7 +227,7 @@ namespace WinTenBot.Helpers
 
                 var insertHit = await new Query(tableName)
                     .Where("from_id", data["from_id"])
-                    .ExecForSqLite()
+                    .ExecForMysql(true)
                     .UpdateAsync(update);
 
                 Log.Information($"Update step: {insertHit}");
@@ -235,7 +235,7 @@ namespace WinTenBot.Helpers
             else
             {
                 var insertHit = await new Query(tableName)
-                    .ExecForSqLite()
+                    .ExecForMysql(true)
                     .InsertAsync(data);
 
                 Log.Information($"Insert Hit: {insertHit}");
@@ -243,7 +243,7 @@ namespace WinTenBot.Helpers
 
             var updatedHistory = await new Query(tableName)
                 .Where("from_id", data["from_id"])
-                .ExecForSqLite()
+                .ExecForMysql(true)
                 .GetAsync();
 
             return updatedHistory.ToJson().MapObject<List<WarnUsernameHistory>>().First();
@@ -263,7 +263,7 @@ namespace WinTenBot.Helpers
 
             var insertHit = await new Query(tableName)
                 .Where("from_id", fromId)
-                .ExecForSqLite()
+                .ExecForMysql(true)
                 .UpdateAsync(update);
 
             Log.Information($"Update step: {insertHit}");
@@ -284,7 +284,7 @@ namespace WinTenBot.Helpers
 
             var insertHit = await new Query(tableName)
                 .Where("from_id", fromId)
-                .ExecForSqLite()
+                .ExecForMysql(true)
                 .UpdateAsync(update);
 
             Log.Information($"Update lastWarn: {insertHit}");
