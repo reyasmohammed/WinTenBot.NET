@@ -33,10 +33,10 @@ namespace WinTenBot.Model
         public bool EnableHumanVerification{ get; set; }
 
         [JsonProperty("enable_word_filter_per_group")]
-        public bool? EnableWordFilterPerGroup { get; set; }
+        public bool EnableWordFilterPerGroup { get; set; }
         
         [JsonProperty("enable_word_filter_group_wide")]
-        public bool? EnableWordFilterGroupWide { get; set; }
+        public bool EnableWordFilterGroupWide { get; set; }
         
         [JsonProperty("enable_warn_username")]
         public bool EnableWarnUsername { get; set; }

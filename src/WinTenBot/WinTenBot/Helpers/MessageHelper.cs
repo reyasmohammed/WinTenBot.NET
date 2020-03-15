@@ -109,6 +109,16 @@ namespace WinTenBot.Helpers
                 Log.Information("Starting check Message");
 
                 var message = telegramProvider.MessageOrEdited;
+                
+                var settingService = new SettingsService(message);
+                var chatSettings = await settingService.GetSettingByGroup();
+
+                if (!chatSettings.EnableWordFilterGroupWide)
+                {
+                    Log.Information("Global Word Filter is disabled!");
+                    return;
+                }
+                
                 var text = message.Text;
                 if (!text.IsNullOrEmpty())
                 {
