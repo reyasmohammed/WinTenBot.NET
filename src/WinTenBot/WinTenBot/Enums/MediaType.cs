@@ -5,6 +5,7 @@ namespace WinTenBot.Enums
         Document = 6,
         LocalDocument = 9,
         Photo = 2,
-        Video = 4
+        Video = 4,
+        Unknown = -1
     }
 }

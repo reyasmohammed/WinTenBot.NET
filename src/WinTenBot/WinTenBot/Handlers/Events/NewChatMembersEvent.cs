@@ -110,7 +110,7 @@ namespace WinTenBot.Handlers.Events
                     keyboard = chatSettings.WelcomeButton.ToReplyMarkup(2);
                 }
 
-                if (!chatSettings.WelcomeMediaType.ToString().IsNullOrEmpty())
+                if (chatSettings.WelcomeMediaType != MediaType.Unknown)
                 {
                     var mediaType = (MediaType) chatSettings.WelcomeMediaType;
                     await _telegramProvider.SendMediaAsync(
