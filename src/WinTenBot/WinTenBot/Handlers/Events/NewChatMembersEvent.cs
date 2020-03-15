@@ -21,6 +21,7 @@ namespace WinTenBot.Handlers.Events
         private ElasticSecurityService _elasticSecurityService;
         private SettingsService _settingsService;
         private TelegramProvider _telegramProvider;
+        private ChatSetting Settings { get; set; }
 
 
         public NewChatMembersEvent()
@@ -37,6 +38,8 @@ namespace WinTenBot.Handlers.Events
             Log.Information("New Chat Members...");
             
             var chatSettings = await _settingsService.GetSettingByGroup();
+            Settings = chatSettings;
+            
             if(!chatSettings.EnableWelcomeMessage){
                 Log.Information("Welcome message is disabled!");
                 return;
@@ -104,6 +107,19 @@ namespace WinTenBot.Handlers.Events
                     keyboard = chatSettings.WelcomeButton.ToReplyMarkup(2);
                 }
 
+                if(chatSettings.EnableHumanVerification){
+                    Log.Information("Human verification is enabled!");
+                    Log.Information("Adding verify button..");
+                    
+                    var userId = newMembers[0].Id;
+                    var verifyButton = $"Saya Manusia!|verify {userId}";
+
+                    var withVerifyArr = new string [] { chatSettings.WelcomeButton, verifyButton };
+                    var withVerify = string.Join(",", withVerifyArr);
+
+                    keyboard = withVerify.ToReplyMarkup(2);
+                }
+
                 if (chatSettings.WelcomeMediaType != MediaType.Unknown)
                 {
                     var mediaType = (MediaType) chatSettings.WelcomeMediaType;
@@ -142,6 +158,14 @@ namespace WinTenBot.Handlers.Events
             Log.Information($"Parsing new {users.Length} members..");
             foreach (var newMember in users)
             {
+                var newMemberId = newMember.Id;
+                
+                if (Settings.EnableHumanVerification)
+                {
+                    Log.Information($"Restricting {newMemberId}");
+                    await _telegramProvider.RestrictMemberAsync(newMemberId);
+                }
+                
                 var isBan = await _telegramProvider.CheckGlobalBanAsync(newMember);
                 if (isBan) continue;
 
@@ -152,7 +176,7 @@ namespace WinTenBot.Handlers.Events
                 }
 
                 var fullName = (newMember.FirstName + " " + newMember.LastName).Trim();
-                var nameLink = MemberHelper.GetNameLink(newMember.Id, fullName);
+                var nameLink = MemberHelper.GetNameLink(newMemberId, fullName);
 
                 if (newMember != lastMember)
                 {

@@ -28,7 +28,10 @@ namespace WinTenBot.Model
         
         [JsonProperty("last_tags_message_id")]
         public string LastTagsMessageId { get; set; }
-        
+
+        [JsonProperty("enable_human_verification")]
+        public bool EnableHumanVerification{ get; set; }
+
         [JsonProperty("enable_word_filter_per_group")]
         public bool? EnableWordFilterPerGroup { get; set; }
         

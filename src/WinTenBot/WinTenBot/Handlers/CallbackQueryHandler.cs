@@ -55,12 +55,14 @@ namespace WinTenBot.Handlers
                     // var a = new HelpCallbackQuery(cq);
                     break;
 
-                case "verification":
+                case "verify":
+                    var verifyCallback = new VerifyCallback(_telegramProvider);
+                    Log.Information($"VerifyResult: {verifyCallback.ToJson(true)}");
                     break;
 
                 case "setting":
                     var settingsCallback = new SettingsCallback(_telegramProvider);
-                    Log.Information($"SettingsCallback: {settingsCallback.ToJson(true)}");
+                    Log.Information($"SettingsResult: {settingsCallback.ToJson(true)}");
                     break;
             }
 
