@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Types;
@@ -22,10 +23,10 @@ namespace WinTenBot.Handlers.Callbacks
 
             Log.Information("Receiving Setting Callback.");
 
-            Execute();
+            Parallel.Invoke(async () => await ExecuteToggleAsync());
         }
 
-        private async Task Execute()
+        private async Task ExecuteToggleAsync()
         {
             var chatId = CallbackQuery.Message.Chat.Id;
             var msgId = CallbackQuery.Message.MessageId;
