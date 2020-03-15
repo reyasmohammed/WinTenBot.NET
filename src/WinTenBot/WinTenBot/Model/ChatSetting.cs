@@ -37,5 +37,8 @@ namespace WinTenBot.Model
         
         [JsonProperty("enable_warn_username")]
         public bool EnableWarnUsername { get; set; }
+
+        [JsonProperty("enable_welcome_message")]
+        public bool EnableWelcomeMessage{ get; set; }
     }
 }

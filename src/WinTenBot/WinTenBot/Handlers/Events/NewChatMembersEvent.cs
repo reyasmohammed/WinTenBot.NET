@@ -35,22 +35,17 @@ namespace WinTenBot.Handlers.Events
             _elasticSecurityService = new ElasticSecurityService(context.Update.Message);
 
             Log.Information("New Chat Members...");
-
+            
+            var chatSettings = await _settingsService.GetSettingByGroup();
+            if(!chatSettings.EnableWelcomeMessage){
+                Log.Information("Welcome message is disabled!");
+                return;
+            }
+            
             var newMembers = msg.NewChatMembers;
             var isBootAdded = await newMembers.IsBotAdded();
             if (isBootAdded)
             {
-                // if (!msg.Chat.Id.IsAllowed())
-                // {
-                //     Log.Information("I must leave right now!");
-                //     
-                //     var msgOut = $"Sepertinya saya salah alamat, saya pamit dulu..";
-                //
-                //     await _requestProvider.SendTextAsync(msgOut);
-                //     await _requestProvider.LeaveChat(msg.Chat.Id);
-                //     return;
-                // }
-
                 var isRestricted = await _telegramProvider.EnsureChatRestrictionAsync();
                 if (isRestricted) return;
 
@@ -79,7 +74,6 @@ namespace WinTenBot.Handlers.Events
 
             if (allNewMember.Length > 0)
             {
-                var chatSettings = await _settingsService.GetSettingByGroup();
 
                 var chatTitle = msg.Chat.Title;
                 var memberCount = await _telegramProvider.GetMemberCount();
