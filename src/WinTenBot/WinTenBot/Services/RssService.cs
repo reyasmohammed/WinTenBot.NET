@@ -127,7 +127,7 @@ namespace WinTenBot.Services
 
         public async Task DeleteDuplicateAsync()
         {
-            var duplicate = rssSettingTable.MysqlDeleteDuplicateRowAsync("url_feed");
+            var duplicate = await rssSettingTable.MysqlDeleteDuplicateRowAsync("url_feed");
             Log.Information($"Delete duplicate on {rssSettingTable} {duplicate}");
         }
     }

@@ -77,7 +77,7 @@ namespace WinTenBot.Providers
             return factory.Select(sql, param);
         }
 
-        public static int MysqlDeleteDuplicateRowAsync(this string tableName, string columnKey)
+        public static Task<int> MysqlDeleteDuplicateRowAsync(this string tableName, string columnKey)
         {
             Log.Information($"Deleting duplicate rows on {tableName}");
             
@@ -87,7 +87,7 @@ namespace WinTenBot.Providers
                             t1.id < t2.id AND 
                             t1.{columnKey} = t2.{columnKey};".StripLeadingWhitespace();
 
-            var exec = sql.ExecForMysqlNonQuery(sql);
+            var exec = sql.ExecForMysqlNonQueryAsync(sql);
             Log.Information($"Deleted: {exec} rows.");
 
             return exec;
