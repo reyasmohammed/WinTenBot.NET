@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Types;
@@ -37,7 +36,7 @@ namespace WinTenBot.Handlers.Callbacks
             var partedParam = callbackParam.Split("_");
             var valueParamStr = partedParam.ValueOfIndex(0);
             var keyParamStr = callbackParam.Replace(valueParamStr, "");
-            var currentVal = valueParamStr.ToInt();
+            var currentVal = valueParamStr.ToBoolInt();
 
             Log.Information($"Param : {keyParamStr}");
             Log.Information($"CurrentVal : {currentVal}");
