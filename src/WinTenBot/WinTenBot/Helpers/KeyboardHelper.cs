@@ -17,10 +17,13 @@ namespace WinTenBot.Helpers
             var splitWelcomeButton = buttonStr.Split(',').ToList();
             foreach (var button in splitWelcomeButton)
             {
-                var buttonLink = button.Split('|').ToList();
-                Log.Information($"Appending keyboard: {buttonLink[0]} -> {buttonLink[1]}");
-                dict.Add(buttonLink[0], buttonLink[1]);
-                
+                Log.Information($"Button: {button}");
+                if (button.Contains("|"))
+                {
+                    var buttonLink = button.Split('|').ToList();
+                    Log.Information($"Appending keyboard: {buttonLink[0]} -> {buttonLink[1]}");
+                    dict.Add(buttonLink[0], buttonLink[1]);
+                }
             }
 
             return dict;
@@ -35,7 +38,13 @@ namespace WinTenBot.Helpers
                 buttons[i] = buttonList
                     .Skip(i * columns)
                     .Take(columns)
-                    .Select(direction => InlineKeyboardButton.WithUrl(direction.Key, direction.Value))
+                    .Select(direction =>
+                    {
+                        if(direction.Value.CheckUrlValid())
+                            return InlineKeyboardButton.WithUrl(direction.Key, direction.Value);
+                        else
+                            return InlineKeyboardButton.WithCallbackData(direction.Key, direction.Value);
+                    })
                     .ToArray();
             }
             return new InlineKeyboardMarkup(buttons);
