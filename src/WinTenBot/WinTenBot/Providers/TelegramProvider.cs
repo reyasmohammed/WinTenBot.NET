@@ -176,7 +176,7 @@ namespace WinTenBot.Providers
                     await Client.SendPhotoAsync(Message.Chat.Id, fileId, caption, ParseMode.Html,
                         replyMarkup: replyMarkup, replyToMessageId: replyToMsgId);
                     break;
-                
+
                 case MediaType.Video:
                     await Client.SendVideoAsync(Message.Chat.Id, fileId, caption: caption, parseMode: ParseMode.Html);
                     break;
@@ -264,6 +264,13 @@ namespace WinTenBot.Providers
             }
         }
 
+
+        public async Task AnswerCallbackQueryAsync(string text)
+        {
+            var callbackQueryId = Context.Update.CallbackQuery.Id;
+            await Client.AnswerCallbackQueryAsync(callbackQueryId, text);
+        }
+        
         public void ResetTime()
         {
             Log.Information("Resetting time..");
@@ -335,6 +342,20 @@ namespace WinTenBot.Providers
             }
         }
 
+        public async Task UnBanMemberAsync(int userId = -1)
+        {
+            Log.Information($"Unban {userId} from {Message.Chat}");
+            try
+            {
+                await Client.UnbanChatMemberAsync(Message.Chat.Id, userId);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "UnBan Member");
+                await SendTextAsync(ex.Message);
+            }
+        }
+
         public async Task<RequestResult> PromoteChatMemberAsync(int userId)
         {
             var requestResult = new RequestResult();
@@ -396,6 +417,32 @@ namespace WinTenBot.Providers
             }
 
             return requestResult;
+        }
+
+        public async Task RestrictMemberAsync(int userId, bool unMute = false)
+        {
+            var chatId = Message.Chat.Id;
+            var untilDate = DateTime.UtcNow.AddDays(366);
+            Log.Information($"Restricting member on {chatId} until {untilDate}");
+            Log.Information($"UserId: {userId}, IsMute: {unMute}");
+
+            var permission = new ChatPermissions
+            {
+                CanSendMessages = unMute,
+                CanSendMediaMessages = unMute,
+                CanSendOtherMessages = unMute,
+                CanAddWebPagePreviews = unMute,
+                CanChangeInfo = unMute,
+                CanInviteUsers = unMute,
+                CanPinMessages = unMute,
+                CanSendPolls = unMute
+            };
+            
+            Log.Information($"ChatPermissions: {permission.ToJson(true)}");
+
+            if (unMute) untilDate = DateTime.UtcNow;
+
+            await Client.RestrictChatMemberAsync(chatId, userId, permission, untilDate);
         }
 
         #endregion
