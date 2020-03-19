@@ -145,6 +145,8 @@ namespace WinTenBot
 
             services.AddScoped<QrCommand>();
 
+            services.AddScoped<CovidCommand>();
+
 
             services.AddHangfireServer();
             services.AddHangfire(config =>
@@ -253,6 +255,7 @@ namespace WinTenBot
                                     .UseCommand<AfkCommand>("afk")
                                     .UseCommand<BanCommand>("ban")
                                     .UseCommand<BotCommand>("bot")
+                                    .UseCommand<CovidCommand>("covid")
                                     .UseCommand<DebugCommand>("dbg")
                                     .UseCommand<DelBanCommand>("dban")
                                     .UseCommand<DelRssCommand>("delrss")
