@@ -13,7 +13,7 @@ namespace WinTenBot.Helpers
         {
             get
             {
-                var timeStamp = DateTime.Now.ToString("yyyyMMdd-hhmm");
+                var timeStamp = DateTime.Now.ToString("yyyyMMdd-HHmm");
                 var fileName = $"covid-all-{timeStamp}.json";
                 return fileName;
             }
