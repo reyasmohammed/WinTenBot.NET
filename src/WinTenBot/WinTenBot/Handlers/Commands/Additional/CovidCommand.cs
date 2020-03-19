@@ -1,7 +1,9 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Flurl.Http;
+using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Model;
@@ -18,12 +20,25 @@ namespace WinTenBot.Handlers.Commands.Additional
         {
             _telegramProvider = new TelegramProvider(context);
 
-            await _telegramProvider.SendTextAsync("Sedang mendapatkan..");
-            
-            var urlApi = "https://coronavirus-tracker-api.herokuapp.com/all";
-            var covidAll = await urlApi.GetJsonAsync<CovidAll>(cancellationToken: cancellationToken);
+            await _telegramProvider.SendTextAsync("Sedang mendapatkan informasi..");
 
-            await covidAll.WriteCacheAsync("covid-all.json");
+            var timeStamp = DateTime.Now.ToString("yyyyMMdd-hhmm"); 
+            var fileName = $"covid-all-{timeStamp}.json";
+            var urlApi = "https://coronavirus-tracker-api.herokuapp.com/all";
+            CovidAll covidAll;
+            
+            if (!fileName.IsFileCacheExist())
+            {
+                Log.Information($"Getting information from {urlApi}");
+                covidAll = await urlApi.GetJsonAsync<CovidAll>(cancellationToken: cancellationToken);
+
+                await covidAll.WriteCacheAsync(fileName);
+            }
+            else
+            {
+                Log.Information($"Loading cache from {fileName}");
+                covidAll = await fileName.ReadCacheAsync<CovidAll>();
+            }
 
             // Log.Information($"CovidAll: {covidAll.ToJson(true)}");
 
@@ -47,9 +62,9 @@ namespace WinTenBot.Handlers.Commands.Additional
             messageBuild.AppendLine("3. Recovered");
             messageBuild.AppendLine($"LastUpdate: {recovered.LastUpdated}");
             messageBuild.AppendLine($"Latest: {recovered.Latest}");
-            messageBuild.AppendLine();
 
-            messageBuild.AppendLine($"Source: {confirmed.Source}");
+            messageBuild.AppendLine();
+            messageBuild.Append($"Source: {confirmed.Source}");
 
             await _telegramProvider.EditAsync(messageBuild.ToString());
         }
