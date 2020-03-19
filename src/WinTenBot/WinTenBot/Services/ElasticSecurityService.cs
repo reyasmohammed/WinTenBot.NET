@@ -104,7 +104,7 @@ namespace WinTenBot.Services
 
         public async Task<DataTable> ReadCacheAsync()
         {
-            var dataTable = await fileJson.ReadCacheAsync();
+            var dataTable = await fileJson.ReadCacheAsync<DataTable>();
             return dataTable;
         }
     }
