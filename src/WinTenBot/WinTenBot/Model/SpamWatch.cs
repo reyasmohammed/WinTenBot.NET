@@ -33,7 +33,7 @@ namespace WinTenBot.Model
             JsonConvert.DeserializeObject<SpamWatch>(json, Converter.Settings);
     }
 
-    public static class Serialize
+    public static partial class Serialize
     {
         public static string ToJson(this SpamWatch self) => 
             JsonConvert.SerializeObject(self, Converter.Settings);
