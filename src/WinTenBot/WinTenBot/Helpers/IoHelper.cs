@@ -27,6 +27,8 @@ namespace WinTenBot.Helpers
 
         public static string EnsureDirectory(this string dirPath)
         {
+            Log.Information($"EnsuringDir of {dirPath}");
+            
             var path = Path.GetDirectoryName(dirPath);
             if (!path.IsNullOrEmpty())
                 Directory.CreateDirectory(path);
