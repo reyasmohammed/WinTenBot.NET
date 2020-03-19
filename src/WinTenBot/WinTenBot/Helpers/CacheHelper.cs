@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -52,10 +53,33 @@ namespace WinTenBot.Helpers
             
             var listFile = Directory.GetFiles(workingDir);
             var listFiltered = listFile.Where(file => 
-                file.Contains(keyword)
-                );
+                file.Contains(keyword)).ToArray();
             
             Log.Information($"Found cache target {listFiltered.Count()} of {listFile.Count()}");
+            foreach (var file in listFiltered)
+            {
+                Log.Information($"Deleting {file}");
+                File.Delete(file);
+            }
+        }
+        
+        public static void ClearCacheOlderThan(string keyword, int days = 1)
+        {
+            Log.Information($"Deleting caches older than {days} days");
+            
+            var dirInfo = new DirectoryInfo(workingDir);
+            var files = dirInfo.GetFiles();
+            var filteredFiles = files.Where(fileInfo =>
+                fileInfo.CreationTimeUtc < DateTime.UtcNow.AddDays(-days) &&
+                fileInfo.Name.Contains(keyword)).ToArray();
+
+            Log.Information($"Found cache target {filteredFiles.Count()} of {files.Count()}");
+
+            foreach (FileInfo file in filteredFiles)
+            {
+                Log.Information($"Deleting {file.FullName}");
+                File.Delete(file.FullName);
+            }
         }
     }
 }
