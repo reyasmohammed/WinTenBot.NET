@@ -1,12 +1,7 @@
-﻿using System;
-using System.Text;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
-using Flurl.Http;
-using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
-using WinTenBot.Model;
 using WinTenBot.Providers;
 
 namespace WinTenBot.Handlers.Commands.Additional
@@ -22,51 +17,9 @@ namespace WinTenBot.Handlers.Commands.Additional
 
             await _telegramProvider.SendTextAsync("Sedang mendapatkan informasi..");
 
-            var timeStamp = DateTime.Now.ToString("yyyyMMdd-hhmm"); 
-            var fileName = $"covid-all-{timeStamp}.json";
-            var urlApi = "https://coronavirus-tracker-api.herokuapp.com/all";
-            CovidAll covidAll;
-            
-            if (!fileName.IsFileCacheExist())
-            {
-                Log.Information($"Getting information from {urlApi}");
-                covidAll = await urlApi.GetJsonAsync<CovidAll>(cancellationToken: cancellationToken);
+            var sendText = await CovidHelper.GetCovidUpdatesAsync();
 
-                await covidAll.WriteCacheAsync(fileName);
-            }
-            else
-            {
-                Log.Information($"Loading cache from {fileName}");
-                covidAll = await fileName.ReadCacheAsync<CovidAll>();
-            }
-
-            // Log.Information($"CovidAll: {covidAll.ToJson(true)}");
-
-            var confirmed = covidAll.Confirmed;
-            var deaths = covidAll.Deaths;
-            var recovered = covidAll.Recovered;
-            
-            var messageBuild = new StringBuilder();
-
-            messageBuild.AppendLine("Corona Updates.");
-            messageBuild.AppendLine("1. Confirmed");
-            messageBuild.AppendLine($"LastUpdate: {confirmed.LastUpdated}");
-            messageBuild.AppendLine($"Latest: {confirmed.Latest}");
-            messageBuild.AppendLine();
-
-            messageBuild.AppendLine("2. Deaths");
-            messageBuild.AppendLine($"LastUpdate: {deaths.LastUpdated}");
-            messageBuild.AppendLine($"Latest: {deaths.Latest}");
-            messageBuild.AppendLine();
-
-            messageBuild.AppendLine("3. Recovered");
-            messageBuild.AppendLine($"LastUpdate: {recovered.LastUpdated}");
-            messageBuild.AppendLine($"Latest: {recovered.Latest}");
-
-            messageBuild.AppendLine();
-            messageBuild.Append($"Source: {confirmed.Source}");
-
-            await _telegramProvider.EditAsync(messageBuild.ToString());
+            await _telegramProvider.EditAsync(sendText);
         }
     }
 }
