@@ -187,7 +187,7 @@ namespace WinTenBot.Providers
             }
         }
 
-        public async Task EditAsync(string sendText, InlineKeyboardMarkup replyMarkup = null)
+        public async Task EditAsync(string sendText, InlineKeyboardMarkup replyMarkup = null, bool disableWebPreview = true)
         {
             TimeProc = Message.Date.GetDelay();
 
@@ -201,13 +201,14 @@ namespace WinTenBot.Providers
                 SentMessageId,
                 sendText,
                 ParseMode.Html,
-                replyMarkup: replyMarkup
+                replyMarkup: replyMarkup,
+                disableWebPagePreview: disableWebPreview
             );
 
             EditedMessageId = edit.MessageId;
         }
 
-        public async Task EditMessageCallback(string sendText, InlineKeyboardMarkup replyMarkup = null)
+        public async Task EditMessageCallback(string sendText, InlineKeyboardMarkup replyMarkup = null, bool disableWebPreview = true)
         {
             try
             {
@@ -217,7 +218,8 @@ namespace WinTenBot.Providers
                     CallBackMessageId,
                     sendText,
                     ParseMode.Html,
-                    replyMarkup: replyMarkup
+                    replyMarkup: replyMarkup,
+                    disableWebPagePreview: disableWebPreview
                 );
             }
             catch (Exception e)
