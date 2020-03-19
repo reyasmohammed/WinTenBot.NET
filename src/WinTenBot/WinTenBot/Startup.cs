@@ -48,6 +48,7 @@ namespace WinTenBot
             Bot.GlobalConfiguration = Configuration;
             Bot.DbConnectionString = Configuration["CommonConfig:ConnectionString"];
             SerilogProvider.LogglyToken = Configuration["CommonConfig:LogglyToken"];
+            FluentMigratorProvider.ConnectionString = Bot.DbConnectionString;
 
             Log.Information($"ProductName: {Configuration["Engines:ProductName"]}");
             Log.Information($"Version: {Configuration["Engines:Version"]}");
@@ -60,6 +61,8 @@ namespace WinTenBot
             GlobalConfiguration.Configuration
                 .UseSerilogLogProvider()
                 .UseColouredConsoleLogProvider();
+            
+            // FluentMigratorProvider.RunMigration();
         }
 
         public void ConfigureServices(IServiceCollection services)
