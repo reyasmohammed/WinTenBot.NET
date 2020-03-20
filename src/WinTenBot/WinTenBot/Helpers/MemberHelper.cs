@@ -136,55 +136,62 @@ namespace WinTenBot.Helpers
 
         public static async Task CheckUsernameAsync(this TelegramProvider telegramProvider)
         {
-            Log.Information("Starting check Username");
-            
-            var warnLimit = 4;
-            var message = telegramProvider.MessageOrEdited;
-            var fromUser = message.From;
-            
-            var settingService = new SettingsService(message);
-            var chatSettings = await settingService.GetSettingByGroup();
-            if (!chatSettings.EnableWarnUsername)
+            try
             {
-                Log.Information("Warn Username is disabled in this Group!");
-                return;
-            }
-            
-            var noUsername = fromUser.IsNoUsername();
-            Log.Information($"{fromUser} IsNoUsername: {noUsername}");
+                Log.Information("Starting check Username");
 
-            if (noUsername)
-            {
-                var updateResult = await UpdateWarnUsernameStat(message);
-                var updatedStep = updateResult.StepCount;
-                var lastMessageId = updateResult.LastWarnMessageId;
+                var warnLimit = 4;
+                var message = telegramProvider.MessageOrEdited;
+                var fromUser = message.From;
 
-                await telegramProvider.DeleteAsync(lastMessageId);
-
-                var sendText = $"{fromUser} belum memasang username." +
-                               $"\nPeringatan ke {updatedStep} dari {warnLimit}";
-
-                if (updatedStep == warnLimit) sendText += "\nIni peringatan terakhir!";
-
-                if (updatedStep > warnLimit)
+                var settingService = new SettingsService(message);
+                var chatSettings = await settingService.GetSettingByGroup();
+                if (!chatSettings.EnableWarnUsername)
                 {
-                    var sendWarn = $"Batas peringatan telah di lampaui." +
-                                   $"\n{fromUser} di tendang sekarang!";
-                    await telegramProvider.SendTextAsync(sendWarn);
-                    
-                    await telegramProvider.KickMemberAsync(fromUser);
-                    await telegramProvider.UnbanMemberAsync(fromUser);
-                    await ResetWarnUsernameStatAsync(message);
-                    
+                    Log.Information("Warn Username is disabled in this Group!");
                     return;
                 }
 
-                var keyboard = new InlineKeyboardMarkup(
-                    InlineKeyboardButton.WithUrl("Cara Pasang Username", "https://t.me/WinTenDev/29")
-                );
+                var noUsername = fromUser.IsNoUsername();
+                Log.Information($"{fromUser} IsNoUsername: {noUsername}");
 
-                await telegramProvider.SendTextAsync(sendText, keyboard);
-                await message.UpdateLastWarnMessageIdAsync(telegramProvider.SentMessageId);
+                if (noUsername)
+                {
+                    var updateResult = await UpdateWarnUsernameStat(message);
+                    var updatedStep = updateResult.StepCount;
+                    var lastMessageId = updateResult.LastWarnMessageId;
+
+                    await telegramProvider.DeleteAsync(lastMessageId);
+
+                    var sendText = $"{fromUser} belum memasang username." +
+                                   $"\nPeringatan ke {updatedStep} dari {warnLimit}";
+
+                    if (updatedStep == warnLimit) sendText += "\nIni peringatan terakhir!";
+
+                    if (updatedStep > warnLimit)
+                    {
+                        var sendWarn = $"Batas peringatan telah di lampaui." +
+                                       $"\n{fromUser} di tendang sekarang!";
+                        await telegramProvider.SendTextAsync(sendWarn);
+
+                        await telegramProvider.KickMemberAsync(fromUser);
+                        await telegramProvider.UnbanMemberAsync(fromUser);
+                        await ResetWarnUsernameStatAsync(message);
+
+                        return;
+                    }
+
+                    var keyboard = new InlineKeyboardMarkup(
+                        InlineKeyboardButton.WithUrl("Cara Pasang Username", "https://t.me/WinTenDev/29")
+                    );
+
+                    await telegramProvider.SendTextAsync(sendText, keyboard);
+                    await message.UpdateLastWarnMessageIdAsync(telegramProvider.SentMessageId);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex,"Error check Username");
             }
         }
         
