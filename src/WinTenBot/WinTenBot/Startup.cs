@@ -150,6 +150,8 @@ namespace WinTenBot
 
             services.AddScoped<CovidCommand>();
 
+            services.AddScoped<TranslateCommand>();
+
 
             services.AddHangfireServer();
             services.AddHangfire(config =>
@@ -291,6 +293,7 @@ namespace WinTenBot
                                     .UseCommand<TagCommand>("tag")
                                     .UseCommand<TagsCommand>("tags")
                                     .UseCommand<TestCommand>("test")
+                                    .UseCommand<TranslateCommand>("tr")
                                     .UseCommand<UntagCommand>("untag")
                                     .UseCommand<WelcomeCommand>("welcome")
                                     .UseCommand<WordFilterCommand>("wfil")
