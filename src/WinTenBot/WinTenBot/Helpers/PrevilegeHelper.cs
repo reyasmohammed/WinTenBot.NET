@@ -14,7 +14,7 @@ namespace WinTenBot.Helpers
         public static bool IsSudoer(this int userId)
         {
             bool isSudoer = false;
-            var sudoers = Bot.GlobalConfiguration.GetSection("Sudoers").Get<List<string>>();
+            var sudoers = BotSettings.GlobalConfiguration.GetSection("Sudoers").Get<List<string>>();
             var match = sudoers.FirstOrDefault(x => x == userId.ToString());
             
             if (match != null)
@@ -29,7 +29,7 @@ namespace WinTenBot.Helpers
         {
             bool isSudoer = false;
             var userId = telegramProvider.Message.From.Id;
-            var sudoers = Bot.GlobalConfiguration.GetSection("Sudoers").Get<List<string>>();
+            var sudoers = BotSettings.GlobalConfiguration.GetSection("Sudoers").Get<List<string>>();
             var match = sudoers.FirstOrDefault(x => x == userId.ToString());
             
             if (match != null)

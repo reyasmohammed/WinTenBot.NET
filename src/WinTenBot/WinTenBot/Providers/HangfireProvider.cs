@@ -11,7 +11,7 @@ namespace WinTenBot.Providers
     {
         public static MySqlStorage GetMysqlStorage()
         {
-            var connectionString = Bot.DbConnectionString;
+            var connectionString = BotSettings.DbConnectionString;
 
             var options = new MySqlStorageOptions
             {
@@ -30,7 +30,7 @@ namespace WinTenBot.Providers
 
         public static SQLiteStorage GetSqliteStorage()
         {
-            var connectionString = Bot.GlobalConfiguration["Hangfire:Sqlite"];
+            var connectionString = BotSettings.GlobalConfiguration["Hangfire:Sqlite"];
             var options = new SQLiteStorageOptions()
             {
                 QueuePollInterval = TimeSpan.FromSeconds(10)
@@ -42,7 +42,7 @@ namespace WinTenBot.Providers
 
         public static LiteDbStorage GetLiteDbStorage()
         {
-            var connectionString = Bot.GlobalConfiguration["Hangfire:LiteDb"];
+            var connectionString = BotSettings.GlobalConfiguration["Hangfire:LiteDb"];
             var options = new LiteDbStorageOptions()
             {
                 QueuePollInterval = TimeSpan.FromSeconds(10)

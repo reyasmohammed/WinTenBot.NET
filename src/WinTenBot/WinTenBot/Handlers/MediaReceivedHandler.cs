@@ -35,7 +35,7 @@ namespace WinTenBot.Handlers
 
             Log.Information($"Media isBan: {isBan}");
 
-            if (Bot.HostingEnvironment.IsProduction())
+            if (BotSettings.HostingEnvironment.IsProduction())
                 await _mediaFilterService.UpdateCacheAsync();
             else
                 Log.Information($"Update cache skipped because local Env");

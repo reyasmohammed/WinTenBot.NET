@@ -181,7 +181,7 @@ namespace WinTenBot.Helpers
 
                     try
                     {
-                        await Bot.Client.SendTextMessageAsync(chatId, sendText, ParseMode.Html);
+                        await BotSettings.Client.SendTextMessageAsync(chatId, sendText, ParseMode.Html);
 
                         var data = new Dictionary<string, object>()
                         {

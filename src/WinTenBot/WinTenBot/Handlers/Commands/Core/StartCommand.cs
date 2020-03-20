@@ -17,9 +17,9 @@ namespace WinTenBot.Handlers.Commands.Core
         {
             _telegramProvider = new TelegramProvider(context);
 
-            var botName = Bot.GlobalConfiguration["Engines:ProductName"];
-            var botVer = Bot.GlobalConfiguration["Engines:Version"];
-            var botCompany = Bot.GlobalConfiguration["Engines:Company"];
+            var botName = BotSettings.GlobalConfiguration["Engines:ProductName"];
+            var botVer = BotSettings.GlobalConfiguration["Engines:Version"];
+            var botCompany = BotSettings.GlobalConfiguration["Engines:Company"];
 
             string sendText = $"🤖 {botName} {botVer}" +
                               $"\nby {botCompany}." +

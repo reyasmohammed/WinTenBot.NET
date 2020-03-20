@@ -7,7 +7,7 @@ namespace WinTenBot.Helpers
     {
         public static bool IsDev()
         {
-            return Bot.HostingEnvironment.IsDevelopment();
+            return BotSettings.HostingEnvironment.IsDevelopment();
         }
     }
 }

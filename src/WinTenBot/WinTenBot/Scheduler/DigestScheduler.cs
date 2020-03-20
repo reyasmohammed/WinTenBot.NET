@@ -13,7 +13,7 @@ namespace WinTenBot.Scheduler
         [AutomaticRetry(Attempts = 2, LogEvents = true, OnAttemptsExceeded = AttemptsExceededAction.Fail)]
         public static void SendGroot()
         {
-            Bot.Client.SendTextMessageAsync("-1001404591750", "I'm Groot");
+            BotSettings.Client.SendTextMessageAsync("-1001404591750", "I'm Groot");
         }
     }
 }

@@ -45,15 +45,17 @@ namespace WinTenBot
         {
             Configuration = configuration;
 
-            Bot.GlobalConfiguration = Configuration;
-            Bot.DbConnectionString = Configuration["CommonConfig:ConnectionString"];
-            SerilogProvider.LogglyToken = Configuration["CommonConfig:LogglyToken"];
-            FluentMigratorProvider.ConnectionString = Bot.DbConnectionString;
+            BotSettings.GlobalConfiguration = Configuration;
+            BotSettings.FillSettings();
+            
+            BotSettings.DbConnectionString = Configuration["CommonConfig:ConnectionString"];
+            SerilogProvider.LogglyToken = Configuration["CommonConfig:Watson"];
+            FluentMigratorProvider.ConnectionString = BotSettings.DbConnectionString;
 
             Log.Information($"ProductName: {Configuration["Engines:ProductName"]}");
             Log.Information($"Version: {Configuration["Engines:Version"]}");
 
-            Bot.Client = new TelegramBotClient(Configuration["ZiziBot:ApiToken"]);
+            BotSettings.Client = new TelegramBotClient(Configuration["ZiziBot:ApiToken"]);
 
             // Bot.Clients.Add("zizibot", new TelegramBotClient(Configuration["ZiziBot:ApiToken"]));
             // Bot.Clients.Add("macosbot", new TelegramBotClient(Configuration["MacOsBot:ApiToken"]));
@@ -169,7 +171,7 @@ namespace WinTenBot
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            Bot.HostingEnvironment = env;
+            BotSettings.HostingEnvironment = env;
 
             var hangfireBaseUrl = Configuration["Hangfire:BaseUrl"];
             var hangfireUsername = Configuration["Hangfire:Username"];

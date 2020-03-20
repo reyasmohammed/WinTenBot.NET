@@ -14,7 +14,7 @@ namespace WinTenBot.Providers
     {
         public static QueryFactory GetMysqlInstances()
         {
-            var connection = new MySqlConnection(Bot.DbConnectionString);
+            var connection = new MySqlConnection(BotSettings.DbConnectionString);
             var factory = new QueryFactory(connection, new MySqlCompiler())
             {
                 Logger = result => { Log.Debug($"MySqlExec: {result}"); }
@@ -24,7 +24,7 @@ namespace WinTenBot.Providers
 
         public static Query ExecForMysql(this Query query, bool printSql = false)
         {
-            var connection = new MySqlConnection(Bot.DbConnectionString);
+            var connection = new MySqlConnection(BotSettings.DbConnectionString);
             var factory = new QueryFactory(connection, new MySqlCompiler());
             if (printSql)
             {
@@ -35,7 +35,7 @@ namespace WinTenBot.Providers
 
         public static async Task<int> ExecForMysqlNonQueryAsync(this string sql, object param = null, bool printSql = false)
         {
-            var connection = new MySqlConnection(Bot.DbConnectionString);
+            var connection = new MySqlConnection(BotSettings.DbConnectionString);
             var factory = new QueryFactory(connection, new MySqlCompiler());
             if (printSql)
             {
@@ -46,7 +46,7 @@ namespace WinTenBot.Providers
         
         public static int ExecForMysqlNonQuery(this string sql, object param = null, bool printSql = false)
         {
-            var connection = new MySqlConnection(Bot.DbConnectionString);
+            var connection = new MySqlConnection(BotSettings.DbConnectionString);
             var factory = new QueryFactory(connection, new MySqlCompiler());
             if (printSql)
             {
@@ -57,7 +57,7 @@ namespace WinTenBot.Providers
         
         public static async Task<IEnumerable<dynamic>> ExecForMysqlQueryAsync(this string sql, object param = null, bool printSql = false)
         {
-            var connection = new MySqlConnection(Bot.DbConnectionString);
+            var connection = new MySqlConnection(BotSettings.DbConnectionString);
             var factory = new QueryFactory(connection, new MySqlCompiler());
             if (printSql)
             {
@@ -68,7 +68,7 @@ namespace WinTenBot.Providers
         
         public static IEnumerable<dynamic> ExecForMysqlQuery(this string sql, object param = null, bool printSql = false)
         {
-            var connection = new MySqlConnection(Bot.DbConnectionString);
+            var connection = new MySqlConnection(BotSettings.DbConnectionString);
             var factory = new QueryFactory(connection, new MySqlCompiler());
             if (printSql)
             {

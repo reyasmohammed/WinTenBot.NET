@@ -92,7 +92,7 @@ namespace WinTenBot.Providers
 
         public async Task<Chat> GetChat()
         {
-            var chat = await Bot.Client.GetChatAsync(Message.Chat.Id);
+            var chat = await BotSettings.Client.GetChatAsync(Message.Chat.Id);
             return chat;
         }
 

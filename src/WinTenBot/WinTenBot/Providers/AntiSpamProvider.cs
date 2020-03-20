@@ -18,7 +18,7 @@ namespace WinTenBot.Providers
         public static async Task<SpamWatch> CheckSpamWatch(this int userId)
         {
             var spamWatch  = new SpamWatch();
-            var spamWatchToken = Bot.GlobalConfiguration["CommonConfig:SpamWatchToken"];
+            var spamWatchToken = BotSettings.GlobalConfiguration["CommonConfig:SpamWatchToken"];
             
             try
             {

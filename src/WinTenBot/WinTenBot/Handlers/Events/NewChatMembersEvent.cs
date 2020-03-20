@@ -52,7 +52,7 @@ namespace WinTenBot.Handlers.Events
                 var isRestricted = await _telegramProvider.EnsureChatRestrictionAsync();
                 if (isRestricted) return;
 
-                var botName = Bot.GlobalConfiguration["Engines:ProductName"];
+                var botName = BotSettings.GlobalConfiguration["Engines:ProductName"];
                 var sendText = $"Hai, perkenalkan saya {botName}" +
                                $"\nFYI saya di bangun ulang menggunakan .NET Core, tepatnya ASP .NET Core." +
                                $"\n\nAku adalah bot pendebug dan grup manajemen yang di lengkapi dengan alat keamanan. " +
@@ -169,7 +169,7 @@ namespace WinTenBot.Handlers.Events
                 var isBan = await _telegramProvider.CheckGlobalBanAsync(newMember);
                 if (isBan) continue;
 
-                if (Bot.HostingEnvironment.IsProduction())
+                if (BotSettings.HostingEnvironment.IsProduction())
                 {
                     // var isCasBan = await IsCasBan(newMember.Id);
                     await newMember.IsCasBanAsync();
