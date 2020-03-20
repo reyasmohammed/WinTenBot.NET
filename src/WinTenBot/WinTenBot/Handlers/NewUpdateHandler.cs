@@ -35,6 +35,7 @@ namespace WinTenBot.Handlers
             shouldAwaitTasks.Add(_telegramProvider.CheckSpamWatchAsync());
             shouldAwaitTasks.Add(_telegramProvider.CheckUsernameAsync());
 
+            nonAwaitTasks.Add(_telegramProvider.EnsureChatHealthAsync());
             nonAwaitTasks.Add(_telegramProvider.AfkCheckAsync());
             nonAwaitTasks.Add(_telegramProvider.FindNotesAsync());
             nonAwaitTasks.Add(_telegramProvider.FindTagsAsync());
