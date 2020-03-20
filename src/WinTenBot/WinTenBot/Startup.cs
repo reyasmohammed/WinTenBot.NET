@@ -285,6 +285,7 @@ namespace WinTenBot
                                     .UseCommand<QrCommand>("qr")
                                     .UseCommand<ReportCommand>("report")
                                     .UseCommand<RssCtlCommand>("rssctl")
+                                    .UseCommand<ResetSettingsCommand>("rsettings")
                                     .UseCommand<RssInfoCommand>("rssinfo")
                                     .UseCommand<RssPullCommand>("rsspull")
                                     .UseCommand<RulesCommand>("rules")

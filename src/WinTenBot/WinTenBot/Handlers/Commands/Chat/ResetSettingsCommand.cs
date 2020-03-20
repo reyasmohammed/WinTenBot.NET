@@ -32,7 +32,7 @@ namespace WinTenBot.Handlers.Commands.Chat
                 var data = new Dictionary<string, object>()
                 {
                     ["chat_id"] = chat.Id,
-                    ["enable_anti_malfiles"] = 1
+                    ["chat_title"] = chat.Title,
                 };
                 
                 var update = await _settingsService.SaveSettingsAsync(data);
