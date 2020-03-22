@@ -28,31 +28,8 @@ namespace WinTenBot.Handlers
             switch (partsCallback[0]) // Level 0
             {
                 case "help":
-                    var sendText = await partsCallback[1].LoadInBotDocs();
-                    Log.Information($"Docs: {sendText}");
-                    var subPartsCallback = partsCallback[1].SplitText("/");
-
-                    Log.Information($"SubParts: {subPartsCallback.ToJson()}");
-                    var jsonButton = partsCallback[1];
-
-                    if (subPartsCallback.Count > 1)
-                    {
-                        jsonButton = subPartsCallback[0];
-
-                        switch (subPartsCallback[1])
-                        {
-                            case "info":
-                                jsonButton = subPartsCallback[1];
-                                break;
-                        }
-                    }
-
-                    var keyboard = await $"Storage/Buttons/{jsonButton}.json".JsonToButton();
-
-
-                    await _telegramProvider.EditMessageCallback(sendText, keyboard);
-
-                    // var a = new HelpCallbackQuery(cq);
+                    var helpCallback = new HelpCallback(_telegramProvider);
+                    Log.Information($"HelpResult: {helpCallback.ToJson(true)}");
                     break;
 
                 case "verify":
