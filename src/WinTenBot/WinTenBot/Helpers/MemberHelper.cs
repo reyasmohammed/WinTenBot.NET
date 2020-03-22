@@ -32,9 +32,17 @@ namespace WinTenBot.Helpers
         {
             Log.Information("Starting check AFK");
 
-            var afkService = new AfkService();
             var message = telegramProvider.MessageOrEdited;
 
+            var settingService = new SettingsService(message);
+            var chatSettings = await settingService.GetSettingByGroup();
+            if (!chatSettings.EnableAfkStat)
+            {
+                Log.Information("Afk Stat is disabled in this Group!");
+                return;
+            }
+
+            var afkService = new AfkService();
             if (message.ReplyToMessage != null)
             {
                 var repMsg = message.ReplyToMessage;
@@ -65,6 +73,14 @@ namespace WinTenBot.Helpers
 
             var message = telegramProvider.MessageOrEdited;
             var user = message.From;
+            
+            var settingService = new SettingsService(message);
+            var chatSettings = await settingService.GetSettingByGroup();
+            if (!chatSettings.EnableFedEs2)
+            {
+                Log.Information("Fed ES2 Ban is disabled in this Group!");
+                return false;
+            }
 
             if (userTarget != null) user = userTarget;
 
@@ -86,9 +102,17 @@ namespace WinTenBot.Helpers
         {
             bool isBan;
             Log.Information("Starting check in Cas Ban");
-
             var message = telegramProvider.MessageOrEdited;
             var user = message.From;
+
+            var settingService = new SettingsService(message);
+            var chatSettings = await settingService.GetSettingByGroup();
+            if (!chatSettings.EnableFedCasBan)
+            {
+                Log.Information("Fed Cas Ban is disabled in this Group!");
+                return false;
+            }
+
             isBan = await user.IsCasBanAsync();
             Log.Information($"{user} is CAS ban: {isBan}");
             if (isBan)
@@ -108,6 +132,14 @@ namespace WinTenBot.Helpers
             Log.Information("Starting Run SpamWatch");
 
             var message = telegramProvider.MessageOrEdited;
+            var settingService = new SettingsService(message);
+            var chatSettings = await settingService.GetSettingByGroup();
+            if (!chatSettings.EnableFedSpamWatch)
+            {
+                Log.Information("Fed SpamWatch is disabled in this Group!");
+                return false;
+            }
+            
             var user = message.From;
             var spamWatch = await user.Id.CheckSpamWatch();
             isBan = spamWatch.IsBan;

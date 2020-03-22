@@ -65,13 +65,18 @@ namespace WinTenBot.Services
             var selectColumns = new[]
             {
                 "id", 
-                "enable_word_filter_per_group", 
-                "enable_word_filter_group_wide",
+                "enable_anti_malfiles",
+                "enable_fed_cas_ban",
+                "enable_fed_es2_ban",
+                "enable_fed_spamwatch",
+                "enable_find_notes",
+                "enable_find_tags",
+                "enable_human_verification",
+                "enable_reply_notification",
                 "enable_warn_username", 
                 "enable_welcome_message",
-                "enable_anti_malfiles",
-                "enable_human_verification",
-                "enable_reply_notification"
+                "enable_word_filter_group", 
+                "enable_word_filter_global",
             };
 
             var data = await new Query(baseTable)
@@ -149,7 +154,7 @@ namespace WinTenBot.Services
             // var x =mapped.Cast<CallBackButton>();
 
             // MatrixHelper.TransposeMatrix<List<ChatSetting>(mapped);
-            Log.Debug($"ListBtn: {listBtn.ToJson()}");
+            Log.Debug($"ListBtn: {listBtn.ToJson(true)}");
             // listBtn.ToJson(true).ToFile("settings_listbtn.json");
 
             return listBtn;

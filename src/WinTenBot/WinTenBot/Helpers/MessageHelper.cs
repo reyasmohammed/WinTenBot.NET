@@ -144,10 +144,19 @@ namespace WinTenBot.Helpers
             {
                 Log.Information("Starting find Notes in Cloud");
                 InlineKeyboardMarkup inlineKeyboardMarkup = null;
+                
+                var message = telegramProvider.MessageOrEdited;
+                var settingService = new SettingsService(message);
+                var chatSettings = await settingService.GetSettingByGroup();
+                if (!chatSettings.EnableFindNotes)
+                {
+                    Log.Information("Find Notes is disabled in this Group!");
+                    return;
+                }
+                
                 var notesService = new NotesService();
 
-                var msg = telegramProvider.MessageOrEdited;
-                var selectedNotes = await notesService.GetNotesBySlug(msg.Chat.Id, msg.Text);
+                var selectedNotes = await notesService.GetNotesBySlug(message.Chat.Id, message.Text);
                 if (selectedNotes.Count > 0)
                 {
                     var content = selectedNotes[0].Content;
@@ -178,17 +187,24 @@ namespace WinTenBot.Helpers
 
         public static async Task FindTagsAsync(this TelegramProvider telegramProvider)
         {
-            var tagsService = new TagsService();
-            Message msg = telegramProvider.MessageOrEdited;
-
-            if (!msg.Text.Contains("#"))
+            var message = telegramProvider.MessageOrEdited;
+            var settingService = new SettingsService(message);
+            var chatSettings = await settingService.GetSettingByGroup();
+            if (!chatSettings.EnableFindTags)
             {
-                Log.Information($"Message {msg.MessageId} is not contains any Hashtag.");
+                Log.Information("Find Tags is disabled in this Group!");
+                return;
+            }
+
+            var tagsService = new TagsService();
+            if (!message.Text.Contains("#"))
+            {
+                Log.Information($"Message {message.MessageId} is not contains any Hashtag.");
                 return;
             }
 
             Log.Information("Tags Received..");
-            var partsText = msg.Text.Split(new char[] {' ', '\n', ','})
+            var partsText = message.Text.Split(new char[] {' ', '\n', ','})
                 .Where(x => x.Contains("#"));
 
             var limitedTags = partsText.Take(5);
@@ -198,7 +214,7 @@ namespace WinTenBot.Helpers
             {
                 Log.Information("Processing : " + split.TrimStart('#'));
 
-                var tagData = await tagsService.GetTagByTag(msg.Chat.Id, split.TrimStart('#'));
+                var tagData = await tagsService.GetTagByTag(message.Chat.Id, split.TrimStart('#'));
                 var json = tagData.ToJson();
                 Log.Information(json);
 
