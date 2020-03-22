@@ -26,6 +26,9 @@ namespace WinTenBot.Providers
             Message = updateContext.Update.CallbackQuery != null
                 ? updateContext.Update.CallbackQuery.Message
                 : updateContext.Update.Message;
+            
+            if (updateContext.Update.CallbackQuery != null)
+                CallbackQuery = updateContext.Update.CallbackQuery;
 
             EditedMessage = updateContext.Update.EditedMessage;
             MessageOrEdited = updateContext.Update.Message
@@ -44,6 +47,7 @@ namespace WinTenBot.Providers
         public Message Message { get; set; }
         public Message EditedMessage { get; set; }
         public Message MessageOrEdited { get; set; }
+        public CallbackQuery CallbackQuery { get; set; }
         public int SentMessageId { get; internal set; }
         public int EditedMessageId { get; private set; }
         public int CallBackMessageId { get; set; }
