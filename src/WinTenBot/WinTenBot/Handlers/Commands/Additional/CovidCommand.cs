@@ -17,7 +17,8 @@ namespace WinTenBot.Handlers.Commands.Additional
 
             await _telegramProvider.SendTextAsync("Sedang mendapatkan informasi..");
 
-            var sendText = await CovidHelper.GetCovidUpdatesAsync();
+            // var sendText = await CovidHelper.GetCovidUpdatesAsync();
+            var sendText = await CovidHelper.GetCovidAll();
 
             await _telegramProvider.EditAsync(sendText);
         }

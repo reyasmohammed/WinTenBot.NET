@@ -59,6 +59,26 @@ namespace WinTenBot.Helpers
             return messageBuild.ToString().Trim();
         }
 
+        public static async Task<string> GetCovidAll()
+        {
+            var url = "https://corona.lmao.ninja/all";
+            var covidAll = await url.GetJsonAsync<Model.Lmao.CovidAll>();
+
+            var strBuild = new StringBuilder();
+
+            strBuild.AppendLine("<b>Covid 19 Worldwide Updates</b>");
+            strBuild.AppendLine($"<b>Cases:</b> {covidAll.Cases}");
+            strBuild.AppendLine($"<b>Deaths:</b> {covidAll.Deaths}");
+            strBuild.AppendLine($"<b>Recovered:</b> {covidAll.Recovered}");
+            strBuild.AppendLine($"<b>Active:</b> {covidAll.Active}");
+
+            var date = DateTimeOffset.FromUnixTimeMilliseconds(covidAll.Updated);
+            strBuild.AppendLine($"\n<b>Updated:</b> {date}");
+            strBuild.AppendLine($"<b>Source:</b> https://corona.lmao.ninja");
+
+            return strBuild.ToString().Trim();
+        }
+
         public static async Task UpdateCacheAsync()
         {
             var urlApi = "https://coronavirus-tracker-api.herokuapp.com/all";
