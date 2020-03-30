@@ -33,7 +33,7 @@ namespace WinTenBot.Providers
             EditedMessage = updateContext.Update.EditedMessage;
             MessageOrEdited = updateContext.Update.Message
                               ?? updateContext.Update.EditedMessage
-                              ?? updateContext.Update.CallbackQuery.Message;
+                              ?? updateContext.Update.CallbackQuery?.Message;
 
             if (Message != null)
             {
