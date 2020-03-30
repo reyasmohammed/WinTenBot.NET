@@ -49,8 +49,9 @@ namespace WinTenBot.Handlers.Commands.Tags
                 {
                     await _telegramProvider.SendTextAsync("📖 Mengumpulkan informasi..");
 //                    Log.Information(TextHelper.ToJson(msg.ReplyToMessage));
+                    var repMsg = msg.ReplyToMessage;
 
-                    var content = msg.ReplyToMessage.Text;
+                    var content = repMsg.Text ?? repMsg.Caption;
                     Log.Information(content);
 
                     bool isExist = await _tagsService.IsExist(msg.Chat.Id, args[0].Trim());
