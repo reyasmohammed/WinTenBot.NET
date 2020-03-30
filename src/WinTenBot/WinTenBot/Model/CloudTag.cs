@@ -1,35 +1,35 @@
 ﻿using System;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace WinTenBot.Model
 {
     public class CloudTag
     {
-        [JsonPropertyName("id_chat")]
+        [JsonProperty("id_chat")]
         public string ChatId { get; set; }
         
-        [JsonPropertyName("id_user")]
+        [JsonProperty("id_user")]
         public string FromId { get; set; }
         
-        [JsonPropertyName("tag")]
+        [JsonProperty("tag")]
         public string Tag { get; set; }
 
-        [JsonPropertyName("content")]
+        [JsonProperty("content")]
         public string Content { get; set; }
         
-        [JsonPropertyName("btn_data")]
+        [JsonProperty("btn_data")]
         public string BtnData { get; set; }
         
-        [JsonPropertyName("type_data")]
+        [JsonProperty("type_data")]
         public string TypeData { get; set; }
         
-        [JsonPropertyName("id_data")]
+        [JsonProperty("id_data")]
         public string IdData { get; set; }
         
-        [JsonPropertyName("created_at")]
+        [JsonProperty("created_at")]
         public DateTime CreatedAt { get; set; }
         
-        [JsonPropertyName("updated_at")]
+        [JsonProperty("updated_at")]
         public DateTime UpdatedAt { get; set; }
     }
 }
