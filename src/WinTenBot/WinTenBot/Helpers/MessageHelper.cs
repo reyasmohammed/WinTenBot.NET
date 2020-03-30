@@ -215,7 +215,7 @@ namespace WinTenBot.Helpers
                 Log.Information("Processing : " + split.TrimStart('#'));
 
                 var tagData = await tagsService.GetTagByTag(message.Chat.Id, split.TrimStart('#'));
-                var json = tagData.ToJson();
+                var json = tagData.ToJson(true);
                 Log.Information(json);
 
                 var content = tagData[0].Content;
