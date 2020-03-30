@@ -8,14 +8,13 @@ namespace WinTenBot.Providers
     public static class SerilogProvider
     {
         public static string LogglyToken { get; set; }
-        
+
         public static void InitializeSerilog()
         {
             const string outputTemplate = "[{Timestamp:HH:mm:ss.ffff} {Level:u3}] {Message:lj}{NewLine}{Exception}";
             var logPath = "Storage/Logs/ZiziBot-Logs-.log";
             var flushInterval = TimeSpan.FromSeconds(1);
             var rollingInterval = RollingInterval.Day;
-            // var logglyToken = Bot.GlobalConfiguration["CommonConfig:LogglyToken"];
             var logglyTags = "serilog,wintenbot";
             var logglyBuffer = "Storage/Caches/Loggly";
 
@@ -26,7 +25,8 @@ namespace WinTenBot.Providers
                 .Enrich.FromLogContext()
                 .WriteTo.Loggly(customerToken: LogglyToken, tags: logglyTags, bufferBaseFilename: logglyBuffer)
                 .WriteTo.Console(theme: SystemConsoleTheme.Colored, outputTemplate: outputTemplate)
-                .WriteTo.File(logPath, rollingInterval: rollingInterval, flushToDiskInterval: flushInterval)
+                .WriteTo.File(logPath, rollingInterval: rollingInterval, flushToDiskInterval: flushInterval,
+                    retainedFileCountLimit: 7)
                 .CreateLogger();
         }
     }
