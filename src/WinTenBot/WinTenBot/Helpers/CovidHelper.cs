@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Text;
 using System.Threading.Tasks;
 using Flurl.Http;
@@ -76,6 +76,11 @@ namespace WinTenBot.Helpers
             var date = DateTimeOffset.FromUnixTimeMilliseconds(covidAll.Updated);
             strBuild.AppendLine($"\n<b>Updated:</b> {date}");
             strBuild.AppendLine($"<b>Source:</b> https://corona.lmao.ninja");
+
+            strBuild.AppendLine();
+            strBuild.AppendLine("<b>Covid info by Country.</b>");
+            strBuild.AppendLine("<code>/covid [country name]</code>");
+            
 
             return strBuild.ToString().Trim();
         }
