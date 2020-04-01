@@ -19,7 +19,7 @@ namespace WinTenBot.Handlers.Commands.Additional
             var partTxt = txt.SplitText(" ").ToArray();
             var part1 = partTxt.ValueOfIndex(1); // Country
 
-            await _telegramProvider.SendTextAsync("Sedang mendapatkan informasi..");
+            await _telegramProvider.SendTextAsync("🔍 Getting information..");
 
             var sendText = "";
             if (part1.IsNullOrEmpty())
