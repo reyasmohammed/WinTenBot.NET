@@ -25,7 +25,7 @@ namespace WinTenBot.Model.Lmao
         public static CovidAll FromJson(string json) => JsonConvert.DeserializeObject<CovidAll>(json, Converter.Settings);
     }
 
-    public static class Serialize
+    public static partial class Serialize
     {
         public static string ToJson(this CovidAll self) => JsonConvert.SerializeObject(self, Converter.Settings);
     }

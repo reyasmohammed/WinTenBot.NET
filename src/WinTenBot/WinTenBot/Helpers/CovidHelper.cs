@@ -3,7 +3,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Flurl.Http;
 using Serilog;
-using WinTenBot.Model;
+using WinTenBot.Model.Lmao;
+using CovidAll = WinTenBot.Model.CovidAll;
 
 namespace WinTenBot.Helpers
 {
@@ -73,6 +74,34 @@ namespace WinTenBot.Helpers
             strBuild.AppendLine($"<b>Active:</b> {covidAll.Active}");
 
             var date = DateTimeOffset.FromUnixTimeMilliseconds(covidAll.Updated);
+            strBuild.AppendLine($"\n<b>Updated:</b> {date}");
+            strBuild.AppendLine($"<b>Source:</b> https://corona.lmao.ninja");
+
+            return strBuild.ToString().Trim();
+        }
+
+        public static async Task<string> GetCovidByCountry(string country)
+        {
+            var urlApi = $"https://corona.lmao.ninja/countries/{country}";
+            var covid = await urlApi.GetJsonAsync<CovidByCountry>();
+            
+            var strBuild = new StringBuilder();
+            strBuild.AppendLine($"<b>Country:</b> {covid.Country}");
+
+            strBuild.AppendLine($"<b>Cases:</b> {covid.Cases}");
+            strBuild.AppendLine($"<b>TodayCases:</b> {covid.TodayCases}");
+            
+            strBuild.AppendLine($"<b>Deaths:</b> {covid.Deaths}");
+            strBuild.AppendLine($"<b>TodayDeaths:</b> {covid.TodayDeaths}");
+            
+            strBuild.AppendLine($"<b>Recovered:</b> {covid.Recovered}");
+            strBuild.AppendLine($"<b>Active:</b> {covid.Active}");
+            strBuild.AppendLine($"<b>Critical:</b> {covid.Critical}");
+            
+            strBuild.AppendLine($"<b>Cases Per 1 Milion:</b> {covid.CasesPerOneMillion}");
+            strBuild.AppendLine($"<b>Deaths Per 1 Milion:</b> {covid.DeathsPerOneMillion}");
+            
+            var date = DateTimeOffset.FromUnixTimeMilliseconds(covid.Updated);
             strBuild.AppendLine($"\n<b>Updated:</b> {date}");
             strBuild.AppendLine($"<b>Source:</b> https://corona.lmao.ninja");
 

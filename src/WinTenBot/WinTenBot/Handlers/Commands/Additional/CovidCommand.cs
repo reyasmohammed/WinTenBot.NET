@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
@@ -14,13 +15,27 @@ namespace WinTenBot.Handlers.Commands.Additional
             CancellationToken cancellationToken)
         {
             _telegramProvider = new TelegramProvider(context);
+            var txt = _telegramProvider.Message.Text;
+            var partTxt = txt.SplitText(" ").ToArray();
+            var part1 = partTxt.ValueOfIndex(1); // Country
 
             await _telegramProvider.SendTextAsync("Sedang mendapatkan informasi..");
 
-            // var sendText = await CovidHelper.GetCovidUpdatesAsync();
-            var sendText = await CovidHelper.GetCovidAll();
+            var sendText = "";
+            if (part1.IsNullOrEmpty())
+            {
+                Log.Information("Getting Covid info Global");
+                // var sendText = await CovidHelper.GetCovidUpdatesAsync();
+                sendText = await CovidHelper.GetCovidAll();
+            }
+            else
+            {
+                Log.Information($"Getting Covid info by Region: {part1}");
+                sendText = await CovidHelper.GetCovidByCountry(part1);
+            }
 
             await _telegramProvider.EditAsync(sendText);
+            
         }
     }
 }
