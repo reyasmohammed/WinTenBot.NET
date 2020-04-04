@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -237,7 +237,7 @@ namespace WinTenBot.Helpers
         {
             var tableName = "warn_member_history";
             var repMessage = message.ReplyToMessage;
-            var fromId = message.From.Id;
+            var fromId = repMessage.From.Id;
             var textMsg = message.Text;
             var partText = textMsg.Split(" ");
             var reasonWarn = partText.ValueOfIndex(1) ?? "no-reason";
@@ -278,7 +278,7 @@ namespace WinTenBot.Helpers
             {
                 var data = new Dictionary<string, object>
                 {
-                    {"from_id", message.From.Id},
+                    {"from_id", repMessage.From.Id},
                     {"first_name", repMessage.From.FirstName},
                     {"last_name", repMessage.From.LastName},
                     {"step_count", 1},
@@ -335,7 +335,8 @@ namespace WinTenBot.Helpers
 
             var update = new Dictionary<string, object>
             {
-                {"step_count", 0}, {"updated_at", DateTime.UtcNow}
+                {"step_count", 0},
+                {"updated_at", DateTime.UtcNow}
             };
 
             var insertHit = await new Query(tableName)
