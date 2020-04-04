@@ -27,7 +27,7 @@ namespace WinTenBot.Helpers
 
             return $"<a href='tg://user?id={user.Id}'>{(firstName + " " + lastName).Trim()}</a>";
         }
-        
+
         public static string GetFromNameLink(this Message message)
         {
             var firstName = message.From.FirstName;
@@ -75,7 +75,7 @@ namespace WinTenBot.Helpers
         }
 
         #region AntiSpam
-        
+
         public static async Task<bool> CheckGlobalBanAsync(this TelegramProvider telegramProvider,
             User userTarget = null)
         {
@@ -192,10 +192,10 @@ namespace WinTenBot.Helpers
                 var updatedStep = warnHistory.StepCount;
                 var lastMessageId = warnHistory.LastWarnMessageId;
                 var nameLink = user.GetNameLink();
-                
+
                 var sendText = $"{nameLink} di beri peringatan!." +
                                $"\nPeringatan ke {updatedStep} dari {warnLimit}";
-                
+
                 if (updatedStep == warnLimit) sendText += "\nIni peringatan terakhir!";
 
                 if (!reasonWarn.IsNullOrEmpty())
@@ -237,10 +237,16 @@ namespace WinTenBot.Helpers
         {
             var tableName = "warn_member_history";
             var repMessage = message.ReplyToMessage;
-            var fromId = repMessage.From.Id;
             var textMsg = message.Text;
             var partText = textMsg.Split(" ");
             var reasonWarn = partText.ValueOfIndex(1) ?? "no-reason";
+
+            var fromId = repMessage.From.Id;
+            var fromFName = repMessage.From.FirstName;
+            var fromLName = repMessage.From.LastName;
+            var warnerId = message.From.Id;
+            var warnerFName = message.From.FirstName;
+            var warnerLName = message.From.LastName;
 
             var warnHistory = await new Query(tableName)
                 .Where("from_id", fromId)
@@ -262,8 +268,12 @@ namespace WinTenBot.Helpers
 
                 var update = new Dictionary<string, object>
                 {
+                    {"first_name", fromFName},
+                    {"last_name", fromLName},
                     {"step_count", newStep},
                     {"reason_warn", reasonWarn},
+                    {"warner_first_name", warnerFName},
+                    {"warner_last_name", warnerLName},
                     {"updated_at", DateTime.UtcNow}
                 };
 
@@ -278,18 +288,18 @@ namespace WinTenBot.Helpers
             {
                 var data = new Dictionary<string, object>
                 {
-                    {"from_id", repMessage.From.Id},
-                    {"first_name", repMessage.From.FirstName},
-                    {"last_name", repMessage.From.LastName},
+                    {"from_id", fromId},
+                    {"first_name", fromFName},
+                    {"last_name", fromLName},
                     {"step_count", 1},
                     {"reason_warn", reasonWarn},
-                    {"warner_user_id",message.From.Id},
-                    {"warner_first_name",message.From.FirstName},
-                    {"warner_last_name",message.From.LastName},
+                    {"warner_user_id", warnerId},
+                    {"warner_first_name", warnerFName},
+                    {"warner_last_name", warnerLName},
                     {"chat_id", message.Chat.Id},
                     {"created_at", DateTime.UtcNow}
                 };
-                
+
                 var insertHit = await new Query(tableName)
                     .ExecForSqLite(true)
                     .InsertAsync(data);
@@ -304,7 +314,7 @@ namespace WinTenBot.Helpers
 
             return updatedHistory.ToJson().MapObject<List<WarnMemberHistory>>().First();
         }
-        
+
         public static async Task UpdateLastWarnMemberMessageIdAsync(this Message message, long messageId)
         {
             Log.Information("Updating last Warn Member MessageId.");
@@ -324,7 +334,7 @@ namespace WinTenBot.Helpers
                 .UpdateAsync(update);
 
             Log.Information($"Update lastWarn: {insertHit}");
-        } 
+        }
 
         public static async Task ResetWarnMemberStatAsync(Message message)
         {
@@ -346,7 +356,7 @@ namespace WinTenBot.Helpers
 
             Log.Information($"Update step: {insertHit}");
         }
-        
+
         public static async Task RemoveWarnMemberStatAsync(int userId)
         {
             Log.Information("Removing warn Member stat.");
@@ -355,7 +365,7 @@ namespace WinTenBot.Helpers
 
             var update = new Dictionary<string, object>
             {
-                {"step_count", 0}, 
+                {"step_count", 0},
                 {"updated_at", DateTime.UtcNow}
             };
 
@@ -366,6 +376,7 @@ namespace WinTenBot.Helpers
 
             Log.Information($"Update step: {insertHit}");
         }
+
         #endregion
 
         #region Check Username
