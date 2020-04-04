@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -341,6 +341,26 @@ namespace WinTenBot.Helpers
 
             var insertHit = await new Query(tableName)
                 .Where("from_id", fromId)
+                .ExecForSqLite(true)
+                .UpdateAsync(update);
+
+            Log.Information($"Update step: {insertHit}");
+        }
+        
+        public static async Task RemoveWarnMemberStatAsync(int userId)
+        {
+            Log.Information("Removing warn Member stat.");
+
+            var tableName = "warn_member_history";
+
+            var update = new Dictionary<string, object>
+            {
+                {"step_count", 0}, 
+                {"updated_at", DateTime.UtcNow}
+            };
+
+            var insertHit = await new Query(tableName)
+                .Where("from_id", userId)
                 .ExecForSqLite(true)
                 .UpdateAsync(update);
 

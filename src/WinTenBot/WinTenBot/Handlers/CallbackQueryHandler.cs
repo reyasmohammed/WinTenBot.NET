@@ -27,25 +27,31 @@ namespace WinTenBot.Handlers
 
             switch (partsCallback[0]) // Level 0
             {
+                case "action":
+                    var callbackResult = new ActionCallback(_telegramProvider);
+                    Log.Information($"ActionResult: {callbackResult.ToJson(true)}");
+                    break;
+                
                 case "help":
                     var helpCallback = new HelpCallback(_telegramProvider);
                     Log.Information($"HelpResult: {helpCallback.ToJson(true)}");
-                    break;
-
-                case "verify":
-                    var verifyCallback = new VerifyCallback(_telegramProvider);
-                    Log.Information($"VerifyResult: {verifyCallback.ToJson(true)}");
                     break;
 
                 case "setting":
                     var settingsCallback = new SettingsCallback(_telegramProvider);
                     Log.Information($"SettingsResult: {settingsCallback.ToJson(true)}");
                     break;
+                
+                case "verify":
+                    var verifyCallback = new VerifyCallback(_telegramProvider);
+                    Log.Information($"VerifyResult: {verifyCallback.ToJson(true)}");
+                    break;
+
             }
 
             // await context.Bot.Client.AnswerCallbackQueryAsync(cq.Id, "PONG", true);
 
-            await next(context);
+            await next(context, cancellationToken);
         }
     }
 }
