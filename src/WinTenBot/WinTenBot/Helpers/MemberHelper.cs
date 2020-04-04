@@ -20,6 +20,14 @@ namespace WinTenBot.Helpers
             return $"<a href='tg://user?id={userId}'>{name}</a>";
         }
 
+        public static string GetNameLink(this User user)
+        {
+            var firstName = user.FirstName;
+            var lastName = user.LastName;
+
+            return $"<a href='tg://user?id={user.Id}'>{(firstName + " " + lastName).Trim()}</a>";
+        }
+        
         public static string GetFromNameLink(this Message message)
         {
             var firstName = message.From.FirstName;
@@ -66,6 +74,8 @@ namespace WinTenBot.Helpers
             }
         }
 
+        #region AntiSpam
+        
         public static async Task<bool> CheckGlobalBanAsync(this TelegramProvider telegramProvider,
             User userTarget = null)
         {
@@ -73,7 +83,7 @@ namespace WinTenBot.Helpers
 
             var message = telegramProvider.MessageOrEdited;
             var user = message.From;
-            
+
             var settingService = new SettingsService(message);
             var chatSettings = await settingService.GetSettingByGroup();
             if (!chatSettings.EnableFedEs2)
@@ -139,7 +149,7 @@ namespace WinTenBot.Helpers
                 Log.Information("Fed SpamWatch is disabled in this Group!");
                 return false;
             }
-            
+
             var user = message.From;
             var spamWatch = await user.Id.CheckSpamWatch();
             isBan = spamWatch.IsBan;
@@ -158,6 +168,184 @@ namespace WinTenBot.Helpers
 
             return isBan;
         }
+
+        #endregion
+
+        #region Manual Warn Member
+
+        public static async Task WarnMemberAsync(this TelegramProvider telegramProvider)
+        {
+            try
+            {
+                Log.Information("Prepare Warning Member..");
+                var message = telegramProvider.Message;
+                var repMessage = message.ReplyToMessage;
+                var textMsg = message.Text;
+                var fromId = message.From.Id;
+                var partText = textMsg.Split(" ");
+                var reasonWarn = partText.ValueOfIndex(1) ?? "no-reason";
+                var user = repMessage.From;
+                Log.Information($"Warning User: {user}");
+
+                var warnLimit = 4;
+                var warnHistory = await UpdateWarnMemberStat(message);
+                var updatedStep = warnHistory.StepCount;
+                var lastMessageId = warnHistory.LastWarnMessageId;
+                var nameLink = user.GetNameLink();
+                
+                var sendText = $"{nameLink} di beri peringatan!." +
+                               $"\nPeringatan ke {updatedStep} dari {warnLimit}";
+                
+                if (updatedStep == warnLimit) sendText += "\nIni peringatan terakhir!";
+
+                if (!reasonWarn.IsNullOrEmpty())
+                {
+                    sendText += $"\n<b>Reason:</b> {reasonWarn}";
+                }
+
+                if (updatedStep > warnLimit)
+                {
+                    var sendWarn = $"Batas peringatan telah di lampaui." +
+                                   $"\n{nameLink} di tendang sekarang!";
+                    await telegramProvider.SendTextAsync(sendWarn);
+
+                    await telegramProvider.KickMemberAsync(user);
+                    await telegramProvider.UnbanMemberAsync(user);
+                    await ResetWarnMemberStatAsync(message);
+
+                    return;
+                }
+
+                var inlineKeyboard = new InlineKeyboardMarkup(new[]
+                {
+                    new[]
+                    {
+                        InlineKeyboardButton.WithCallbackData("Hapus peringatan", $"action remove-warn {user.Id}"),
+                    }
+                });
+
+                await telegramProvider.SendTextAsync(sendText, inlineKeyboard);
+                await message.UpdateLastWarnMemberMessageIdAsync(telegramProvider.SentMessageId);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error Warn Member");
+            }
+        }
+
+        private static async Task<WarnMemberHistory> UpdateWarnMemberStat(Message message)
+        {
+            var tableName = "warn_member_history";
+            var repMessage = message.ReplyToMessage;
+            var fromId = message.From.Id;
+            var textMsg = message.Text;
+            var partText = textMsg.Split(" ");
+            var reasonWarn = partText.ValueOfIndex(1) ?? "no-reason";
+
+            var warnHistory = await new Query(tableName)
+                .Where("from_id", fromId)
+                .ExecForSqLite(true)
+                .GetAsync();
+
+            var exist = warnHistory.Any();
+
+            Log.Information($"Check Warn Username History: {exist}");
+
+            if (exist)
+            {
+                var warnHistories = warnHistory.ToJson().MapObject<List<WarnMemberHistory>>().First();
+
+                Log.Information($"Mapped: {warnHistories.ToJson(true)}");
+
+                var newStep = warnHistories.StepCount + 1;
+                Log.Information($"New step for {message.From} is {newStep}");
+
+                var update = new Dictionary<string, object>
+                {
+                    {"step_count", newStep},
+                    {"reason_warn", reasonWarn},
+                    {"updated_at", DateTime.UtcNow}
+                };
+
+                var insertHit = await new Query(tableName)
+                    .Where("from_id", fromId)
+                    .ExecForSqLite(true)
+                    .UpdateAsync(update);
+
+                Log.Information($"Update step: {insertHit}");
+            }
+            else
+            {
+                var data = new Dictionary<string, object>
+                {
+                    {"from_id", message.From.Id},
+                    {"first_name", repMessage.From.FirstName},
+                    {"last_name", repMessage.From.LastName},
+                    {"step_count", 1},
+                    {"reason_warn", reasonWarn},
+                    {"warner_user_id",message.From.Id},
+                    {"warner_first_name",message.From.FirstName},
+                    {"warner_last_name",message.From.LastName},
+                    {"chat_id", message.Chat.Id},
+                    {"created_at", DateTime.UtcNow}
+                };
+                
+                var insertHit = await new Query(tableName)
+                    .ExecForSqLite(true)
+                    .InsertAsync(data);
+
+                Log.Information($"Insert Hit: {insertHit}");
+            }
+
+            var updatedHistory = await new Query(tableName)
+                .Where("from_id", fromId)
+                .ExecForSqLite(true)
+                .GetAsync();
+
+            return updatedHistory.ToJson().MapObject<List<WarnMemberHistory>>().First();
+        }
+        
+        public static async Task UpdateLastWarnMemberMessageIdAsync(this Message message, long messageId)
+        {
+            Log.Information("Updating last Warn Member MessageId.");
+
+            var tableName = "warn_member_history";
+            var fromId = message.ReplyToMessage.From.Id;
+
+            var update = new Dictionary<string, object>
+            {
+                {"last_warn_message_id", messageId},
+                {"updated_at", DateTime.UtcNow}
+            };
+
+            var insertHit = await new Query(tableName)
+                .Where("from_id", fromId)
+                .ExecForSqLite(true)
+                .UpdateAsync(update);
+
+            Log.Information($"Update lastWarn: {insertHit}");
+        } 
+
+        public static async Task ResetWarnMemberStatAsync(Message message)
+        {
+            Log.Information("Resetting warn Username step.");
+
+            var tableName = "warn_member_history";
+            var fromId = message.ReplyToMessage.From.Id;
+
+            var update = new Dictionary<string, object>
+            {
+                {"step_count", 0}, {"updated_at", DateTime.UtcNow}
+            };
+
+            var insertHit = await new Query(tableName)
+                .Where("from_id", fromId)
+                .ExecForSqLite(true)
+                .UpdateAsync(update);
+
+            Log.Information($"Update step: {insertHit}");
+        }
+        #endregion
 
         #region Check Username
 
@@ -218,15 +406,15 @@ namespace WinTenBot.Helpers
                     );
 
                     await telegramProvider.SendTextAsync(sendText, keyboard);
-                    await message.UpdateLastWarnMessageIdAsync(telegramProvider.SentMessageId);
+                    await message.UpdateLastWarnUsernameMessageIdAsync(telegramProvider.SentMessageId);
                 }
             }
             catch (Exception ex)
             {
-                Log.Error(ex,"Error check Username");
+                Log.Error(ex, "Error check Username");
             }
         }
-        
+
         private static async Task<WarnUsernameHistory> UpdateWarnUsernameStat(Message message)
         {
             var tableName = "warn_username_history";
@@ -235,8 +423,8 @@ namespace WinTenBot.Helpers
             {
                 {"from_id", message.From.Id},
                 {"first_name", message.From.FirstName},
-                {"last_name", message.From.LastName}, 
-                {"step_count", 1}, 
+                {"last_name", message.From.LastName},
+                {"step_count", 1},
                 {"chat_id", message.Chat.Id},
                 {"created_at", DateTime.UtcNow}
             };
@@ -291,7 +479,7 @@ namespace WinTenBot.Helpers
         public static async Task ResetWarnUsernameStatAsync(Message message)
         {
             Log.Information("Resetting warn Username step.");
-            
+
             var tableName = "warn_username_history";
             var fromId = message.From.Id;
 
@@ -308,16 +496,16 @@ namespace WinTenBot.Helpers
             Log.Information($"Update step: {insertHit}");
         }
 
-        public static async Task UpdateLastWarnMessageIdAsync(this Message message, long messageId)
+        public static async Task UpdateLastWarnUsernameMessageIdAsync(this Message message, long messageId)
         {
             Log.Information("Updating last Warn MessageId.");
-            
+
             var tableName = "warn_username_history";
             var fromId = message.From.Id;
 
             var update = new Dictionary<string, object>
             {
-                {"last_warn_message_id", messageId}, 
+                {"last_warn_message_id", messageId},
                 {"updated_at", DateTime.UtcNow}
             };
 

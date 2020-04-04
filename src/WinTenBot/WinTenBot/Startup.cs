@@ -122,7 +122,8 @@ namespace WinTenBot
                 .AddScoped<AfkCommand>();
 
             services.AddScoped<KickCommand>()
-                .AddScoped<BanCommand>();
+                .AddScoped<BanCommand>()
+                .AddScoped<WarnCommand>();
 
             services.AddScoped<PromoteCommand>()
                 .AddScoped<DemoteCommand>();
@@ -215,7 +216,7 @@ namespace WinTenBot
 
             var serverOptions = new BackgroundJobServerOptions
             {
-                WorkerCount = Environment.ProcessorCount * 20
+                WorkerCount = Environment.ProcessorCount * 2
             };
 
             app.UseHangfireServer(serverOptions, additionalProcesses: new[]
@@ -298,6 +299,7 @@ namespace WinTenBot
                                     .UseCommand<TestCommand>("test")
                                     .UseCommand<TranslateCommand>("tr")
                                     .UseCommand<UntagCommand>("untag")
+                                    .UseCommand<WarnCommand>("warn")
                                     .UseCommand<WelcomeCommand>("welcome")
                                     .UseCommand<WordFilterCommand>("wfil")
                                     .UseCommand<WordSyncCommand>("wsync")
