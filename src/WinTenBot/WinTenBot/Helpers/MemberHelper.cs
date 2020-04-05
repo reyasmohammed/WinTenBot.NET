@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Serilog;
 using SqlKata;
@@ -71,6 +72,73 @@ namespace WinTenBot.Helpers
 
                 await afkService.SaveAsync(data);
                 await afkService.UpdateCacheAsync();
+            }
+        }
+
+        public static async Task CheckMataZiziAsync(this TelegramProvider telegramProvider)
+        {
+            try
+            {
+                var message = telegramProvider.Message;
+                var fromId = message.From.Id;
+                var fromUsername = message.From.Username;
+                var fromFName = message.From.FirstName;
+                var fromLName = message.From.LastName;
+
+
+                Log.Information("Starting SangMata check..");
+
+                var query = await new Query("hit_activity")
+                    .ExecForMysql(true)
+                    .Where("from_id", fromId)
+                    .OrderByDesc("timestamp")
+                    .Limit(1)
+                    .GetAsync();
+
+                if (!query.Any())
+                {
+                    Log.Information($"This may first Hit from User {fromId}");
+                    return;
+                }
+
+                var hitActivity = query.ToJson().MapObject<List<HitActivity>>().FirstOrDefault();
+
+                Log.Information($"SangMata: {hitActivity.ToJson(true)}");
+
+                var changesCount = 0;
+                var msgBuild = new StringBuilder();
+
+                msgBuild.AppendLine("😽 <b>MataZizi</b>");
+                msgBuild.AppendLine($"<b>UserID:</b> {fromId}");
+
+                if (fromUsername != hitActivity.FromUsername)
+                {
+                    Log.Information("Username changed detected!");
+                    msgBuild.AppendLine($"Mengubah Username menjadi @{fromUsername}");
+                    changesCount++;
+                }
+                
+                if (fromFName != hitActivity.FromFirstName)
+                {
+                    Log.Information("First Name changed detected!");
+                    msgBuild.AppendLine($"Mengubah nama depan menjadi {fromFName}");
+                    changesCount++;
+                }
+                
+                if (fromLName != hitActivity.FromLastName)
+                {
+                    Log.Information("Last Name changed detected!");
+                    msgBuild.AppendLine($"Mengubah nama belakang menjadi {fromLName}");
+                    changesCount++;
+                }
+
+                if(changesCount>0)
+                    await telegramProvider.SendTextAsync(msgBuild.ToString().Trim());
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error SangMata");
             }
         }
 

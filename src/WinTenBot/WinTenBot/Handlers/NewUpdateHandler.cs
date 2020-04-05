@@ -39,6 +39,7 @@ namespace WinTenBot.Handlers
             nonAwaitTasks.Add(_telegramProvider.AfkCheckAsync());
             nonAwaitTasks.Add(_telegramProvider.FindNotesAsync());
             nonAwaitTasks.Add(_telegramProvider.FindTagsAsync());
+            nonAwaitTasks.Add(_telegramProvider.CheckMataZiziAsync());
             nonAwaitTasks.Add(_telegramProvider.HitActivityAsync());
 
             if (context.Update.CallbackQuery == null)
