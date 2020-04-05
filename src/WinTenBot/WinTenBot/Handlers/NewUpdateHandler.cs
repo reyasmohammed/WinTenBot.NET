@@ -55,10 +55,10 @@ namespace WinTenBot.Handlers
 
             await Task.WhenAll(shouldAwaitTasks);
 
-#pragma warning disable 4014
+            #pragma warning disable 4014
             // This List Task should not await.
             Task.WhenAll(nonAwaitTasks);
-#pragma warning restore 4014
+            #pragma warning restore 4014
 
             await next(context, cancellationToken);
         }
