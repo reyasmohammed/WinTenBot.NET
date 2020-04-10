@@ -309,6 +309,7 @@ namespace WinTenBot.Helpers
             var partText = textMsg.Split(" ");
             var reasonWarn = partText.ValueOfIndex(1) ?? "no-reason";
 
+            var chatId = repMessage.Chat.Id;
             var fromId = repMessage.From.Id;
             var fromFName = repMessage.From.FirstName;
             var fromLName = repMessage.From.LastName;
@@ -318,6 +319,7 @@ namespace WinTenBot.Helpers
 
             var warnHistory = await new Query(tableName)
                 .Where("from_id", fromId)
+                .Where("chat_id",chatId)
                 .ExecForSqLite(true)
                 .GetAsync();
 
@@ -347,6 +349,7 @@ namespace WinTenBot.Helpers
 
                 var insertHit = await new Query(tableName)
                     .Where("from_id", fromId)
+                    .Where("chat_id",chatId)
                     .ExecForSqLite(true)
                     .UpdateAsync(update);
 
@@ -377,6 +380,7 @@ namespace WinTenBot.Helpers
 
             var updatedHistory = await new Query(tableName)
                 .Where("from_id", fromId)
+                .Where("chat_id",chatId)
                 .ExecForSqLite(true)
                 .GetAsync();
 
@@ -389,7 +393,8 @@ namespace WinTenBot.Helpers
 
             var tableName = "warn_member_history";
             var fromId = message.ReplyToMessage.From.Id;
-
+            var chatId = message.Chat.Id;
+            
             var update = new Dictionary<string, object>
             {
                 {"last_warn_message_id", messageId},
@@ -398,6 +403,7 @@ namespace WinTenBot.Helpers
 
             var insertHit = await new Query(tableName)
                 .Where("from_id", fromId)
+                .Where("chat_id",chatId)
                 .ExecForSqLite(true)
                 .UpdateAsync(update);
 
@@ -410,6 +416,7 @@ namespace WinTenBot.Helpers
 
             var tableName = "warn_member_history";
             var fromId = message.ReplyToMessage.From.Id;
+            var chatId = message.Chat.Id;
 
             var update = new Dictionary<string, object>
             {
@@ -419,17 +426,20 @@ namespace WinTenBot.Helpers
 
             var insertHit = await new Query(tableName)
                 .Where("from_id", fromId)
+                .Where("chat_id",chatId)
                 .ExecForSqLite(true)
                 .UpdateAsync(update);
 
             Log.Information($"Update step: {insertHit}");
         }
 
-        public static async Task RemoveWarnMemberStatAsync(int userId)
+        public static async Task RemoveWarnMemberStatAsync(this TelegramProvider telegramProvider, int userId)
         {
             Log.Information("Removing warn Member stat.");
 
             var tableName = "warn_member_history";
+            var message = telegramProvider.Message;
+            var chatId = message.Chat.Id;
 
             var update = new Dictionary<string, object>
             {
@@ -439,6 +449,7 @@ namespace WinTenBot.Helpers
 
             var insertHit = await new Query(tableName)
                 .Where("from_id", userId)
+                .Where("chat_id",chatId)
                 .ExecForSqLite(true)
                 .UpdateAsync(update);
 
@@ -531,6 +542,7 @@ namespace WinTenBot.Helpers
 
             var warnHistory = await new Query(tableName)
                 .Where("from_id", data["from_id"])
+                .Where("chat_id", data["chat_id"])
                 .ExecForMysql(true)
                 .GetAsync();
 
@@ -554,6 +566,7 @@ namespace WinTenBot.Helpers
 
                 var insertHit = await new Query(tableName)
                     .Where("from_id", data["from_id"])
+                    .Where("chat_id", data["chat_id"])
                     .ExecForMysql(true)
                     .UpdateAsync(update);
 
@@ -570,6 +583,7 @@ namespace WinTenBot.Helpers
 
             var updatedHistory = await new Query(tableName)
                 .Where("from_id", data["from_id"])
+                .Where("chat_id", data["chat_id"])
                 .ExecForMysql(true)
                 .GetAsync();
 
@@ -582,14 +596,17 @@ namespace WinTenBot.Helpers
 
             var tableName = "warn_username_history";
             var fromId = message.From.Id;
+            var chatId = message.Chat.Id;
 
             var update = new Dictionary<string, object>
             {
-                {"step_count", 0}, {"updated_at", DateTime.UtcNow}
+                {"step_count", 0}, 
+                {"updated_at", DateTime.UtcNow}
             };
 
             var insertHit = await new Query(tableName)
                 .Where("from_id", fromId)
+                .Where("chat_id", chatId)
                 .ExecForMysql(true)
                 .UpdateAsync(update);
 
@@ -602,6 +619,7 @@ namespace WinTenBot.Helpers
 
             var tableName = "warn_username_history";
             var fromId = message.From.Id;
+            var chatId = message.Chat.Id;
 
             var update = new Dictionary<string, object>
             {
@@ -611,6 +629,7 @@ namespace WinTenBot.Helpers
 
             var insertHit = await new Query(tableName)
                 .Where("from_id", fromId)
+                .Where("chat_id", chatId)
                 .ExecForMysql(true)
                 .UpdateAsync(update);
 

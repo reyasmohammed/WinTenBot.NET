@@ -41,7 +41,7 @@ namespace WinTenBot.Handlers.Callbacks
             {
                 case "remove-warn":
                     Log.Information($"Removing warn for {target}");
-                    await MemberHelper.RemoveWarnMemberStatAsync(target);
+                    await Telegram.RemoveWarnMemberStatAsync(target);
                     await Telegram.EditMessageCallback($"Peringatan untuk UserID: {target} sudah di hapus");
                     break;
                 
