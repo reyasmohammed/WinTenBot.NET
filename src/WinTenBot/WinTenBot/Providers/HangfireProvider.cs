@@ -1,32 +1,31 @@
 using System;
-using System.Transactions;
 using Hangfire.LiteDB;
-using Hangfire.MySql;
 using Hangfire.Storage.SQLite;
-using WinTenBot.Model;
+using Serilog;
+using WinTenBot.Model; // using Hangfire.MySql;
 
 namespace WinTenBot.Providers
 {
     public static class HangfireProvider
     {
-        public static MySqlStorage GetMysqlStorage()
-        {
-            var connectionString = BotSettings.DbConnectionString;
-
-            var options = new MySqlStorageOptions
-            {
-                TransactionIsolationLevel = IsolationLevel.ReadCommitted,
-                QueuePollInterval = TimeSpan.FromSeconds(15),
-                JobExpirationCheckInterval = TimeSpan.FromHours(1),
-                CountersAggregateInterval = TimeSpan.FromMinutes(5),
-                PrepareSchemaIfNecessary = true,
-                DashboardJobListLimit = 50000,
-                TransactionTimeout = TimeSpan.FromMinutes(1),
-                TablesPrefix = "Hangfire_"
-            };
-            var storage = new MySqlStorage(connectionString, options);
-            return storage;
-        }
+        // public static MySqlStorage GetMysqlStorage()
+        // {
+        //     var connectionString = BotSettings.DbConnectionString;
+        //
+        //     var options = new MySqlStorageOptions
+        //     {
+        //         TransactionIsolationLevel = IsolationLevel.ReadCommitted,
+        //         QueuePollInterval = TimeSpan.FromSeconds(15),
+        //         JobExpirationCheckInterval = TimeSpan.FromHours(1),
+        //         CountersAggregateInterval = TimeSpan.FromMinutes(5),
+        //         PrepareSchemaIfNecessary = true,
+        //         DashboardJobListLimit = 50000,
+        //         TransactionTimeout = TimeSpan.FromMinutes(1),
+        //         TablesPrefix = "Hangfire_"
+        //     };
+        //     var storage = new MySqlStorage(connectionString, options);
+        //     return storage;
+        // }
 
         public static SQLiteStorage GetSqliteStorage()
         {
