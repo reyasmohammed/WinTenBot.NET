@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -84,13 +84,14 @@ namespace WinTenBot.Helpers
                 var fromUsername = message.From.Username;
                 var fromFName = message.From.FirstName;
                 var fromLName = message.From.LastName;
-
+                var chatId = message.Chat.Id;
 
                 Log.Information("Starting SangMata check..");
 
                 var query = await new Query("hit_activity")
                     .ExecForMysql(true)
                     .Where("from_id", fromId)
+                    .Where("chat_id", chatId)
                     .OrderByDesc("timestamp")
                     .Limit(1)
                     .GetAsync();
