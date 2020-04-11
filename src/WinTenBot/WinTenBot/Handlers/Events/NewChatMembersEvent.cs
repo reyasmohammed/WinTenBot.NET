@@ -79,6 +79,7 @@ namespace WinTenBot.Handlers.Events
             {
 
                 var chatTitle = msg.Chat.Title;
+                var greet = TimeHelper.GetTimeGreet();
                 var memberCount = await _telegramProvider.GetMemberCount();
                 var newMemberCount = newMembers.Length;
 
@@ -96,8 +97,9 @@ namespace WinTenBot.Handlers.Events
                     allNewMember,
                     allNoUsername,
                     allNewBot,
-                    newMemberCount,
                     chatTitle,
+                    greet,
+                    newMemberCount,
                     memberCount
                 });
 
