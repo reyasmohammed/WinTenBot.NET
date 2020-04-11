@@ -22,6 +22,9 @@ namespace WinTenBot.Handlers.Commands.Notes
         {
             _telegramProvider = new TelegramProvider(context);
 
+            await _telegramProvider.SendTextAsync("This feature currently disabled");
+            return;
+            
             var notesData = await _notesService.GetNotesByChatId(_telegramProvider.Message.Chat.Id);
 
             var sendText = "Filters di Obrolan ini.";

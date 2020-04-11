@@ -26,6 +26,9 @@ namespace WinTenBot.Handlers.Commands.Notes
             _telegramProvider = new TelegramProvider(context);
             var msg = context.Update.Message;
 
+            await _telegramProvider.SendTextAsync("This feature currently disabled");
+            return;
+            
             if (msg.ReplyToMessage != null)
             {
                 var repMsg = msg.ReplyToMessage;
@@ -47,7 +50,7 @@ namespace WinTenBot.Handlers.Commands.Notes
                     {"user_id", msg.From.Id}
                 };
 
-                if (partsMsgText[1] != "")
+                if (!partsMsgText.ValueOfIndex(1).IsNullOrEmpty())
                 {
                     data.Add("btn_data", partsMsgText[1]);
                 }
