@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -475,6 +475,7 @@ namespace WinTenBot.Helpers
                 var warnLimit = 4;
                 var message = telegramProvider.MessageOrEdited;
                 var fromUser = message.From;
+                var nameLink = fromUser.GetNameLink();
 
                 var settingService = new SettingsService(message);
                 var chatSettings = await settingService.GetSettingByGroup();
@@ -495,15 +496,15 @@ namespace WinTenBot.Helpers
 
                     await telegramProvider.DeleteAsync(lastMessageId);
 
-                    var sendText = $"{fromUser} belum memasang username." +
+                    var sendText = $"Hai {nameLink}, kamu belum memasang username!" +
                                    $"\nPeringatan ke {updatedStep} dari {warnLimit}";
 
-                    if (updatedStep == warnLimit) sendText += "\nIni peringatan terakhir!";
+                    if (updatedStep == warnLimit) sendText += "\n\n<b>Ini peringatan terakhir!</b>";
 
                     if (updatedStep > warnLimit)
                     {
                         var sendWarn = $"Batas peringatan telah di lampaui." +
-                                       $"\n{fromUser} di tendang sekarang!";
+                                       $"\n{nameLink} di tendang sekarang!";
                         await telegramProvider.SendTextAsync(sendWarn);
 
                         await telegramProvider.KickMemberAsync(fromUser);
