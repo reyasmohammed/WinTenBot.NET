@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
+using Microsoft.Extensions.Hosting;
 using Telegram.Bot;
 using WinTenBot.Helpers;
 
@@ -41,7 +42,14 @@ namespace WinTenBot.Model
         public static IConfiguration GlobalConfiguration { get; set; }
 
         public static IWebHostEnvironment HostingEnvironment { get; set; }
-        
+        public static bool IsDevelopment => HostingEnvironment.IsDevelopment();
+        public static bool IsStaging => HostingEnvironment.IsStaging();
+        public static bool IsProduction => HostingEnvironment.IsProduction();
+        public static bool IsEnvironment(string envName)
+        {
+            return HostingEnvironment.IsEnvironment(envName);
+        }
+
         public static List<string> Sudoers { get; set; }
         public static long BotChannelLogs { get; set; }
         public static string SpamWatchToken { get; set; }
