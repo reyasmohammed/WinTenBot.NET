@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Serilog;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using WinTenBot.Model;
 using WinTenBot.Providers;
@@ -78,6 +79,19 @@ namespace WinTenBot.Helpers
             Log.Information($"UserId {fromId} IsAdmin: {isAdmin}");
 
             return isAdmin;
+        }
+
+        public static async Task<ChatMember[]> GetAllAdmins(this TelegramProvider telegramProvider)
+        {
+            var client = telegramProvider.Client;
+            var message = telegramProvider.Message;
+            var chatId = message.Chat.Id;
+            
+            var allAdmins = await client.GetChatAdministratorsAsync(chatId);
+            if(BotSettings.IsDevelopment)
+                Log.Information($"All Admin on {chatId} {allAdmins.ToJson(true)}");
+
+            return allAdmins;
         }
     }
 }
