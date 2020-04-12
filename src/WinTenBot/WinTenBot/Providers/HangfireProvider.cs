@@ -2,7 +2,9 @@ using System;
 using Hangfire.LiteDB;
 using Hangfire.Storage.SQLite;
 using Serilog;
-using WinTenBot.Model; // using Hangfire.MySql;
+using WinTenBot.Model;
+
+// using Hangfire.MySql;
 
 namespace WinTenBot.Providers
 {
@@ -29,7 +31,9 @@ namespace WinTenBot.Providers
 
         public static SQLiteStorage GetSqliteStorage()
         {
-            var connectionString = BotSettings.GlobalConfiguration["Hangfire:Sqlite"];
+            var connectionString = BotSettings.HangfireSqliteDb;
+            Log.Information($"HangfireSqlite: {connectionString}");
+            
             var options = new SQLiteStorageOptions()
             {
                 QueuePollInterval = TimeSpan.FromSeconds(10)
@@ -41,7 +45,9 @@ namespace WinTenBot.Providers
 
         public static LiteDbStorage GetLiteDbStorage()
         {
-            var connectionString = BotSettings.GlobalConfiguration["Hangfire:LiteDb"];
+            var connectionString = BotSettings.HangfireLiteDb;
+            Log.Information($"HangfireLiteDb: {connectionString}");
+
             var options = new LiteDbStorageOptions()
             {
                 QueuePollInterval = TimeSpan.FromSeconds(10)
