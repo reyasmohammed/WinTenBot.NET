@@ -31,14 +31,25 @@ namespace WinTenBot.Handlers
             var shouldAwaitTasks = new List<Task>();
             var nonAwaitTasks = new List<Task>();
 
-            shouldAwaitTasks.Add(_telegramProvider.CheckCasBanAsync());
-            shouldAwaitTasks.Add(_telegramProvider.CheckSpamWatchAsync());
-            shouldAwaitTasks.Add(_telegramProvider.CheckUsernameAsync());
+            if (_telegramProvider.IsNeedRunTasks())
+            {
+                shouldAwaitTasks.Add(_telegramProvider.CheckCasBanAsync());
+                shouldAwaitTasks.Add(_telegramProvider.CheckSpamWatchAsync());
+                shouldAwaitTasks.Add(_telegramProvider.CheckUsernameAsync());
+                shouldAwaitTasks.Add(_telegramProvider.EnsureChatRestrictionAsync());
+                shouldAwaitTasks.Add(_telegramProvider.CheckGlobalBanAsync());
+                
+                nonAwaitTasks.Add(_telegramProvider.EnsureChatHealthAsync());
+                nonAwaitTasks.Add(_telegramProvider.AfkCheckAsync());
+                nonAwaitTasks.Add(_telegramProvider.FindNotesAsync());
+                nonAwaitTasks.Add(_telegramProvider.FindTagsAsync());
+            }
+            else
+            {
+                Log.Information("Seem not need queue some Tasks..");
+            }
+            
 
-            nonAwaitTasks.Add(_telegramProvider.EnsureChatHealthAsync());
-            nonAwaitTasks.Add(_telegramProvider.AfkCheckAsync());
-            nonAwaitTasks.Add(_telegramProvider.FindNotesAsync());
-            nonAwaitTasks.Add(_telegramProvider.FindTagsAsync());
             nonAwaitTasks.Add(_telegramProvider.CheckMataZiziAsync());
             nonAwaitTasks.Add(_telegramProvider.HitActivityAsync());
 
@@ -47,11 +58,10 @@ namespace WinTenBot.Handlers
                 shouldAwaitTasks.Add(_telegramProvider.CheckMessageAsync());
             }
 
-            if (!_telegramProvider.IsPrivateChat())
-            {
-                shouldAwaitTasks.Add(_telegramProvider.EnsureChatRestrictionAsync());
-                shouldAwaitTasks.Add(_telegramProvider.CheckGlobalBanAsync());
-            }
+            // if (!_telegramProvider.IsPrivateChat())
+            // {
+            //     
+            // }
 
             await Task.WhenAll(shouldAwaitTasks);
 

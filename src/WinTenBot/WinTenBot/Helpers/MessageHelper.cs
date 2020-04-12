@@ -54,6 +54,15 @@ namespace WinTenBot.Helpers
             return text.Trim();
         }
 
+        public static bool IsNeedRunTasks(this TelegramProvider telegramProvider)
+        {
+            var message = telegramProvider.Message;
+            
+            return message.NewChatMembers == null 
+                   || message.LeftChatMember == null
+                   || !telegramProvider.IsPrivateChat();
+        }
+
         public static string GetMessageLink(this Message message)
         {
             var chatUsername = message.Chat.Username;
