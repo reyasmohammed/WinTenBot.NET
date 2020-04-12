@@ -125,7 +125,58 @@ namespace WinTenBot.Helpers
                 {
                     Log.Information("No Logs file need be processed for previous date");
                 }
-            }catch(Exception ex){
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error Send .Log file to ChannelTarget.");
+            }
+        }
+
+        public static async Task ClearLogs(this string logsPath, string filter = "", bool upload = true)
+        {
+            try
+            {
+                Log.Information($"Clearing {logsPath}, filter: {filter}, upload: {upload}");
+                var botClient = BotSettings.Client;
+                var channelTarget = BotSettings.BotChannelLogs;
+
+                if (!channelTarget.ToString().StartsWith("-100"))
+                {
+                    Log.Information("Please specify ChannelTarget in appsettings.json");
+                    return;
+                }
+
+                var dirInfo = new DirectoryInfo(logsPath);
+                var files = dirInfo.GetFiles();
+                var filteredFiles = files.Where(fileInfo =>
+                    fileInfo.CreationTimeUtc < DateTime.UtcNow.AddDays(-1) &&
+                    fileInfo.FullName.Contains(filter)).ToArray();
+
+                if (filteredFiles.Length > 0)
+                {
+                    Log.Information($"Found {filteredFiles.Length} of {files.Length}");
+                    foreach (var fileInfo in filteredFiles)
+                    {
+                        var filePath = fileInfo.FullName;
+                        if (upload)
+                        {
+                            Log.Information($"Uploading file {filePath}");
+                            var fileStream = File.OpenRead(filePath);
+
+                            var media = new InputOnlineFile(fileStream, fileInfo.Name);
+                            await botClient.SendDocumentAsync(channelTarget, media);
+                        }
+
+                        filePath.DeleteFile();
+                    }
+                }
+                else
+                {
+                    Log.Information("No Logs file need be processed for previous date");
+                }
+            }
+            catch (Exception ex)
+            {
                 Log.Error(ex, "Error Send .Log file to ChannelTarget.");
             }
         }
@@ -133,7 +184,7 @@ namespace WinTenBot.Helpers
         public static async Task EnsureChatHealthAsync(this TelegramProvider telegramProvider)
         {
             Log.Information("Ensuring chat health..");
-            
+
             var message = telegramProvider.Message;
             var settingsService = new SettingsService
             {
@@ -145,7 +196,7 @@ namespace WinTenBot.Helpers
                 ["chat_id"] = message.Chat.Id,
                 ["chat_title"] = message.Chat.Title,
             };
-                
+
             var update = await settingsService.SaveSettingsAsync(data);
         }
     }
