@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -205,24 +205,28 @@ namespace WinTenBot.Helpers
 
             Log.Information("Tags Received..");
             var partsText = message.Text.Split(new char[] {' ', '\n', ','})
-                .Where(x => x.Contains("#"));
+                .Where(x => x.Contains("#")).ToArray();
 
-            var limitedTags = partsText.Take(5);
+            var allTags = partsText.Count();
+            var limitedTags = partsText.Take(5).ToArray();
+            var limitedCount = limitedTags.Count();
 
+            Log.Information($"AllTags: {allTags.ToJson(true)}");
+            Log.Information($"First 5: {limitedTags.ToJson(true)}");
             //            int count = 1;
             foreach (var split in limitedTags)
             {
-                Log.Information("Processing : " + split.TrimStart('#'));
+                var trimTag = split.TrimStart('#');
+                Log.Information($"Processing : {trimTag}");
 
-                var tagData = await tagsService.GetTagByTag(message.Chat.Id, split.TrimStart('#'));
-                var json = tagData.ToJson(true);
-                Log.Information(json);
+                var tagData = await tagsService.GetTagByTag(message.Chat.Id, trimTag);
+                Log.Information($"Data of tag: {trimTag} {tagData.ToJson(true)}");
 
                 var content = tagData[0].Content;
                 var buttonStr = tagData[0].BtnData;
 
                 InlineKeyboardMarkup buttonMarkup = null;
-                if (buttonStr != "")
+                if (!buttonStr.IsNullOrEmpty())
                 {
                     buttonMarkup = buttonStr.ToReplyMarkup(2);
                 }
@@ -230,7 +234,7 @@ namespace WinTenBot.Helpers
                 await telegramProvider.SendTextAsync(content, buttonMarkup);
             }
 
-            if (partsText.Count() > limitedTags.Count())
+            if (allTags > limitedCount)
             {
                 await telegramProvider.SendTextAsync("Due performance reason, we limit 5 batch call tags");
             }

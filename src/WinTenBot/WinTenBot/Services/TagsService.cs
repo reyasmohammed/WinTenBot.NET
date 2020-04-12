@@ -60,7 +60,7 @@ namespace WinTenBot.Services
                 .Where("id_chat", chatId)
                 .Where("tag", tag)
                 .OrderBy("tag")
-                .ExecForMysql()
+                .ExecForMysql(true)
                 .GetAsync();
 
             var mapped = query.ToJson().MapObject<List<CloudTag>>();
