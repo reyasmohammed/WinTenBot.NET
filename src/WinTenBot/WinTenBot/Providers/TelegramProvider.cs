@@ -103,7 +103,7 @@ namespace WinTenBot.Providers
 
         #region Message
 
-        public async Task SendTextAsync(string sendText, InlineKeyboardMarkup replyMarkup = null,
+        public async Task<Message> SendTextAsync(string sendText, InlineKeyboardMarkup replyMarkup = null,
             int replyToMsgId = -1, long customChatId = -1)
         {
             TimeProc = Message.Date.GetDelay();
@@ -152,6 +152,8 @@ namespace WinTenBot.Providers
             }
 
             if (send != null) SentMessageId = send.MessageId;
+            
+            return send;
         }
 
         public async Task SendMediaAsync(string fileId, MediaType mediaType, string caption = "",
@@ -182,7 +184,8 @@ namespace WinTenBot.Providers
                     break;
 
                 case MediaType.Video:
-                    await Client.SendVideoAsync(Message.Chat.Id, fileId, caption: caption, parseMode: ParseMode.Html);
+                    await Client.SendVideoAsync(Message.Chat.Id, fileId, caption: caption, parseMode: ParseMode.Html,
+                    replyMarkup:replyMarkup, replyToMessageId:replyToMsgId);
                     break;
 
                 default:
