@@ -1,7 +1,4 @@
-﻿using CodeHollow.FeedReader;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
@@ -10,6 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using CodeHollow.FeedReader;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Serilog;
 using WinTenBot.Helpers.JsonSettings;
 
@@ -21,12 +21,12 @@ namespace WinTenBot.Helpers
         {
             var serializerSetting = new JsonSerializerSettings();
 
-            if(followProperty) serializerSetting.ContractResolver = new CamelCaseFollowProperty();
+            if (followProperty) serializerSetting.ContractResolver = new CamelCaseFollowProperty();
             serializerSetting.Formatting = indented ? Formatting.Indented : Formatting.None;
 
             return JsonConvert.SerializeObject(dataTable, serializerSetting);
         }
-        
+
         public static T MapObject<T>(this string json)
         {
             // return JsonSerializer.Deserialize<T>(json);
@@ -50,7 +50,6 @@ namespace WinTenBot.Helpers
 
         public static string ResolveVariable(this string input, object parameters)
         {
-
             Log.Information("Resolving variable..");
             var type = parameters.GetType();
             Regex regex = new Regex("\\{(.*?)\\}");
@@ -107,7 +106,7 @@ namespace WinTenBot.Helpers
             if (str.IsNullOrEmpty()) return str;
 
             var escaped = Regex.Replace(str, @"[\x00'""\b\n\r\t\cZ\\%_]",
-                delegate (Match match)
+                delegate(Match match)
                 {
                     var v = match.Value;
                     switch (v)
@@ -165,7 +164,8 @@ namespace WinTenBot.Helpers
                 feedUrl = url;
             else if (urls.Count() == 1)
                 feedUrl = urls.First().Url;
-            else if (urls.Count() == 2) // if 2 urls, then its usually a feed and a comments feed, so take the first per default
+            else if (urls.Count() == 2
+            ) // if 2 urls, then its usually a feed and a comments feed, so take the first per default
                 feedUrl = urls.First().Url;
 
             return feedUrl;
@@ -196,17 +196,29 @@ namespace WinTenBot.Helpers
             return new string(arr);
         }
 
-        public static string RemoveThisChar(this string str,string chars)
+        public static string RemoveThisChar(this string str, string chars)
         {
-            return str.IsNullOrEmpty() ? str : chars.Aggregate(str, (current, c) => 
-                current.Replace($"{c}", ""));
+            return str.IsNullOrEmpty()
+                ? str
+                : chars.Aggregate(str, (current, c) =>
+                    current.Replace($"{c}", ""));
         }
-        
+
+        public static string RemoveThisString(this string str, string[] forRemoves)
+        {
+            foreach (var remove in forRemoves)
+            {
+                str = str.Replace(remove, "").Trim();
+            }
+
+            return str;
+        }
+
         public static string StripMargin(this string s)
         {
             return Regex.Replace(s, @"[ \t]+\|", string.Empty);
         }
-        
+
         public static string StripLeadingWhitespace(this string s)
         {
             Regex r = new Regex(@"^\s+", RegexOptions.Multiline);
