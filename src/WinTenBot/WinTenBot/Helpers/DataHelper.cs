@@ -70,6 +70,11 @@ namespace WinTenBot.Helpers
             return string.IsNullOrEmpty(str);
         }
 
+        public static bool IsNotNullOrEmpty(this string str)
+        {
+            return !str.IsNullOrEmpty();
+        }
+
         // Source: https://www.codeproject.com/Articles/44274/Transpose-a-DataTable-using-C
         public static DataTable TransposedTable(this DataTable inputTable)
         {
