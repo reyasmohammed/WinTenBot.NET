@@ -463,7 +463,18 @@ namespace WinTenBot.Helpers
 
         public static bool IsNoUsername(this User user)
         {
-            return user.Username == null;
+            var userId = user.Id;
+            var ignored =new []
+            {
+                "777000"
+            };
+
+            var match = ignored.FirstOrDefault(id => id == userId.ToString());
+            if (!match.IsNotNullOrEmpty()) return user.Username == null;
+            
+            Log.Information("This user true Ignored!");
+            return false;
+
         }
 
         public static async Task CheckUsernameAsync(this TelegramProvider telegramProvider)
