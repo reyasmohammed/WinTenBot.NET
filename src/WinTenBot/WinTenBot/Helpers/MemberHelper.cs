@@ -525,8 +525,11 @@ namespace WinTenBot.Helpers
                         return;
                     }
 
+                    var urlStart = await telegramProvider.GetUrlStart("start=set-username");
+                    Log.Information($"UrlStart: {urlStart}");
+
                     var keyboard = new InlineKeyboardMarkup(
-                        InlineKeyboardButton.WithUrl("Cara Pasang Username", "https://t.me/WinTenDev/29")
+                        InlineKeyboardButton.WithUrl("Cara Pasang Username", urlStart)
                     );
 
                     await telegramProvider.SendTextAsync(sendText, keyboard);
