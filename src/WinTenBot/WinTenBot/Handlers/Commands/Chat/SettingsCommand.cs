@@ -18,6 +18,9 @@ namespace WinTenBot.Handlers.Commands.Chat
         {
             _telegramProvider = new TelegramProvider(context);
             _settingsService = new SettingsService(context.Update.Message);
+            var message = _telegramProvider.Message;
+
+            await _telegramProvider.DeleteAsync(message.MessageId);
 
             var adminOrPrivate = await _telegramProvider.IsAdminOrPrivateChat();
             if (adminOrPrivate)
