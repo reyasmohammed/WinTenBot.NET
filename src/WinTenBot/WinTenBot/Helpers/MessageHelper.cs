@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +8,7 @@ using SqlKata.Execution;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
+using WinTenBot.Enums;
 using WinTenBot.Model;
 using WinTenBot.Providers;
 using WinTenBot.Services;
@@ -162,6 +163,13 @@ namespace WinTenBot.Helpers
                     Log.Information("Find Notes is disabled in this Group!");
                     return;
                 }
+
+                var msgText = message.Text;
+                if (msgText.IsNullOrEmpty())
+                {
+                    Log.Information("Message Text should not null or empty");
+                    return;
+                }
                 
                 var notesService = new NotesService();
 
@@ -170,17 +178,16 @@ namespace WinTenBot.Helpers
                 {
                     var content = selectedNotes[0].Content;
                     var btnData = selectedNotes[0].BtnData;
-                    if (btnData != "")
+                    if (!btnData.IsNullOrEmpty())
                     {
                         inlineKeyboardMarkup = btnData.ToReplyMarkup(2);
                     }
 
                     await telegramProvider.SendTextAsync(content, inlineKeyboardMarkup);
-                    inlineKeyboardMarkup = null;
 
                     foreach (var note in selectedNotes)
                     {
-                        Log.Debug(note.ToJson());
+                        Log.Debug("List Notes: " + note.ToJson(true));
                     }
                 }
                 else
@@ -233,6 +240,8 @@ namespace WinTenBot.Helpers
 
                 var content = tagData[0].Content;
                 var buttonStr = tagData[0].BtnData;
+                var typeData = tagData[0].TypeData;
+                var idData = tagData[0].IdData;
 
                 InlineKeyboardMarkup buttonMarkup = null;
                 if (!buttonStr.IsNullOrEmpty())
@@ -240,7 +249,16 @@ namespace WinTenBot.Helpers
                     buttonMarkup = buttonStr.ToReplyMarkup(2);
                 }
 
-                await telegramProvider.SendTextAsync(content, buttonMarkup);
+                if (typeData != MediaType.Unknown)
+                {
+                    await telegramProvider.SendMediaAsync(idData, typeData, content, buttonMarkup);
+                }
+                else
+                {
+                    await telegramProvider.SendTextAsync(content, buttonMarkup);
+                }
+
+                // await telegramProvider.SendTextAsync(content, buttonMarkup);
             }
 
             if (allTags > limitedCount)
