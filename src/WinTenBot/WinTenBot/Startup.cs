@@ -295,6 +295,7 @@ namespace WinTenBot
                                     .UseCommand<SetWelcomeCommand>("setwelcome")
                                     .UseCommand<StartCommand>("start")
                                     .UseCommand<TagCommand>("tag")
+                                    .UseCommand<TagsCommand>("notes")
                                     .UseCommand<TagsCommand>("tags")
                                     .UseCommand<TestCommand>("test")
                                     .UseCommand<TranslateCommand>("tr")
