@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types.Enums;
@@ -32,9 +33,15 @@ namespace WinTenBot.Handlers.Commands.Group
                 if (msg.From.Id != repMsg.From.Id)
                 {
                     var mentionAdmins = await _telegramProvider.GetMentionAdminsStr();
-
+                    var allListAdmin =await _telegramProvider.GetAllAdmins();
+                    var allAdminId = allListAdmin.Select(a => a.User.Id);
+                    
+                    var reporterNameLink = msg.GetFromNameLink();
+                    var reportedNameLink = repMsg.GetFromNameLink();
+                    var repMsgLink = repMsg.GetMessageLink();
+                    
                     sendText = $"Ada laporan nich." +
-                               $"\n{msg.GetFromNameLink()} melaporkan {repMsg.GetFromNameLink()}" +
+                               $"\n{reporterNameLink} melaporkan {reportedNameLink}" +
                                $"{mentionAdmins}";
 
                     var keyboard = new InlineKeyboardMarkup(new[]
@@ -47,7 +54,7 @@ namespace WinTenBot.Handlers.Commands.Group
                         new[]
                         {
                             InlineKeyboardButton.WithCallbackData("Ban", "PONG"),
-                            InlineKeyboardButton.WithCallbackData("Ke Pesan", "PONG"),
+                            InlineKeyboardButton.WithUrl("Ke Pesan", repMsgLink),
                         }
                     });
 
