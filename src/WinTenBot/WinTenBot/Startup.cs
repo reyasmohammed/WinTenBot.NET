@@ -64,7 +64,7 @@ namespace WinTenBot
                 .UseSerilogLogProvider()
                 .UseColouredConsoleLogProvider();
             
-            // FluentMigratorProvider.RunMigration();
+            FluentMigratorProvider.RunMigration();
         }
 
         public void ConfigureServices(IServiceCollection services)
