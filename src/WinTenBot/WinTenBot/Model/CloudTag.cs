@@ -1,5 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
+using WinTenBot.Enums;
 
 namespace WinTenBot.Model
 {
@@ -21,7 +22,7 @@ namespace WinTenBot.Model
         public string BtnData { get; set; }
         
         [JsonProperty("type_data")]
-        public string TypeData { get; set; }
+        public MediaType TypeData { get; set; }
         
         [JsonProperty("id_data")]
         public string IdData { get; set; }
