@@ -19,6 +19,8 @@
     <PackageReference Include="Hangfire.LiteDB" Version="0.3.1" />
     <PackageReference Include="Hangfire.Storage.SQLite" Version="0.2.4" />
     <PackageReference Include="JsonEnvVar" Version="1.0.0" />
+    <PackageReference Include="JsonFlatFileDataStore" Version="2.2.2" />
+    <PackageReference Include="MySql.Data" Version="8.0.19" />
     <PackageReference Include="Serilog" Version="2.9.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
