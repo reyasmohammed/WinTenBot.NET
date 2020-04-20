@@ -73,15 +73,12 @@ namespace WinTenBot.Services
             // return data;
         }
 
-        public async Task SaveTag(Dictionary<string, object> data)
+        public async Task SaveTagAsync(Dictionary<string, object> data)
         {
-            var json = TextHelper.ToJson(data);
-            Log.Information(json);
             var insert = await new Query("tags")
-                .ExecForMysql()
+                .ExecForMysql(true)
                 .InsertAsync(data);
-
-                // var insert = await _mySqlProvider.Insert("tags", data);
+            
             Log.Information($"SaveTag: {insert}");
         }
 

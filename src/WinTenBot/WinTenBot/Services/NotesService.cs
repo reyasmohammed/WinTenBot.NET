@@ -30,10 +30,12 @@ namespace WinTenBot.Services
 
         public async Task<List<CloudNote>> GetNotesBySlug(long chatId, string slug)
         {
+            Log.Information("Getting Notes by Slug..");
+            
             var query = await new Query(baseTable)
                 .Where("chat_id",chatId)
                 .OrWhereContains("slug",slug)
-                .ExecForMysql()
+                .ExecForMysql(true)
                 .GetAsync();
 
             var mapped = query.ToJson().MapObject<List<CloudNote>>();
