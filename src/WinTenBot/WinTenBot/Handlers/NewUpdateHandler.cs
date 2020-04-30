@@ -35,11 +35,15 @@ namespace WinTenBot.Handlers
             {
                 if (!_telegramProvider.IsPrivateChat())
                 {
-                    shouldAwaitTasks.Add(_telegramProvider.CheckUsernameAsync());
-                    shouldAwaitTasks.Add(_telegramProvider.CheckSpamWatchAsync());
-                    shouldAwaitTasks.Add(_telegramProvider.CheckCasBanAsync());
                     shouldAwaitTasks.Add(_telegramProvider.EnsureChatRestrictionAsync());
-                    shouldAwaitTasks.Add(_telegramProvider.CheckGlobalBanAsync());
+
+                    if (message.NewChatMembers != null)
+                    {
+                        shouldAwaitTasks.Add(_telegramProvider.CheckGlobalBanAsync());
+                        shouldAwaitTasks.Add(_telegramProvider.CheckCasBanAsync());
+                        shouldAwaitTasks.Add(_telegramProvider.CheckSpamWatchAsync());
+                        shouldAwaitTasks.Add(_telegramProvider.CheckUsernameAsync());
+                    }
                 }
 
                 nonAwaitTasks.Add(_telegramProvider.EnsureChatHealthAsync());
