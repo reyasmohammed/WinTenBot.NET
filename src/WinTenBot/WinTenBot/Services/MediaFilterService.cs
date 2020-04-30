@@ -19,7 +19,7 @@ namespace WinTenBot.Services
         public async Task<bool> IsExist(string key, string value)
         {
             var query = await new Query(baseTable)
-                .ExecForMysql()
+                .ExecForMysql(true)
                 .Where(key, value)
                 .GetAsync();
             return query.Any();
