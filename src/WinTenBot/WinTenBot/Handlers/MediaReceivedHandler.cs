@@ -26,8 +26,11 @@ namespace WinTenBot.Handlers
             var msg = context.Update.Message;
 
             Log.Information("Media received... ");
-            var isBan = await _mediaFilterService.IsExistInCache("file_id", msg.GetReducedFileId());
-//            var isBan = await _mediaFilterService.IsExist("file_id", msg.GetReducedFileId());
+            var fileId = msg.GetFileId();
+            var reducedFileId = msg.GetReducedFileId();
+
+            // var isBan = await _mediaFilterService.IsExistInCache("file_id", msg.GetReducedFileId());
+            var isBan = await _mediaFilterService.IsExist("file_id", fileId);
             if (isBan)
             {
                 await _telegramProvider.DeleteAsync(msg.MessageId);

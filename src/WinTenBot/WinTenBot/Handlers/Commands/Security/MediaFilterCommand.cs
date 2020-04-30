@@ -34,7 +34,7 @@ namespace WinTenBot.Handlers.Commands.Security
                     var repMsg = msg.ReplyToMessage;
                     Log.Information(msg.Type.ToJson(true));
 
-                    var fileId = repMsg.GetReducedFileId();
+                    var fileId = repMsg.GetFileId();
 
                     var isExist = await _mediaFilterService.IsExist("file_id", fileId);
                     if (!isExist)
