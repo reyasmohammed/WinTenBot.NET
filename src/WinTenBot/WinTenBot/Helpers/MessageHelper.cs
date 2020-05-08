@@ -88,22 +88,27 @@ namespace WinTenBot.Helpers
                 .ExecForSqLite(true)
                 .GetAsync();
 
-            var mapped = query.ToJson().MapObject<List<WordFilter>>();
+            var mappedWords = query.ToJson().MapObject<List<WordFilter>>();
 
-            var partedWord = words.Split(" ");
+            var partedWord = words.Split(new[] { '\n', '\r', ' ', '\t' }, 
+                StringSplitOptions.RemoveEmptyEntries);
             foreach (var word in partedWord)
             {
-                foreach (WordFilter wordFilter in mapped)
+                foreach (WordFilter wordFilter in mappedWords)
                 {
                     var forFilter = wordFilter.Word;
                     var isGlobal = wordFilter.IsGlobal;
-
-                    if (forFilter == word.ToLower())
+                    var isDeep = wordFilter.DeepFilter;
+                    var forCompare = word;
+                    if(isDeep)   forCompare = word .ToLower();
+                    
+                    if (forFilter == forCompare)
                     {
                         isMust = true;
                     }
 
-                    // Log.Debug($"Is ({isGlobal}) '{word}' == '{forFilter}' ? {isMust}");
+                    var result = $"'{forCompare}' == '{forFilter}' ? {isMust}. Deep: {isDeep}, Global: {isGlobal}";
+                    if (BotSettings.IsDevelopment) Log.Debug(result);
 
                     if (isMust) break;
                 }
