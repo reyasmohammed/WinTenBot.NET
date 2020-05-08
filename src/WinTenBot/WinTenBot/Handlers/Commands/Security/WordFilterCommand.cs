@@ -28,49 +28,65 @@ namespace WinTenBot.Handlers.Commands.Security
 
             var isSudoer = _telegramProvider.IsSudoer();
             var isAdmin = await _telegramProvider.IsAdminGroup();
-            if (isSudoer || isAdmin)
+            if (!isSudoer && !isAdmin)
             {
-                var where = new Dictionary<string, object>() {{"word", word}};
+                return;
+            }
+            
+            var where = new Dictionary<string, object>() {{"word", word}};
 
-                if (paramOption == "-g" && isSudoer)
+            if (paramOption.Contains("-"))
+            {
+                if (paramOption.Contains("g") && isSudoer) // Global
                 {
                     isGlobalBlock = true;
                     await _telegramProvider.AppendTextAsync("Kata ini akan di blokir dengan mode Group-wide!");
                 }
 
-                if (!isSudoer)
+                if (paramOption.Contains("d"))
                 {
-                    await _telegramProvider.AppendTextAsync("Hanya Sudoer yang dapat memblokir Kata mode Group-wide!");
-                }
-
-                if (paramOption != "-g")
-                {
-                    where.Add("chat_id", msg.Chat.Id);
-                }
-
-                if (word != "")
-                {
-                    await _telegramProvider.AppendTextAsync("Sedang menambahkan kata");
                     
-                    var isExist = await _wordFilterService.IsExistAsync(where);
-                    if (!isExist)
-                    {
-                        var save = await _wordFilterService.SaveWordAsync(word, isGlobalBlock);
+                }
+                
+                if (paramOption.Contains("c"))
+                {
+                    
+                }
+            }
+            
+            if (!paramOption.Contains("g"))
+            {
+                @where.Add("chat_id", msg.Chat.Id);
+            }
 
-                        await _telegramProvider.AppendTextAsync("Kata berhasil di tambahkan");
-                    }
-                    else
-                    {
-                        await _telegramProvider.AppendTextAsync("Kata sudah di tambahkan");
-                    }
+            if (!isSudoer)
+            {
+                await _telegramProvider.AppendTextAsync("Hanya Sudoer yang dapat memblokir Kata mode Group-wide!");
+            }
+
+            if (word != "")
+            {
+                await _telegramProvider.AppendTextAsync("Sedang menambahkan kata");
+
+                var isExist = await _wordFilterService.IsExistAsync(@where);
+                if (!isExist)
+                {
+                    var save = await _wordFilterService.SaveWordAsync(word, isGlobalBlock);
+
+                    await _telegramProvider.AppendTextAsync("Kata berhasil di tambahkan");
                 }
                 else
                 {
-                    await _telegramProvider.SendTextAsync("Apa kata?");
+                    await _telegramProvider.AppendTextAsync("Kata sudah di tambahkan");
                 }
-
-                await _telegramProvider.DeleteAsync(delay: 3000);
             }
+            else
+            {
+                await _telegramProvider.SendTextAsync("Apa kata yg mau di blok?");
+            }
+
+            await _telegramProvider.DeleteAsync(delay: 3000);
+            
         }
     }
 }
