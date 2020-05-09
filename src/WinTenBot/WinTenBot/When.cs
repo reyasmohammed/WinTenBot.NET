@@ -1,7 +1,5 @@
-﻿using System.Linq;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Telegram.Bot.Framework.Abstractions;
-using Telegram.Bot.Types.Enums;
 
 namespace WinTenBot
 {
@@ -27,11 +25,12 @@ namespace WinTenBot
             context.Update.Message?.Text != null;
 
         public static bool NewCommand(IUpdateContext context) =>
-            context.Update.Message?.Entities?.FirstOrDefault()?.Type == MessageEntityType.BotCommand;
+            context.Update.Message.Text.StartsWith("/");
+            // context.Update.Message?.Entities?.First()?.Type == MessageEntityType.BotCommand;
 
         public static bool PingReceived(IUpdateContext context) =>
             context.Update.Message?.Text.ToLower() == "ping" ||
-        context.Update.Message?.Text.ToLower() == "/ping";
+            context.Update.Message?.Text.ToLower() == "/ping";
         
         public static bool CallTagReceived(IUpdateContext context) =>
             context.Update.Message.Text.Contains('#');
