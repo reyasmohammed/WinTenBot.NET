@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Serilog;
 
@@ -27,7 +28,7 @@ namespace WinTenBot.Helpers
         
         public static string ValueOfIndex(this string[] array, int index)
         {
-            string value = null;
+            string value = string.Empty;
             if (array.Length > index && array[index] != null)
             {
                 value = array[index];
