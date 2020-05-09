@@ -47,7 +47,7 @@ namespace WinTenBot
 
             BotSettings.GlobalConfiguration = Configuration;
             BotSettings.FillSettings();
-            
+
             BotSettings.DbConnectionString = Configuration["CommonConfig:ConnectionString"];
             SerilogProvider.LogglyToken = Configuration["CommonConfig:Watson"];
             FluentMigratorProvider.ConnectionString = BotSettings.DbConnectionString;
@@ -63,7 +63,7 @@ namespace WinTenBot
             GlobalConfiguration.Configuration
                 .UseSerilogLogProvider()
                 .UseColouredConsoleLogProvider();
-            
+
             FluentMigratorProvider.RunMigration();
         }
 
@@ -73,9 +73,6 @@ namespace WinTenBot
                 .AddTransient<ZiziBot>()
                 .Configure<BotOptions<ZiziBot>>(Configuration.GetSection("ZiziBot"))
                 .Configure<CustomBotOptions<ZiziBot>>(Configuration.GetSection("ZiziBot"))
-                // .AddTransient<MacOsBot>()
-                // .Configure<BotOptions<MacOsBot>>(Configuration.GetSection("MacOsBot"))
-                // .Configure<CustomBotOptions<MacOsBot>>(Configuration.GetSection("MacOsBot"))
                 .AddScoped<NewUpdateHandler>()
                 .AddScoped<GenericMessageHandler>()
                 .AddScoped<WebhookLogger>()
@@ -155,7 +152,6 @@ namespace WinTenBot
 
             services.AddScoped<TranslateCommand>();
 
-
             services.AddHangfireServer();
             services.AddHangfire(config =>
             {
@@ -197,20 +193,15 @@ namespace WinTenBot
                 // get bot updates from Telegram via long-polling approach during development
                 // this will disable Telegram webhooks
                 app.UseTelegramBotLongPolling<ZiziBot>(configureBot, TimeSpan.FromSeconds(1));
-                // app.UseTelegramBotLongPolling<MacOsBot>(configureBot, TimeSpan.FromSeconds(1));
-
                 app.UseHangfireDashboard("/hangfire", dashboardOptions);
             }
             else
             {
                 // use Telegram bot webhook middleware in higher environments
                 app.UseTelegramBotWebhook<ZiziBot>(configureBot);
-                // app.UseTelegramBotWebhook<MacOsBot>(configureBot);
 
                 // and make sure webhook is enabled
                 app.EnsureWebhookSet<ZiziBot>();
-                // app.EnsureWebhookSet<MacOsBot>();
-
                 app.UseHangfireDashboard(hangfireBaseUrl, dashboardOptions);
             }
 
