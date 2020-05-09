@@ -21,9 +21,6 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		RESX_ShowPerformanceTraces = True
-		RESX_AutoCreateNewLanguageFiles = True
-		RESX_SortFileContentOnSave = True
-		RESX_NeutralResourcesLanguage = id-ID
-		SolutionGuid = {21D7FED4-B73C-4E5C-8BC4-B9772AB5B3CA}
+		SolutionGuid = {AFE8345E-016B-4B6D-A95A-3D62AEF8BA8A}
 	EndGlobalSection
 EndGlobal
