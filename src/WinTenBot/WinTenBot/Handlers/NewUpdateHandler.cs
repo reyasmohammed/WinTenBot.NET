@@ -27,40 +27,56 @@ namespace WinTenBot.Handlers
 
             Log.Information($"New Update: {context.Update.ToJson(true)}");
 
+            await EnqueuePreTask();
+
+            await next(context, cancellationToken);
+        }
+
+        private async Task EnqueuePreTask()
+        {
+            Log.Information("Enqueue pre tasks");
+
+            var message = _telegramProvider.Message;
+            var callbackQuery = _telegramProvider.CallbackQuery;
+
             // var actions = new List<Action>();
             var shouldAwaitTasks = new List<Task>();
             var nonAwaitTasks = new List<Task>();
 
-            if (_telegramProvider.IsNeedRunTasks())
+            // if (_telegramProvider.IsNeedRunTasks())
+            // {
+            if (!_telegramProvider.IsPrivateChat())
             {
-                if (!_telegramProvider.IsPrivateChat())
+                shouldAwaitTasks.Add(_telegramProvider.EnsureChatRestrictionAsync());
+
+                if (message.Text != null)
                 {
-                    shouldAwaitTasks.Add(_telegramProvider.EnsureChatRestrictionAsync());
-
-                    if (message.NewChatMembers != null)
-                    {
-                        shouldAwaitTasks.Add(_telegramProvider.CheckGlobalBanAsync());
-                        shouldAwaitTasks.Add(_telegramProvider.CheckCasBanAsync());
-                        shouldAwaitTasks.Add(_telegramProvider.CheckSpamWatchAsync());
-                        shouldAwaitTasks.Add(_telegramProvider.CheckUsernameAsync());
-                    }
+                    shouldAwaitTasks.Add(_telegramProvider.CheckGlobalBanAsync());
+                    shouldAwaitTasks.Add(_telegramProvider.CheckCasBanAsync());
+                    shouldAwaitTasks.Add(_telegramProvider.CheckSpamWatchAsync());
+                    shouldAwaitTasks.Add(_telegramProvider.CheckUsernameAsync());
                 }
+            }
 
-                nonAwaitTasks.Add(_telegramProvider.EnsureChatHealthAsync());
-                nonAwaitTasks.Add(_telegramProvider.AfkCheckAsync());
+            nonAwaitTasks.Add(_telegramProvider.EnsureChatHealthAsync());
+            nonAwaitTasks.Add(_telegramProvider.AfkCheckAsync());
+
+            if (message.Text != null)
+            {
                 nonAwaitTasks.Add(_telegramProvider.FindNotesAsync());
                 nonAwaitTasks.Add(_telegramProvider.FindTagsAsync());
             }
-            else
-            {
-                Log.Information("Seem not need queue some Tasks..");
-            }
-            
+            // }
+            // else
+            // {
+            // Log.Information("Seem not need queue some Tasks..");
+            // }
+
 
             nonAwaitTasks.Add(_telegramProvider.CheckMataZiziAsync());
             nonAwaitTasks.Add(_telegramProvider.HitActivityAsync());
 
-            if (context.Update.CallbackQuery == null)
+            if (callbackQuery == null)
             {
                 shouldAwaitTasks.Add(_telegramProvider.CheckMessageAsync());
             }
@@ -70,14 +86,14 @@ namespace WinTenBot.Handlers
             //     
             // }
 
+            Log.Information($"Running {shouldAwaitTasks.Count} awaited and {nonAwaitTasks.Count} non-await tasks");
+
             await Task.WhenAll(shouldAwaitTasks);
 
-            #pragma warning disable 4014
+#pragma warning disable 4014
             // This List Task should not await.
             Task.WhenAll(nonAwaitTasks);
-            #pragma warning restore 4014
-
-            await next(context, cancellationToken);
+#pragma warning restore 4014
         }
     }
 }
