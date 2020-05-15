@@ -24,6 +24,7 @@ namespace WinTenBot.Scheduler
             Log.Debug($"Starting cron Log Cleaner with id {jobId}");
 
             RecurringJob.AddOrUpdate(jobId, () => BotHelper.ClearLog(), Cron.Hourly);
+            RecurringJob.Trigger(jobId);
         }
 
         private static void StartLogglyCleanup()
@@ -33,7 +34,8 @@ namespace WinTenBot.Scheduler
             
             Log.Debug($"Starting cron Loggly Cache Cleaner with id {jobId}");
 
-            RecurringJob.AddOrUpdate(jobId, () => storageCaches.ClearLogs("loggly",false), Cron.Daily);
+            RecurringJob.AddOrUpdate(jobId, () => storageCaches.ClearLogs("Loggly",false), Cron.Hourly);
+            RecurringJob.Trigger(jobId);
         }
     }
 }
