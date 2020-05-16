@@ -18,6 +18,7 @@ namespace WinTenBot.Handlers.Commands.Additional
             _telegramProvider = new TelegramProvider(context);
 
             var message = _telegramProvider.Message;
+            var userLang = message.From.LanguageCode;
 
             if (message.ReplyToMessage != null)
             {
@@ -57,7 +58,8 @@ namespace WinTenBot.Handlers.Commands.Additional
             }
             else
             {
-                await _telegramProvider.SendTextAsync("Reply message where you want to translate");
+                var hintTranslate = await "Balas pesan yang ingin anda terjemahkan".Translate(userLang);
+                await _telegramProvider.SendTextAsync(hintTranslate.MergedTranslation);
             }
 
         }
