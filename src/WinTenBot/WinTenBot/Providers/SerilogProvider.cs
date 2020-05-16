@@ -12,7 +12,7 @@ namespace WinTenBot.Providers
         public static void InitializeSerilog()
         {
             const string outputTemplate = "[{Timestamp:HH:mm:ss.ffff} {Level:u3}] {Message:lj}{NewLine}{Exception}";
-            var logPath = "Storage/Logs/ZiziBot-Logs-.log";
+            var logPath = "Storage/Logs/ZiziBot-.log";
             var flushInterval = TimeSpan.FromSeconds(1);
             var rollingInterval = RollingInterval.Day;
             // var logglyTags = "serilog,wintenbot";
