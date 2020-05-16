@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Framework.Abstractions;
+using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
 using WinTenBot.Services;
@@ -20,8 +21,9 @@ namespace WinTenBot.Handlers.Commands.Core
             _rssService = new RssService(context.Update.Message);
 
             var chatId = _telegramProvider.Message.Chat.Id;
+            var fromId = _telegramProvider.Message.From.Id;
 
-            if (_telegramProvider.Message.From.Id.IsSudoer())
+            if (fromId.IsSudoer())
             {
                 Log.Information("Test started..");
                 await _telegramProvider.SendTextAsync("Sedang mengetes sesuatu");
@@ -47,9 +49,29 @@ namespace WinTenBot.Handlers.Commands.Core
 
                 // await RssHelper.SyncRssHistoryToCloud();
                 // await BotHelper.ClearLog();
-                await SyncHelper.SyncGBanToLocalAsync();
 
-                await _telegramProvider.EditAsync("Selesai ngetest");
+                // await SyncHelper.SyncGBanToLocalAsync();
+                // var greet = TimeHelper.GetTimeGreet();
+
+                var inlineKeyboard = new InlineKeyboardMarkup(new[]
+                {
+                    // new[]
+                    // {
+                        // InlineKeyboardButton.WithCallbackData("Warn Username Limit", "info warn-username-limit"),
+                        // InlineKeyboardButton.WithCallbackData("-", "callback-set warn_username_limit 3"),
+                        // InlineKeyboardButton.WithCallbackData("4", "info setelah"),
+                        // InlineKeyboardButton.WithCallbackData("+", "callback-set warn_username_limit 5")
+                    // },
+                    new[]
+                    {
+                        // InlineKeyboardButton.WithCallbackData("Warn Username Limit", "info warn-username-limit"),
+                        InlineKeyboardButton.WithCallbackData("-", "callback-set warn_username_limit 3"),
+                        InlineKeyboardButton.WithCallbackData("4", "info setelah"),
+                        InlineKeyboardButton.WithCallbackData("+", "callback-set warn_username_limit 5")
+                    }
+                });
+
+                await _telegramProvider.EditAsync("Warn Username Limit", inlineKeyboard);
             }
 
             // else
