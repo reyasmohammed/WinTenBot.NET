@@ -273,6 +273,15 @@ namespace WinTenBot.Providers
             }
         }
 
+        public async Task ForwardMessageAsync(int messageId = -1)
+        {
+            var fromChatId = Message.Chat.Id;
+            var msgId = Message.MessageId;
+            if (messageId != -1) msgId = messageId;
+            var chatId = BotSettings.BotChannelLogs;
+            await Client.ForwardMessageAsync(chatId, fromChatId, msgId);
+        }
+
 
         public async Task AnswerCallbackQueryAsync(string text)
         {
