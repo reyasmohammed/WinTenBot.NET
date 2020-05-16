@@ -308,12 +308,11 @@ namespace WinTenBot.Providers
             if (fileId.IsNullOrEmpty()) fileId = Message.ReplyToMessage.GetFileId();
             Log.Information($"Downloading file {fileId}");
 
-
             var file = await Client.GetFileAsync(fileId);
 
             Log.Information($"DownloadFile: {file.ToJson(true)}");
 
-            fileName = $"Storage/Cache/{fileName}".EnsureDirectory();
+            fileName = $"Storage/Caches/{fileName}".EnsureDirectory();
             using (var fileStream = File.OpenWrite(fileName))
             {
                 await Client.DownloadFileAsync(filePath: file.FilePath, destination: fileStream);
