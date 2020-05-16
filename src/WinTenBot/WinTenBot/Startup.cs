@@ -142,7 +142,8 @@ namespace WinTenBot
                 .AddScoped<StartCommand>()
                 .AddScoped<IdCommand>()
                 .AddScoped<InfoCommand>()
-                .AddScoped<BotCommand>();
+                .AddScoped<BotCommand>()
+                .AddScoped<GlobalReportCommand>();
 
             services.AddScoped<OutCommand>();
 
@@ -262,6 +263,7 @@ namespace WinTenBot
                                     .UseCommand<ExportRssCommand>("exportrss")
                                     .UseCommand<GlobalBanCommand>("fban")
                                     .UseCommand<GlobalBanCommand>("gban")
+                                    .UseCommand<GlobalReportCommand>("greport")
                                     .UseCommand<HelpCommand>("help")
                                     .UseCommand<IdCommand>("id")
                                     .UseCommand<ImportRssCommand>("importrss")
@@ -298,7 +300,7 @@ namespace WinTenBot
                                 )
                                 .Use<GenericMessageHandler>()
 
-                            //.Use<NLP>()
+                        //.Use<NLP>()
                         )
                         // .UseWhen<StickerHandler>(When.StickerMessage)
                         .UseWhen<WeatherReporter>(When.LocationMessage)
