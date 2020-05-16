@@ -12,10 +12,6 @@ namespace WinTenBot.Handlers
     {
         private TelegramProvider _telegramProvider;
 
-        public NewUpdateHandler()
-        {
-        }
-
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
             _telegramProvider = new TelegramProvider(context);
@@ -30,6 +26,8 @@ namespace WinTenBot.Handlers
             await EnqueuePreTask();
 
             await next(context, cancellationToken);
+            
+            EnqueueBackgroundTask();
         }
 
         private async Task EnqueuePreTask()
@@ -41,7 +39,6 @@ namespace WinTenBot.Handlers
 
             // var actions = new List<Action>();
             var shouldAwaitTasks = new List<Task>();
-            var nonAwaitTasks = new List<Task>();
 
             // if (_telegramProvider.IsNeedRunTasks())
             // {
@@ -58,6 +55,23 @@ namespace WinTenBot.Handlers
                 }
             }
 
+            if (callbackQuery == null)
+            {
+                shouldAwaitTasks.Add(_telegramProvider.CheckMessageAsync());
+            }
+
+            Log.Information("Awaiting should await task..");
+
+            await Task.WhenAll(shouldAwaitTasks.ToArray());
+        }
+
+        private void EnqueueBackgroundTask()
+        {
+            var nonAwaitTasks = new List<Task>();
+            var message = _telegramProvider.Message;
+
+            //Exec nonAwait Tasks
+            Log.Information("Running nonAwait task..");
             nonAwaitTasks.Add(_telegramProvider.EnsureChatHealthAsync());
             nonAwaitTasks.Add(_telegramProvider.AfkCheckAsync());
 
@@ -76,24 +90,18 @@ namespace WinTenBot.Handlers
             nonAwaitTasks.Add(_telegramProvider.CheckMataZiziAsync());
             nonAwaitTasks.Add(_telegramProvider.HitActivityAsync());
 
-            if (callbackQuery == null)
-            {
-                shouldAwaitTasks.Add(_telegramProvider.CheckMessageAsync());
-            }
 
             // if (!_telegramProvider.IsPrivateChat())
             // {
             //     
             // }
 
-            Log.Information($"Running {shouldAwaitTasks.Count} awaited and {nonAwaitTasks.Count} non-await tasks");
 
-            await Task.WhenAll(shouldAwaitTasks);
-
-#pragma warning disable 4014
+            #pragma warning disable 4014
             // This List Task should not await.
-            Task.WhenAll(nonAwaitTasks);
-#pragma warning restore 4014
+            Task.WhenAny(nonAwaitTasks.ToArray());
+            #pragma warning restore 4014
+            
         }
     }
 }
