@@ -32,8 +32,8 @@ namespace WinTenBot.Handlers.Commands.Security
             {
                 return;
             }
-            
-            var where = new Dictionary<string, object>() {{"word", word}};
+
+            var where = new Dictionary<string, object>() { { "word", word } };
 
             if (paramOption.Contains("-"))
             {
@@ -45,15 +45,13 @@ namespace WinTenBot.Handlers.Commands.Security
 
                 if (paramOption.Contains("d"))
                 {
-                    
                 }
-                
+
                 if (paramOption.Contains("c"))
                 {
-                    
                 }
             }
-            
+
             if (!paramOption.Contains("g"))
             {
                 @where.Add("chat_id", msg.Chat.Id);
@@ -86,7 +84,6 @@ namespace WinTenBot.Handlers.Commands.Security
             }
 
             await _telegramProvider.DeleteAsync(delay: 3000);
-            
         }
     }
 }
