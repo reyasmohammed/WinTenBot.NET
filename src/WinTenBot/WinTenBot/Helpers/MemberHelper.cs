@@ -44,7 +44,7 @@ namespace WinTenBot.Helpers
             var message = telegramProvider.MessageOrEdited;
 
             var settingService = new SettingsService(message);
-            var chatSettings = await settingService.GetSettingByGroup();
+            var chatSettings = await settingService.ReadCache();
             if (!chatSettings.EnableAfkStat)
             {
                 Log.Information("Afk Stat is disabled in this Group!");
@@ -154,7 +154,7 @@ namespace WinTenBot.Helpers
             var user = message.From;
 
             var settingService = new SettingsService(message);
-            var chatSettings = await settingService.GetSettingByGroup();
+            var chatSettings = await settingService.ReadCache();
             if (!chatSettings.EnableFedEs2)
             {
                 Log.Information("Fed ES2 Ban is disabled in this Group!");
@@ -185,7 +185,7 @@ namespace WinTenBot.Helpers
             var user = message.From;
 
             var settingService = new SettingsService(message);
-            var chatSettings = await settingService.GetSettingByGroup();
+            var chatSettings = await settingService.ReadCache();
             if (!chatSettings.EnableFedCasBan)
             {
                 Log.Information("Fed Cas Ban is disabled in this Group!");
@@ -212,7 +212,7 @@ namespace WinTenBot.Helpers
 
             var message = telegramProvider.MessageOrEdited;
             var settingService = new SettingsService(message);
-            var chatSettings = await settingService.GetSettingByGroup();
+            var chatSettings = await settingService.ReadCache();
             if (!chatSettings.EnableFedSpamWatch)
             {
                 Log.Information("Fed SpamWatch is disabled in this Group!");
@@ -489,7 +489,7 @@ namespace WinTenBot.Helpers
                 var nameLink = fromUser.GetNameLink();
 
                 var settingService = new SettingsService(message);
-                var chatSettings = await settingService.GetSettingByGroup();
+                var chatSettings = await settingService.ReadCache();
                 if (!chatSettings.EnableWarnUsername)
                 {
                     Log.Information("Warn Username is disabled in this Group!");

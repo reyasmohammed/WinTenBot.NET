@@ -108,7 +108,7 @@ namespace WinTenBot.Helpers
                     }
 
                     var result = $"'{forCompare}' == '{forFilter}' ? {isMust}. Deep: {isDeep}, Global: {isGlobal}";
-                    if (BotSettings.IsDevelopment) Log.Debug(result);
+                    // if (BotSettings.IsDevelopment) Log.Debug(result);
 
                     if (isMust) break;
                 }
@@ -126,7 +126,7 @@ namespace WinTenBot.Helpers
                 var message = telegramProvider.MessageOrEdited;
                 
                 var settingService = new SettingsService(message);
-                var chatSettings = await settingService.GetSettingByGroup();
+                var chatSettings = await settingService.ReadCache();
 
                 if (!chatSettings.EnableWordFilterGroupWide)
                 {
@@ -162,7 +162,7 @@ namespace WinTenBot.Helpers
                 
                 var message = telegramProvider.MessageOrEdited;
                 var settingService = new SettingsService(message);
-                var chatSettings = await settingService.GetSettingByGroup();
+                var chatSettings = await settingService.ReadCache();
                 if (!chatSettings.EnableFindNotes)
                 {
                     Log.Information("Find Notes is disabled in this Group!");
@@ -210,7 +210,7 @@ namespace WinTenBot.Helpers
         {
             var message = telegramProvider.MessageOrEdited;
             var settingService = new SettingsService(message);
-            var chatSettings = await settingService.GetSettingByGroup();
+            var chatSettings = await settingService.ReadCache();
             if (!chatSettings.EnableFindTags)
             {
                 Log.Information("Find Tags is disabled in this Group!");

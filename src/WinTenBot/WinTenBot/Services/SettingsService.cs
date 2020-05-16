@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Serilog;
@@ -202,6 +203,18 @@ namespace WinTenBot.Services
                 .Where(where)
                 .ExecForMysql()
                 .UpdateAsync(data);
+        }
+
+        public async Task<ChatSetting> ReadCache()
+        {
+            var chatId = Message.Chat.Id.ToString();
+            var cachePath = Path.Combine(chatId, "settings.json");
+            if (!cachePath.IsFileCacheExist())
+            {
+                await UpdateCache();
+            }
+            
+            return await cachePath.ReadCacheAsync<ChatSetting>();
         }
 
         public async Task UpdateCache()

@@ -198,6 +198,8 @@ namespace WinTenBot.Helpers
             };
 
             var update = await settingsService.SaveSettingsAsync(data);
+
+            await settingsService.UpdateCache();
         }
     }
 }
