@@ -11,8 +11,6 @@ namespace WinTenBot
     {
         public static void Main(string[] args)
         {
-            SerilogProvider.InitializeSerilog();
-            
             try
             {
                 Log.Information("Starting WebAPI..");

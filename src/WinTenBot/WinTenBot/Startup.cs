@@ -47,6 +47,7 @@ namespace WinTenBot
 
             BotSettings.GlobalConfiguration = Configuration;
             BotSettings.FillSettings();
+            SerilogProvider.InitializeSerilog();
 
             BotSettings.DbConnectionString = Configuration["CommonConfig:ConnectionString"];
             SerilogProvider.LogglyToken = Configuration["CommonConfig:Watson"];
