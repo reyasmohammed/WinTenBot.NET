@@ -23,11 +23,6 @@ namespace WinTenBot.Handlers.Events
         private TelegramProvider _telegramProvider;
         private ChatSetting Settings { get; set; }
 
-
-        public NewChatMembersEvent()
-        {
-        }
-
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
             Message msg = context.Update.Message;
@@ -37,7 +32,7 @@ namespace WinTenBot.Handlers.Events
 
             Log.Information("New Chat Members...");
             
-            var chatSettings = await _settingsService.GetSettingByGroup();
+            var chatSettings = await _settingsService.ReadCache();
             Settings = chatSettings;
             
             if(!chatSettings.EnableWelcomeMessage){
@@ -122,26 +117,37 @@ namespace WinTenBot.Handlers.Events
                     keyboard = withVerify.ToReplyMarkup(2);
                 }
 
+                if (!chatSettings.EnableHumanVerification)
+                {
+                    var prevMsgId = chatSettings.LastWelcomeMessageId.ToInt();
+                    await _telegramProvider.DeleteAsync(prevMsgId);
+                }
+
+                int sentMsgId = -1;
+
                 if (chatSettings.WelcomeMediaType != MediaType.Unknown)
                 {
                     var mediaType = (MediaType) chatSettings.WelcomeMediaType;
-                    await _telegramProvider.SendMediaAsync(
+                    sentMsgId = (await _telegramProvider.SendMediaAsync(
                         chatSettings.WelcomeMedia,
                         mediaType,
                         sendText,
-                        keyboard);
+                        keyboard)).MessageId;
                 }
                 else
                 {
-                    await _telegramProvider.SendTextAsync(sendText, keyboard);
+                    sentMsgId = (await _telegramProvider.SendTextAsync(sendText, keyboard)).MessageId;
                 }
 
                 await _settingsService.SaveSettingsAsync(new Dictionary<string, object>()
                 {
                     {"chat_id", msg.Chat.Id},
                     {"chat_title", msg.Chat.Title},
-                    {"members_count", memberCount}
+                    {"members_count", memberCount},
+                    {"last_welcome_message_id", sentMsgId}
                 });
+
+                await _settingsService.UpdateCache();
             }
             else
             {
