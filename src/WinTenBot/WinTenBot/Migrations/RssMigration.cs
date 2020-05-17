@@ -5,10 +5,11 @@ namespace WinTenBot.Migrations
     [Migration(202003141720)]
     public class RssMigration : Migration
     {
+        private const string TableName = "rss_settings";
         public override void Up()
         {
-            if (!Schema.Table("rss_setting").Exists())
-                Create.Table("rss_settings")
+            if (!Schema.Table(TableName).Exists())
+                Create.Table(TableName)
                     .WithColumn("id").AsInt32().NotNullable().PrimaryKey().Identity()
                     .WithColumn("chat_id").AsString(30).NotNullable()
                     .WithColumn("from_id").AsString(20).NotNullable()
@@ -19,7 +20,7 @@ namespace WinTenBot.Migrations
 
         public override void Down()
         {
-            Delete.Table("rss_settings");
+            Delete.Table(TableName);
         }
     }
 }

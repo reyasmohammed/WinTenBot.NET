@@ -25,6 +25,11 @@ namespace WinTenBot.Model
             HangfireLiteDb = GlobalConfiguration["Hangfire:LiteDb"];
 
             SerilogLogglyToken = GlobalConfiguration["CommonConfig:LogglyToken"];
+
+            DatadogApiKey = GlobalConfiguration["Datadog:ApiKey"];
+            DatadogHost = GlobalConfiguration["Datadog:Host"];
+            DatadogSource = GlobalConfiguration["Datadog:Source"];
+            DatadogTags = GlobalConfiguration.GetSection("Datadog:Tags").Get<List<string>>();
             
             IbmWatsonTranslateUrl = GlobalConfiguration["IbmConfig:Watson:TranslateUrl"];
             IbmWatsonTranslateToken = GlobalConfiguration["IbmConfig:Watson:TranslateToken"];
@@ -59,6 +64,11 @@ namespace WinTenBot.Model
         public static string HangfireLiteDb { get; set; }
         
         public static string SerilogLogglyToken { get; set; }
+        
+        public static string DatadogApiKey { get; set; }
+        public static string DatadogHost { get; set; }
+        public static string DatadogSource { get; set; }
+        public static List<string> DatadogTags { get; set; }
         
         public static string IbmWatsonTranslateUrl { get; set; }
         public static string IbmWatsonTranslateToken { get; set; }

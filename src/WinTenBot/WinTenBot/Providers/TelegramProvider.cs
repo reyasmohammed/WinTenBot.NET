@@ -156,14 +156,15 @@ namespace WinTenBot.Providers
             return send;
         }
 
-        public async Task SendMediaAsync(string fileId, MediaType mediaType, string caption = "",
+        public async Task<Message> SendMediaAsync(string fileId, MediaType mediaType, string caption = "",
             IReplyMarkup replyMarkup = null, int replyToMsgId = -1)
         {
             Log.Information($"Sending media: {mediaType}, fileId: {fileId} to {Message.Chat.Id}");
+            
             switch (mediaType)
             {
                 case MediaType.Document:
-                    await Client.SendDocumentAsync(Message.Chat.Id, fileId, caption, ParseMode.Html,
+                    return await Client.SendDocumentAsync(Message.Chat.Id, fileId, caption, ParseMode.Html,
                         replyMarkup: replyMarkup, replyToMessageId: replyToMsgId);
                     break;
 
@@ -172,24 +173,25 @@ namespace WinTenBot.Providers
                     await using (var fs = File.OpenRead(fileId))
                     {
                         InputOnlineFile inputOnlineFile = new InputOnlineFile(fs, fileName);
-                        await Client.SendDocumentAsync(Message.Chat.Id, inputOnlineFile, caption, ParseMode.Html,
+                        return await Client.SendDocumentAsync(Message.Chat.Id, inputOnlineFile, caption, ParseMode.Html,
                             replyMarkup: replyMarkup, replyToMessageId: replyToMsgId);
                     }
 
                     break;
 
                 case MediaType.Photo:
-                    await Client.SendPhotoAsync(Message.Chat.Id, fileId, caption, ParseMode.Html,
+                    return await Client.SendPhotoAsync(Message.Chat.Id, fileId, caption, ParseMode.Html,
                         replyMarkup: replyMarkup, replyToMessageId: replyToMsgId);
                     break;
 
                 case MediaType.Video:
-                    await Client.SendVideoAsync(Message.Chat.Id, fileId, caption: caption, parseMode: ParseMode.Html,
+                    return await Client.SendVideoAsync(Message.Chat.Id, fileId, caption: caption, parseMode: ParseMode.Html,
                     replyMarkup:replyMarkup, replyToMessageId:replyToMsgId);
                     break;
 
                 default:
                     Log.Information($"Media unknown: {mediaType}");
+                    return null;
                     break;
             }
         }

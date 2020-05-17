@@ -1,7 +1,10 @@
 ﻿using System;
 using Serilog;
 using Serilog.Events;
+using Serilog.Sinks.Datadog.Logs;
 using Serilog.Sinks.SystemConsole.Themes;
+using WinTenBot.Helpers;
+using WinTenBot.Model;
 
 namespace WinTenBot.Providers
 {
@@ -12,14 +15,12 @@ namespace WinTenBot.Providers
         public static void InitializeSerilog()
         {
             const string outputTemplate = "[{Timestamp:HH:mm:ss.ffff} {Level:u3}] {Message:lj}{NewLine}{Exception}";
-            var logPath = "Storage/Logs/ZiziBot-Logs-.log";
+            var logPath = "Storage/Logs/ZiziBot-.log";
             var flushInterval = TimeSpan.FromSeconds(1);
             var rollingInterval = RollingInterval.Day;
-            // var logglyTags = "serilog,wintenbot";
-            // var logglyBuffer = "Storage/Caches/Loggly";
+            var datadogKey = BotSettings.DatadogApiKey;
 
-            var config = new LoggerConfiguration()
-                .MinimumLevel.Debug()
+            var serilogConfig = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Debug)
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Debug)
@@ -29,23 +30,20 @@ namespace WinTenBot.Providers
                 .WriteTo.File(logPath, rollingInterval: rollingInterval, flushToDiskInterval: flushInterval,
                     retainedFileCountLimit: 7);
 
-            // if (LogglyToken.IsNotNullOrEmpty())
-            // {
-                // config.WriteTo.Loggly(customerToken: LogglyToken, tags: logglyTags, bufferBaseFilename: logglyBuffer);
-            // }
+            if (datadogKey != "YOUR_API_KEY" || datadogKey.IsNotNullOrEmpty())
+            {
+                var dataDogHost = "intake.logs.datadoghq.com";
+                var config = new DatadogConfiguration(url: dataDogHost, port: 10516, useSSL: true, useTCP: true);
+                serilogConfig.WriteTo.DatadogLogs(
+                    apiKey: datadogKey,
+                    service: "TelegramBot",
+                    source: BotSettings.DatadogSource,
+                    host: BotSettings.DatadogHost,
+                    tags: BotSettings.DatadogTags.ToArray(),
+                    configuration: config);
+            }
 
-            // if (BotSettings.SerilogSentryDsn.IsNotNullOrEmpty())
-            // {
-                // config.WriteTo.Sentry(s =>
-                // {
-                //     s.MinimumBreadcrumbLevel = LogEventLevel.Information;
-                //     s.MinimumEventLevel = LogEventLevel.Information;
-                // });
-            // }
-
-            Log.Logger = config.CreateLogger();
-            
-            Log.Information("Serilog is ready!");
+            Log.Logger = serilogConfig.CreateLogger();
 
             // Log.Logger = new LoggerConfiguration()
             //     .MinimumLevel.Debug()
