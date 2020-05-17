@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,7 +27,7 @@ namespace WinTenBot.Helpers
                     break;
 
                 case MessageType.Photo:
-                    fileId = message.Photo[0].FileId;
+                    fileId = message.Photo.Last().FileId;
                     break;
 
                 case MessageType.Video:
@@ -58,8 +58,8 @@ namespace WinTenBot.Helpers
         public static bool IsNeedRunTasks(this TelegramProvider telegramProvider)
         {
             var message = telegramProvider.Message;
-            
-            return message.NewChatMembers == null 
+
+            return message.NewChatMembers == null
                    || message.LeftChatMember == null
                    || !telegramProvider.IsPrivateChat();
         }
@@ -90,7 +90,7 @@ namespace WinTenBot.Helpers
 
             var mappedWords = query.ToJson().MapObject<List<WordFilter>>();
 
-            var partedWord = words.Split(new[] { '\n', '\r', ' ', '\t' }, 
+            var partedWord = words.Split(new[] {'\n', '\r', ' ', '\t'},
                 StringSplitOptions.RemoveEmptyEntries);
             foreach (var word in partedWord)
             {
@@ -124,7 +124,7 @@ namespace WinTenBot.Helpers
                 Log.Information("Starting check Message");
 
                 var message = telegramProvider.MessageOrEdited;
-                
+
                 var settingService = new SettingsService(message);
                 var chatSettings = await settingService.ReadCache();
 
@@ -133,7 +133,7 @@ namespace WinTenBot.Helpers
                     Log.Information("Global Word Filter is disabled!");
                     return;
                 }
-                
+
                 var text = message.Text;
                 if (!text.IsNullOrEmpty())
                 {
@@ -159,7 +159,7 @@ namespace WinTenBot.Helpers
             {
                 Log.Information("Starting find Notes in Cloud");
                 InlineKeyboardMarkup inlineKeyboardMarkup = null;
-                
+
                 var message = telegramProvider.MessageOrEdited;
                 var settingService = new SettingsService(message);
                 var chatSettings = await settingService.ReadCache();
@@ -175,7 +175,7 @@ namespace WinTenBot.Helpers
                     Log.Information("Message Text should not null or empty");
                     return;
                 }
-                
+
                 var notesService = new NotesService();
 
                 var selectedNotes = await notesService.GetNotesBySlug(message.Chat.Id, message.Text);
