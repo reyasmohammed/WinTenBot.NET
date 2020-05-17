@@ -117,11 +117,8 @@ namespace WinTenBot.Handlers.Events
                     keyboard = withVerify.ToReplyMarkup(2);
                 }
 
-                if (!chatSettings.EnableHumanVerification)
-                {
-                    var prevMsgId = chatSettings.LastWelcomeMessageId.ToInt();
-                    await _telegramProvider.DeleteAsync(prevMsgId);
-                }
+                var prevMsgId = chatSettings.LastWelcomeMessageId.ToInt();
+
 
                 int sentMsgId = -1;
 
@@ -139,6 +136,11 @@ namespace WinTenBot.Handlers.Events
                     sentMsgId = (await _telegramProvider.SendTextAsync(sendText, keyboard)).MessageId;
                 }
 
+                if (!chatSettings.EnableHumanVerification)
+                {
+                    await _telegramProvider.DeleteAsync(prevMsgId);
+                }
+                
                 await _settingsService.SaveSettingsAsync(new Dictionary<string, object>()
                 {
                     {"chat_id", msg.Chat.Id},
