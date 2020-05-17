@@ -36,6 +36,7 @@
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.112.2" />
     <PackageReference Include="Telegram.Bot" Version="15.5.1" />
     <PackageReference Include="Telegram.Bot.Framework" Version="2.0.0-alpha5" />
+    <PackageReference Include="Tesseract" Version="3.3.0" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Storage\Buttons\**">
