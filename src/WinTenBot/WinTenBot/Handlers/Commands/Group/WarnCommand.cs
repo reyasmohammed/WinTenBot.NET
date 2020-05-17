@@ -16,6 +16,9 @@ namespace WinTenBot.Handlers.Commands.Group
             _telegramProvider = new TelegramProvider(context);
             var msg = _telegramProvider.Message;
 
+            if (!await _telegramProvider.IsAdminOrPrivateChat())
+                return;
+
             if (msg.ReplyToMessage != null)
             {
                 await _telegramProvider.WarnMemberAsync();
