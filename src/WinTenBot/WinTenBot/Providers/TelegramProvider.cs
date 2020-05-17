@@ -13,6 +13,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Enums;
 using WinTenBot.Helpers;
 using WinTenBot.Model;
+using WinTenBot.Services;
 using File = System.IO.File;
 
 namespace WinTenBot.Providers
@@ -35,12 +36,16 @@ namespace WinTenBot.Providers
                               ?? updateContext.Update.EditedMessage
                               ?? updateContext.Update.CallbackQuery?.Message;
 
+            var settingService = new SettingsService(Message);
+            CurrentSetting = settingService.ReadCache().Result;
+            
             if (Message != null)
             {
                 TimeInit = Message.Date.GetDelay();
             }
         }
 
+        public ChatSetting CurrentSetting { get; set; }
         public IUpdateContext Context { get; set; }
         private string AppendText { get; set; }
         public ITelegramBotClient Client { get; set; }
@@ -438,10 +443,15 @@ namespace WinTenBot.Providers
             return requestResult;
         }
 
-        public async Task RestrictMemberAsync(int userId, bool unMute = false)
+        public async Task RestrictMemberAsync(int userId, bool unMute = false, DateTime until = default)
         {
             var chatId = Message.Chat.Id;
-            var untilDate = DateTime.UtcNow.AddDays(366);
+            var untilDate = until;
+            if (until == default)
+            {
+                untilDate = DateTime.UtcNow.AddDays(366);
+            }
+
             Log.Information($"Restricting member on {chatId} until {untilDate}");
             Log.Information($"UserId: {userId}, IsMute: {unMute}");
 
