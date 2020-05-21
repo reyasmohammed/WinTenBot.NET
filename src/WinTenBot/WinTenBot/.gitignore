@@ -23,7 +23,7 @@ Storage/Caches/
 Storage/Logs/
 
 appsettings.json
-Hangfire_LiteDb.db
+*.db
 
 # Build results
 [Dd]ebug/
