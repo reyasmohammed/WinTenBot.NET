@@ -113,8 +113,9 @@ namespace WinTenBot.Helpers
 
         public static async Task SyncWordToLocalAsync()
         {
+            Log.Information("Getting data from MySql");
             var cloudQuery = await new Query("word_filter")
-                .ExecForMysql()
+                .ExecForMysql(true)
                 .GetAsync();
 
             var cloudWords = cloudQuery.ToJson().MapObject<List<WordFilter>>();
@@ -138,9 +139,11 @@ namespace WinTenBot.Helpers
                 };
 
                 var insert = await new Query("word_filter")
-                    .ExecForSqLite(true)
+                    .ExecForSqLite()
                     .InsertAsync(data);
             }
+            
+            Log.Information($"Synced {cloudQuery.Count()} row(s)");
         }
 
 

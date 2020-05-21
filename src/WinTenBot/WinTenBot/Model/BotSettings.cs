@@ -33,6 +33,10 @@ namespace WinTenBot.Model
             
             IbmWatsonTranslateUrl = GlobalConfiguration["IbmConfig:Watson:TranslateUrl"];
             IbmWatsonTranslateToken = GlobalConfiguration["IbmConfig:Watson:TranslateToken"];
+
+            TesseractTrainedData = @"Storage\Data\Tesseract\";
+            
+            OcrSpaceKey=GlobalConfiguration["OcrSpace:ApiKey"];
         }
         
         public static string ProductName { get; set; }
@@ -72,5 +76,9 @@ namespace WinTenBot.Model
         
         public static string IbmWatsonTranslateUrl { get; set; }
         public static string IbmWatsonTranslateToken { get; set; }
+        
+        public static string TesseractTrainedData { get; set; }
+        
+        public static string OcrSpaceKey { get; set; }
     }
 }

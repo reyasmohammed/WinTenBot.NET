@@ -148,7 +148,8 @@ namespace WinTenBot
 
             services.AddScoped<OutCommand>();
 
-            services.AddScoped<QrCommand>();
+            services.AddScoped<QrCommand>()
+                .AddScoped<TesseractOcrCommand>();
 
             services.AddScoped<CovidCommand>();
 
@@ -291,6 +292,7 @@ namespace WinTenBot
                                     .UseCommand<TagCommand>("tag")
                                     .UseCommand<TagsCommand>("notes")
                                     .UseCommand<TagsCommand>("tags")
+                                    .UseCommand<TesseractOcrCommand>("ocr")
                                     .UseCommand<TestCommand>("test")
                                     .UseCommand<TranslateCommand>("tr")
                                     .UseCommand<UntagCommand>("untag")
