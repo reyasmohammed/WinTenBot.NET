@@ -15,7 +15,7 @@ namespace WinTenBot.Helpers
             Log.Information("Starting Hit Activity");
 
             var message = telegramProvider.MessageOrEdited;
-            var botUser = await telegramProvider.GetBotUser();
+            var botUser = await telegramProvider.GetMeAsync();
             var data = new Dictionary<string, object>()
             {
                 {"via_bot", botUser.Username},
