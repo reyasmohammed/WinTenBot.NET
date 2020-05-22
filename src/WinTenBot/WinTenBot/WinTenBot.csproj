@@ -10,7 +10,7 @@
   <ItemGroup>
     <PackageReference Include="CodeHollow.FeedReader" Version="1.2.1" />
     <PackageReference Include="CsvHelper" Version="15.0.5" />
-    <PackageReference Include="EasyEncrypt" Version="1.0.3.2" />
+    <PackageReference Include="EasyEncrypt" Version="2.1.0" />
     <PackageReference Include="FluentMigrator" Version="3.2.6" />
     <PackageReference Include="FluentMigrator.Runner" Version="3.2.6" />
     <PackageReference Include="Flurl.Http" Version="2.4.2" />

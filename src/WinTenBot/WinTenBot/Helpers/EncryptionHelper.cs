@@ -1,6 +1,6 @@
 using System;
 using System.Security.Cryptography;
-using EasyEncrypt;
+using EasyEncrypt2;
 using Serilog;
 
 namespace WinTenBot.Helpers
@@ -9,15 +9,16 @@ namespace WinTenBot.Helpers
     {
         public static string Password { get; set; } = "1234";
         public static string Salt { get; set; } = "12345678";
+
         public static string AesEncrypt(this string input)
         {
             try
             {
-                return new Encryption(Aes.Create(), Password, Salt).Encrypt(input);
+                return new EasyEncrypt(Password, Salt, Aes.Create()).Encrypt(input);
             }
             catch (Exception ex)
             {
-                Log.Error(ex,"Error AES Encrypt");
+                Log.Error(ex, "Error AES Encrypt");
                 return null;
             }
         }
@@ -26,11 +27,11 @@ namespace WinTenBot.Helpers
         {
             try
             {
-                return new Encryption(Aes.Create(), Password, Salt).Decrypt(encryptedInput);
+                return new EasyEncrypt(Password, Salt, Aes.Create()).Decrypt(encryptedInput);
             }
             catch (Exception ex)
             {
-                Log.Error(ex,"Error AES Decrypt");
+                Log.Error(ex, "Error AES Decrypt");
                 return null;
             }
         }
