@@ -46,7 +46,8 @@ namespace WinTenBot.Migrations
                     .WithColumn("welcome_media").AsString(150).WithDefaultValue("")
                     .WithColumn("welcome_media_type").AsInt16().WithDefaultValue(-1)
                     .WithColumn("created_at").AsMySqlTimestamp().WithDefault(SystemMethods.CurrentDateTime)
-                    .WithColumn("updated_at").AsMySqlTimestamp().WithDefault(SystemMethods.CurrentDateTime);
+                    .WithColumn("updated_at").AsMySqlTimestamp().WithDefault(SystemMethods.CurrentDateTime)
+                    .Indexed("chat_id");
             }
         }
 
