@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types.ReplyMarkups;
+using WinTenBot.Helpers;
+using WinTenBot.Model;
 using WinTenBot.Providers;
 
 namespace WinTenBot.Handlers.Commands.Core
@@ -15,14 +17,25 @@ namespace WinTenBot.Handlers.Commands.Core
         {
             _telegramProvider = new TelegramProvider(context);
 
-            // Message msg = context.Update.Message;
+            var me = await _telegramProvider.GetMeAsync();
+            var botName = me.FirstName;
+            var botVersion = BotSettings.ProductVersion;
 
-            var sendText = "<b>WinTenBot (.NET) Alpha Preview</b>\n" +
-                           "Version: 3.0.1037 EAP\n\n" +
-                           "ℹ️ Bot Telegram resmi berbasis <b>WinTen API.</b> untuk manajemen dan peralatan grup.\n\n" +
-                           "<b>Saya masih Beta, mungkin terdapat bug dan tidak stabil. Tidak di rekomendasikan untuk grup Anda.</b>\n\n" +
-                           "Untuk Bot lebih cepat dan tetap cepat dan terus peningkatan dan keandalan, silakan <b>Donasi</b> via Paypal untuk beli VPS dan beri saya Kopi.\n\n" +
-                           "Saya tetap ada dan masih berjalan cepat, terima kasih banyak untuk <b>Akmal Projext</b>.";
+            var sendText = $"<b>{botName} (.NET) Alpha Preview</b>\n" +
+                           $"by @WinTenDev\n" +
+                           $"Version: {botVersion}\n\n" +
+                           "ℹ️ Bot Telegram resmi berbasis <b>WinTen API.</b> untuk manajemen dan peralatan grup. " +
+                           "Untuk detail fitur pada perintah /start.\n\n";
+
+            if (await _telegramProvider.IsBeta())
+            {
+                sendText += "<b>Saya masih Beta, mungkin terdapat bug dan tidak stabil. " +
+                            "Tidak di rekomendasikan untuk grup Anda.</b>\n\n";
+            }
+
+            sendText += "Untuk Bot lebih cepat dan tetap cepat dan terus peningkatan dan keandalan, " +
+                        "silakan <b>Donasi</b> via Paypal untuk beli VPS dan beri saya Kopi.\n\n" +
+                        "Terima kasih kepada <b>Akmal Projext</b> yang telah memberikan kesempatan ZiziBot pada kehidupan sebelumnya.";
 
             var inlineKeyboard = new InlineKeyboardMarkup(new[]
             {
@@ -48,13 +61,6 @@ namespace WinTenBot.Handlers.Commands.Core
             });
 
             await _telegramProvider.SendTextAsync(sendText, inlineKeyboard);
-
-            // await context.Bot.Client.SendTextMessageAsync(
-            //     msg.Chat,
-            //     sendText,
-            //     ParseMode.Html,
-            //     replyMarkup: inlineKeyboard
-            // );
         }
     }
 }

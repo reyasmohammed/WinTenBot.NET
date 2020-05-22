@@ -24,9 +24,17 @@ namespace WinTenBot.Helpers
             return $"https://t.me/{username}?{param}";
         }
 
-        public static async Task<User> GetBotUser(this TelegramProvider telegramProvider)
+        public static async Task<User> GetMeAsync(this TelegramProvider telegramProvider)
         {
             return await telegramProvider.Client.GetMeAsync();
+        }
+
+        public static async Task<bool> IsBeta(this TelegramProvider telegramProvider)
+        {
+            var me = await GetMeAsync(telegramProvider);
+            var isBeta = me.Username.ToLower().Contains("beta");
+            Log.Information($"IsBeta: {isBeta}");
+            return isBeta;
         }
 
         public static async Task<bool> IsBotAdded(this User[] users)
