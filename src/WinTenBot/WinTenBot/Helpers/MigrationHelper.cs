@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Serilog;
 using WinTenBot.Providers;
@@ -18,7 +19,7 @@ namespace WinTenBot.Helpers
         public static void MigrateMysql()
         {
             var path = Environment.CurrentDirectory + @"/Storage/SQL/MySql";
-            var listFiles = Directory.GetFiles(path);
+            var listFiles = Directory.GetFiles(path).Where(f => f.EndsWith(".sql"));
             foreach (var file in listFiles)
             {
                 Log.Information($"Migrating => {file}");
