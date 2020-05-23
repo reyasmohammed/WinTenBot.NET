@@ -4,22 +4,23 @@ using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
+using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Additional
 {
     public class CovidCommand : CommandBase
     {
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _telegramProvider = new TelegramProvider(context);
-            var txt = _telegramProvider.Message.Text;
+            _telegramService = new TelegramService(context);
+            var txt = _telegramService.Message.Text;
             var partTxt = txt.SplitText(" ").ToArray();
             var part1 = partTxt.ValueOfIndex(1); // Country
 
-            await _telegramProvider.SendTextAsync("🔍 Getting information..");
+            await _telegramService.SendTextAsync("🔍 Getting information..");
 
             var sendText = "";
             if (part1.IsNullOrEmpty())
@@ -34,7 +35,7 @@ namespace WinTenBot.Handlers.Commands.Additional
                 sendText = await CovidHelper.GetCovidByCountry(part1);
             }
 
-            await _telegramProvider.EditAsync(sendText);
+            await _telegramService.EditAsync(sendText);
             
         }
     }

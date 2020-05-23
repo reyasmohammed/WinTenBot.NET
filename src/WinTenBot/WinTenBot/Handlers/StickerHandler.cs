@@ -4,21 +4,22 @@ using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 using WinTenBot.Providers;
+using WinTenBot.Services;
 
 namespace WinTenBot.Handlers
 {
     class StickerHandler : IUpdateHandler
     {
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
 
             Message msg = context.Update.Message;
             Sticker incomingSticker = msg.Sticker;
 
-            var chat = await _telegramProvider.GetChat();
+            var chat = await _telegramService.GetChat();
             var stickerSetName = chat.StickerSetName ?? "EvilMinds";
             StickerSet evilMindsSet = await context.Bot.Client.GetStickerSetAsync(stickerSetName, cancellationToken);
 

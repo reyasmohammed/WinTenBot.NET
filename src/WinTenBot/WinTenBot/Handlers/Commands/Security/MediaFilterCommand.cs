@@ -12,7 +12,7 @@ namespace WinTenBot.Handlers.Commands.Security
     public class MediaFilterCommand : CommandBase
     {
         private MediaFilterService _mediaFilterService;
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public MediaFilterCommand()
         {
@@ -22,7 +22,7 @@ namespace WinTenBot.Handlers.Commands.Security
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
             var msg = context.Update.Message;
 
             var sendText = "Saat ini hanya untuk Sudoer saja.";
@@ -63,7 +63,7 @@ namespace WinTenBot.Handlers.Commands.Security
                     "terima kasih atas laporan nya.";
             }
 
-            await _telegramProvider.SendTextAsync(sendText);
+            await _telegramService.SendTextAsync(sendText);
         }
     }
 }

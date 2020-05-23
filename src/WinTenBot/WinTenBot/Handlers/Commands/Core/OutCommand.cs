@@ -5,21 +5,22 @@ using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
+using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Core
 {
     public class OutCommand : CommandBase
     {
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
             var msg = context.Update.Message;
             var partsMsg = msg.Text.GetTextWithoutCmd().Split("|").ToArray();
 
-            var isSudoer = _telegramProvider.IsSudoer();
+            var isSudoer = _telegramService.IsSudoer();
             if (isSudoer)
             {
                 var sendText = "Maaf, saya harus keluar";
@@ -31,12 +32,12 @@ namespace WinTenBot.Handlers.Commands.Core
 
                 var chatId = partsMsg[0].ToInt64();
                 Log.Information($"Target out: {chatId}");
-                await _telegramProvider.SendTextAsync(sendText, customChatId: chatId);
-                await _telegramProvider.LeaveChat(chatId);
+                await _telegramService.SendTextAsync(sendText, customChatId: chatId);
+                await _telegramService.LeaveChat(chatId);
             }
             else
             {
-                await _telegramProvider.SendTextAsync("Kamu tidak punya hak akses.");
+                await _telegramService.SendTextAsync("Kamu tidak punya hak akses.");
             }
         }
     }

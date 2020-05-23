@@ -10,7 +10,7 @@ namespace WinTenBot.Handlers.Commands.Notes
     public class NotesCommand : CommandBase
     {
         private NotesService _notesService;
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public NotesCommand()
         {
@@ -20,12 +20,12 @@ namespace WinTenBot.Handlers.Commands.Notes
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
 
-            await _telegramProvider.SendTextAsync("This feature currently disabled");
+            await _telegramService.SendTextAsync("This feature currently disabled");
             return;
             
-            var notesData = await _notesService.GetNotesByChatId(_telegramProvider.Message.Chat.Id);
+            var notesData = await _notesService.GetNotesByChatId(_telegramService.Message.Chat.Id);
 
             var sendText = "Filters di Obrolan ini.";
 
@@ -43,9 +43,9 @@ namespace WinTenBot.Handlers.Commands.Notes
                            "\nUntuk menambahkannya ketik /addfilter";
             }
 
-            await _notesService.UpdateCache(_telegramProvider.Message.Chat.Id);
+            await _notesService.UpdateCache(_telegramService.Message.Chat.Id);
 
-            await _telegramProvider.SendTextAsync(sendText);
+            await _telegramService.SendTextAsync(sendText);
         }
     }
 }

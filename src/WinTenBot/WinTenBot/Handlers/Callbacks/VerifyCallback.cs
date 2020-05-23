@@ -3,18 +3,19 @@ using Serilog;
 using Telegram.Bot.Types;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
+using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Callbacks
 {
     public class VerifyCallback
     {
-        private TelegramProvider Telegram { get; set; }
+        private TelegramService Telegram { get; set; }
         private CallbackQuery CallbackQuery { get; set; }
 
-        public VerifyCallback(TelegramProvider telegramProvider)
+        public VerifyCallback(TelegramService telegramService)
         {
-            Telegram = telegramProvider;
-            CallbackQuery = telegramProvider.Context.Update.CallbackQuery;
+            Telegram = telegramService;
+            CallbackQuery = telegramService.Context.Update.CallbackQuery;
             Log.Information("Receiving Verify Callback");
 
             Parallel.Invoke(async () => await ExecuteVerifyAsync());

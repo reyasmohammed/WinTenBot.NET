@@ -5,38 +5,39 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
+using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Core
 {
     internal class PingCommand : CommandBase
     {
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
 
-            var msg = _telegramProvider.MessageOrEdited;
+            var msg = _telegramService.MessageOrEdited;
 
             var keyboard = new InlineKeyboardMarkup(
                 InlineKeyboardButton.WithCallbackData("Ping", "PONG")
             );
 
-            await _telegramProvider.AppendTextAsync("ℹ️ Pong!!");
+            await _telegramService.AppendTextAsync("ℹ️ Pong!!");
             var isSudoer = msg.From.Id.IsSudoer();
 
             if (msg.Chat.Type == ChatType.Private && isSudoer)
             {
                 // await "\n<b>Engine info.</b>".AppendTextAsync();
-                await _telegramProvider.AppendTextAsync("🎛 <b>Engine info.</b>");
+                await _telegramService.AppendTextAsync("🎛 <b>Engine info.</b>");
 
                 // var getWebHookInfo = await _chatProcessor.Client.GetWebhookInfoAsync(cancellationToken);
-                var getWebHookInfo = await _telegramProvider.Client.GetWebhookInfoAsync(cancellationToken);
+                var getWebHookInfo = await _telegramService.Client.GetWebhookInfoAsync(cancellationToken);
                 if (getWebHookInfo.Url == "")
                 {
                     // sendText += "\n\n<i>Bot run in Poll mode.</i>";
-                    await _telegramProvider.AppendTextAsync("\n<i>Bot run in Poll mode.</i>", keyboard);
+                    await _telegramService.AppendTextAsync("\n<i>Bot run in Poll mode.</i>", keyboard);
                 }
                 else
                 {
@@ -49,7 +50,7 @@ namespace WinTenBot.Handlers.Commands.Core
                                    $"\nLast Error: {getWebHookInfo.LastErrorDate}" +
                                    $"\nError Message: {getWebHookInfo.LastErrorMessage}";
 
-                    await _telegramProvider.AppendTextAsync(hookInfo, keyboard);
+                    await _telegramService.AppendTextAsync(hookInfo, keyboard);
                 }
             }
 

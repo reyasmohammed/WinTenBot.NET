@@ -12,20 +12,20 @@ namespace WinTenBot.Handlers.Commands.Rss
     public class RssInfoCommand : CommandBase
     {
         private RssService _rssService;
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
             _rssService = new RssService(context.Update.Message);
 
-            var chatId = _telegramProvider.Message.Chat.Id;
-            var isAdmin = await _telegramProvider.IsAdminGroup();
+            var chatId = _telegramService.Message.Chat.Id;
+            var isAdmin = await _telegramService.IsAdminGroup();
 
-            if (isAdmin || _telegramProvider.IsPrivateChat())
+            if (isAdmin || _telegramService.IsPrivateChat())
             {
-                await _telegramProvider.SendTextAsync("🔄 Sedang meload data..");
+                await _telegramService.SendTextAsync("🔄 Sedang meload data..");
                 var rssData = await _rssService.GetRssSettingsAsync(chatId);
                 var rssCount = rssData.Count();
 
@@ -44,11 +44,11 @@ namespace WinTenBot.Handlers.Commands.Rss
                                 "\nGunakan <code>/setrss https://link_rss_nya</code> untuk menambahkan.";
                 }
 
-                await _telegramProvider.EditAsync(sendText);
+                await _telegramService.EditAsync(sendText);
             }
             else
             {
-                await _telegramProvider.SendTextAsync("Kamu bukan admin, atau kamu bisa mengaturnya di japri ");
+                await _telegramService.SendTextAsync("Kamu bukan admin, atau kamu bisa mengaturnya di japri ");
             }
         }
     }

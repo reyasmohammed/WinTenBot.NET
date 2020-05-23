@@ -6,18 +6,19 @@ using Telegram.Bot.Types;
 using WinTenBot.Handlers.Callbacks;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
+using WinTenBot.Services;
 
 namespace WinTenBot.Handlers
 {
     public class CallbackQueryHandler : IUpdateHandler
     {
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
             CallbackQuery cq = context.Update.CallbackQuery;
-            _telegramProvider.CallBackMessageId = cq.Message.MessageId;
+            _telegramService.CallBackMessageId = cq.Message.MessageId;
 
             Log.Information("CallbackQuery" + cq.ToJson(true));
             // Log.Information($"CallBackData: {cq.Data}");
@@ -28,22 +29,22 @@ namespace WinTenBot.Handlers
             switch (partsCallback[0]) // Level 0
             {
                 case "action":
-                    var callbackResult = new ActionCallback(_telegramProvider);
+                    var callbackResult = new ActionCallback(_telegramService);
                     Log.Information($"ActionResult: {callbackResult.ToJson(true)}");
                     break;
                 
                 case "help":
-                    var helpCallback = new HelpCallback(_telegramProvider);
+                    var helpCallback = new HelpCallback(_telegramService);
                     Log.Information($"HelpResult: {helpCallback.ToJson(true)}");
                     break;
 
                 case "setting":
-                    var settingsCallback = new SettingsCallback(_telegramProvider);
+                    var settingsCallback = new SettingsCallback(_telegramService);
                     Log.Information($"SettingsResult: {settingsCallback.ToJson(true)}");
                     break;
                 
                 case "verify":
-                    var verifyCallback = new VerifyCallback(_telegramProvider);
+                    var verifyCallback = new VerifyCallback(_telegramService);
                     Log.Information($"VerifyResult: {verifyCallback.ToJson(true)}");
                     break;
 

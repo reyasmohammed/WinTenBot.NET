@@ -6,17 +6,18 @@ using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Enums;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
+using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Additional
 {
     public class QrCommand : CommandBase
     {
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
             var msg = context.Update.Message;
             Message repMsg = null;
             var data = msg.Text.GetTextWithoutCmd();
@@ -32,7 +33,7 @@ namespace WinTenBot.Handlers.Commands.Additional
                 var sendText = "<b>Generate QR from text or caption media</b>" +
                                "\n<b>Usage : </b><code>/qr</code> (In-Reply)" +
                                "\n                <code>/qr your text here</code> (In-Message)";
-                await _telegramProvider.SendTextAsync(sendText);
+                await _telegramService.SendTextAsync(sendText);
                 return;
             }
 
@@ -48,7 +49,7 @@ namespace WinTenBot.Handlers.Commands.Additional
             var fileName = $"{msg.Chat.Id}_{msg.MessageId}.jpg";
 
             // urlQr.SaveUrlTo(fileName);
-            await _telegramProvider.SendMediaAsync(urlQr, MediaType.Photo, replyMarkup: keyboard);
+            await _telegramService.SendMediaAsync(urlQr, MediaType.Photo, replyMarkup: keyboard);
         }
     }
 }

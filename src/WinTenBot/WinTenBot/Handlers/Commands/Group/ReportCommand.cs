@@ -6,23 +6,24 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
+using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Group
 {
     public class ReportCommand : CommandBase
     {
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
             var msg = context.Update.Message;
             var sendText = "Balas pesan yg mau di report";
 
             if (msg.Chat.Type == ChatType.Private)
             {
-                await _telegramProvider.SendTextAsync("Report hanya untuk grup saja");
+                await _telegramService.SendTextAsync("Report hanya untuk grup saja");
                 return;
             }
 
@@ -32,8 +33,8 @@ namespace WinTenBot.Handlers.Commands.Group
 
                 if (msg.From.Id != repMsg.From.Id)
                 {
-                    var mentionAdmins = await _telegramProvider.GetMentionAdminsStr();
-                    var allListAdmin =await _telegramProvider.GetAllAdmins();
+                    var mentionAdmins = await _telegramService.GetMentionAdminsStr();
+                    var allListAdmin =await _telegramService.GetAllAdmins();
                     var allAdminId = allListAdmin.Select(a => a.User.Id);
                     
                     var reporterNameLink = msg.GetFromNameLink();
@@ -58,7 +59,7 @@ namespace WinTenBot.Handlers.Commands.Group
                         }
                     });
 
-                    await _telegramProvider.SendTextAsync(sendText);
+                    await _telegramService.SendTextAsync(sendText);
                     return;
                 }
 
@@ -66,7 +67,7 @@ namespace WinTenBot.Handlers.Commands.Group
             }
 
 
-            await _telegramProvider.SendTextAsync(sendText);
+            await _telegramService.SendTextAsync(sendText);
         }
     }
 }

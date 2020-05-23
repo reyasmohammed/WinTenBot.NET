@@ -3,18 +3,19 @@ using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
+using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Rss
 {
     public class RssPullCommand : CommandBase
     {
-        private TelegramProvider response;
+        private TelegramService response;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
             // ChatHelper.Init(context);
-            response = new TelegramProvider(context);
+            response = new TelegramService(context);
 
             // var chatId = ChatHelper.Message.Chat.Id.ToString();
             // var isAdmin = await ChatHelper.IsAdminGroup();

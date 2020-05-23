@@ -3,16 +3,17 @@ using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
+using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Events
 {
     public class PinnedMessageEvent : IUpdateHandler
     {
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
             var msg = context.Update.Message;
 
             var pinnedMsg = msg.PinnedMessage;
@@ -20,7 +21,7 @@ namespace WinTenBot.Handlers.Events
                            $"\nPengirim: {pinnedMsg.GetFromNameLink()}" +
                            $"\nPengepin: {msg.GetFromNameLink()}";
 
-            await _telegramProvider.SendTextAsync(sendText);
+            await _telegramService.SendTextAsync(sendText);
         }
     }
 }

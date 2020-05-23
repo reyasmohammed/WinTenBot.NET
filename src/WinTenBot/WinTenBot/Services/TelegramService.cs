@@ -13,14 +13,27 @@ using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Enums;
 using WinTenBot.Helpers;
 using WinTenBot.Model;
-using WinTenBot.Services;
 using File = System.IO.File;
 
-namespace WinTenBot.Providers
+namespace WinTenBot.Services
 {
-    public class TelegramProvider
+    public class TelegramService
     {
-        public TelegramProvider(IUpdateContext updateContext)
+        public ChatSetting CurrentSetting { get; set; }
+        public IUpdateContext Context { get; set; }
+        private string AppendText { get; set; }
+        public ITelegramBotClient Client { get; set; }
+        public Message Message { get; set; }
+        public Message EditedMessage { get; set; }
+        public Message MessageOrEdited { get; set; }
+        public CallbackQuery CallbackQuery { get; set; }
+        public int SentMessageId { get; internal set; }
+        public int EditedMessageId { get; private set; }
+        public int CallBackMessageId { get; set; }
+        private string TimeInit { get; set; }
+        private string TimeProc { get; set; }
+        
+        public TelegramService(IUpdateContext updateContext)
         {
             Context = updateContext;
             Client = updateContext.Bot.Client;
@@ -45,19 +58,6 @@ namespace WinTenBot.Providers
             }
         }
 
-        public ChatSetting CurrentSetting { get; set; }
-        public IUpdateContext Context { get; set; }
-        private string AppendText { get; set; }
-        public ITelegramBotClient Client { get; set; }
-        public Message Message { get; set; }
-        public Message EditedMessage { get; set; }
-        public Message MessageOrEdited { get; set; }
-        public CallbackQuery CallbackQuery { get; set; }
-        public int SentMessageId { get; internal set; }
-        public int EditedMessageId { get; private set; }
-        public int CallBackMessageId { get; set; }
-        private string TimeInit { get; set; }
-        private string TimeProc { get; set; }
 
         public async Task<string> GetMentionAdminsStr()
         {

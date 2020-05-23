@@ -13,7 +13,7 @@ namespace WinTenBot.Handlers.Commands.Notes
     public class AddNotesCommand : CommandBase
     {
         private NotesService _notesService;
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public AddNotesCommand()
         {
@@ -23,16 +23,16 @@ namespace WinTenBot.Handlers.Commands.Notes
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
             var msg = context.Update.Message;
 
-            await _telegramProvider.SendTextAsync("This feature currently disabled");
+            await _telegramService.SendTextAsync("This feature currently disabled");
             return;
             
             if (msg.ReplyToMessage != null)
             {
                 var repMsg = msg.ReplyToMessage;
-                await _telegramProvider.SendTextAsync("Mengumpulkan informasi");
+                await _telegramService.SendTextAsync("Mengumpulkan informasi");
 
                 var partsContent = repMsg.Text.Split(new[] {"\n\n"}, StringSplitOptions.None);
                 var partsMsgText = msg.Text.GetTextWithoutCmd().Split("\n\n");
@@ -55,10 +55,10 @@ namespace WinTenBot.Handlers.Commands.Notes
                     data.Add("btn_data", partsMsgText[1]);
                 }
 
-                await _telegramProvider.EditAsync("Menyimpan..");
+                await _telegramService.EditAsync("Menyimpan..");
                 await _notesService.SaveNote(data);
 
-                await _telegramProvider.EditAsync("Berhasil");
+                await _telegramService.EditAsync("Berhasil");
             }
         }
     }

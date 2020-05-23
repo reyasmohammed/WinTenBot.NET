@@ -5,16 +5,17 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
+using WinTenBot.Services;
 
 namespace WinTenBot.Handlers
 {
     internal class PingHandler : IUpdateHandler
     {
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
             var msg = context.Update.Message;
 
             var keyboard = new InlineKeyboardMarkup(
@@ -27,7 +28,7 @@ namespace WinTenBot.Handlers
             if (msg.Chat.Type == ChatType.Private && isSudoer)
             {
                 sendText += "\n🎛 <b>Engine info.</b>";
-                var getWebHookInfo = await _telegramProvider.Client.GetWebhookInfoAsync(cancellationToken);
+                var getWebHookInfo = await _telegramService.Client.GetWebhookInfoAsync(cancellationToken);
                 if (getWebHookInfo.Url == "")
                 {
                     sendText += "\n\n<i>Bot run in Poll mode.</i>";
@@ -45,7 +46,7 @@ namespace WinTenBot.Handlers
                 }
             }
 
-            await _telegramProvider.SendTextAsync(sendText, keyboard);
+            await _telegramService.SendTextAsync(sendText, keyboard);
         }
     }
 }

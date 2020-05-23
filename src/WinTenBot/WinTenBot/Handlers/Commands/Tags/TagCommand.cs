@@ -13,7 +13,7 @@ namespace WinTenBot.Handlers.Commands.Tags
     public class TagCommand : CommandBase
     {
         private TagsService _tagsService;
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public TagCommand()
         {
@@ -24,14 +24,14 @@ namespace WinTenBot.Handlers.Commands.Tags
             CancellationToken cancellationToken)
         {
             var msg = context.Update.Message;
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
             var isSudoer = msg.From.Id.IsSudoer();
-            var isAdmin =await _telegramProvider.IsAdminGroup();
+            var isAdmin =await _telegramService.IsAdminGroup();
             
             if (!isSudoer || !isAdmin)
             {
                 // var sendText = "This feature currently limited";
-                await _telegramProvider.DeleteAsync(msg.MessageId);
+                await _telegramService.DeleteAsync(msg.MessageId);
                 Log.Information("This User is not Admin!");
                 // await _telegramProvider.SendTextAsync("This feature currently limited");
                 return;
@@ -64,7 +64,7 @@ namespace WinTenBot.Handlers.Commands.Tags
                 
                 if (slugTag.Length >= 3)
                 {
-                    await _telegramProvider.SendTextAsync("📖 Sedang mempersiapkan..");
+                    await _telegramService.SendTextAsync("📖 Sedang mempersiapkan..");
 
                     var content = repMsg.Text ?? repMsg.Caption ?? "";
                     Log.Information(content);
@@ -88,14 +88,14 @@ namespace WinTenBot.Handlers.Commands.Tags
                             data.Add("type_data",repMsg.Type);
                         }
 
-                        await _telegramProvider.EditAsync("📝 Menyimpan tag data..");
+                        await _telegramService.EditAsync("📝 Menyimpan tag data..");
                         await _tagsService.SaveTagAsync(data);
 
                         // var keyboard = new InlineKeyboardMarkup(
                         //     InlineKeyboardButton.WithCallbackData("OK", "tag finish-create")
                         // );
 
-                        await _telegramProvider.EditAsync("✅ Tag berhasil di simpan.." +
+                        await _telegramService.EditAsync("✅ Tag berhasil di simpan.." +
                                                           $"\nTag: <code>#{slugTag}</code>" +
                                                           $"\nKetik /tags untuk melihat semua Tag.");
 
@@ -103,16 +103,16 @@ namespace WinTenBot.Handlers.Commands.Tags
                         return;
                     }
 
-                    await _telegramProvider.EditAsync("✅ Tag sudah ada. " +
+                    await _telegramService.EditAsync("✅ Tag sudah ada. " +
                                                              "Silakan ganti Tag jika ingin isi konten berbeda");
                     return;
                 }
 
-                await _telegramProvider.EditAsync("Slug Tag minimal 3 karakter");
+                await _telegramService.EditAsync("Slug Tag minimal 3 karakter");
             }
             else
             {
-                await _telegramProvider.SendTextAsync(sendText);
+                await _telegramService.SendTextAsync(sendText);
             }
         }
     }

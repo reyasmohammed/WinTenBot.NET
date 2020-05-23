@@ -4,17 +4,18 @@ using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 using WinTenBot.Providers;
+using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Events
 {
     public class LeftChatMemberEvent : IUpdateHandler
     {
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
             Message msg = context.Update.Message;
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
             var leftMember = msg.LeftChatMember;
             var leftUserId = leftMember.Id;
             var isBan = await leftUserId.CheckGBan();
@@ -30,7 +31,7 @@ namespace WinTenBot.Handlers.Events
                 var sendText = $"Sampai jumpa lagi {leftFullName} " +
                                $"\nKami di <b>{chatTitle}</b> menunggumu kembali.. :(";
 
-                await _telegramProvider.SendTextAsync(sendText);
+                await _telegramService.SendTextAsync(sendText);
             }
             else
             {

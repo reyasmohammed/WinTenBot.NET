@@ -5,19 +5,20 @@ using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Helpers;
 using WinTenBot.Model;
 using WinTenBot.Providers;
+using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Core
 {
     public class InfoCommand : CommandBase
     {
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
 
-            var me = await _telegramProvider.GetMeAsync();
+            var me = await _telegramService.GetMeAsync();
             var botName = me.FirstName;
             var botVersion = BotSettings.ProductVersion;
 
@@ -27,7 +28,7 @@ namespace WinTenBot.Handlers.Commands.Core
                            "ℹ️ Bot Telegram resmi berbasis <b>WinTen API.</b> untuk manajemen dan peralatan grup. " +
                            "Untuk detail fitur pada perintah /start.\n\n";
 
-            if (await _telegramProvider.IsBeta())
+            if (await _telegramService.IsBeta())
             {
                 sendText += "<b>Saya masih Beta, mungkin terdapat bug dan tidak stabil. " +
                             "Tidak di rekomendasikan untuk grup Anda.</b>\n\n";
@@ -60,7 +61,7 @@ namespace WinTenBot.Handlers.Commands.Core
                 }
             });
 
-            await _telegramProvider.SendTextAsync(sendText, inlineKeyboard);
+            await _telegramService.SendTextAsync(sendText, inlineKeyboard);
         }
     }
 }

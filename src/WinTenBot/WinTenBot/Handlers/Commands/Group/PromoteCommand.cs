@@ -3,17 +3,18 @@ using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
+using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Group
 {
     public class PromoteCommand : CommandBase
     {
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
             var msg = context.Update.Message;
             if (msg.ReplyToMessage != null)
             {
@@ -25,7 +26,7 @@ namespace WinTenBot.Handlers.Commands.Group
 
             var sendText = $"{nameLink} berhasil menjadi admin";
 
-            var promote = await _telegramProvider.PromoteChatMemberAsync(userId);
+            var promote = await _telegramService.PromoteChatMemberAsync(userId);
             if (!promote.IsSuccess)
             {
                 var errorCode = promote.ErrorCode;
@@ -35,7 +36,7 @@ namespace WinTenBot.Handlers.Commands.Group
                            $"\nPesan: {errorMessage}";
             }
 
-            await _telegramProvider.SendTextAsync(sendText);
+            await _telegramService.SendTextAsync(sendText);
         }
     }
 }

@@ -26,6 +26,7 @@ using WinTenBot.Handlers.Commands.Rules;
 using WinTenBot.Handlers.Commands.Security;
 using WinTenBot.Handlers.Commands.Tags;
 using WinTenBot.Handlers.Commands.Welcome;
+using WinTenBot.Handlers.Commands.Words;
 using WinTenBot.Handlers.Events;
 using WinTenBot.Helpers;
 using WinTenBot.Interfaces;

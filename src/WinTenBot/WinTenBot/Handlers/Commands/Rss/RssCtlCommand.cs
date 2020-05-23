@@ -5,39 +5,40 @@ using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
 using WinTenBot.Scheduler;
+using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Rss
 {
     public class RssCtlCommand : CommandBase
     {
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
             var msg = context.Update.Message;
 
-            var isSudoer = _telegramProvider.IsSudoer();
+            var isSudoer = _telegramService.IsSudoer();
             if (isSudoer)
             {
                 var partedMsg = msg.Text.Split(" ");
                 var param1 = partedMsg.ValueOfIndex(1);
                 Log.Debug($"RssCtl Param1: {param1}");
 
-                await _telegramProvider.AppendTextAsync("Access Granted");
+                await _telegramService.AppendTextAsync("Access Granted");
                 switch (param1)
                 {
                     case "start":
-                        await _telegramProvider.AppendTextAsync("Starting RSS Service");
+                        await _telegramService.AppendTextAsync("Starting RSS Service");
                         RssScheduler.InitScheduler();
-                        await _telegramProvider.AppendTextAsync("Start successfully.");
+                        await _telegramService.AppendTextAsync("Start successfully.");
                         break;
 
                     case "stop":
-                        await _telegramProvider.AppendTextAsync("Stopping RSS Service");
+                        await _telegramService.AppendTextAsync("Stopping RSS Service");
                         HangfireHelper.DeleteAllJobs();
-                        await _telegramProvider.AppendTextAsync("Stop successfully.");
+                        await _telegramService.AppendTextAsync("Stop successfully.");
                         break;
                 }
             }

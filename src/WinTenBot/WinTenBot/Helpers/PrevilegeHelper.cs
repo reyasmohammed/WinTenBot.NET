@@ -7,6 +7,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using WinTenBot.Model;
 using WinTenBot.Providers;
+using WinTenBot.Services;
 
 namespace WinTenBot.Helpers
 {
@@ -26,10 +27,10 @@ namespace WinTenBot.Helpers
             return  isSudoer;
         }
         
-        public static bool IsSudoer(this TelegramProvider telegramProvider)
+        public static bool IsSudoer(this TelegramService telegramService)
         {
             bool isSudoer = false;
-            var userId = telegramProvider.Message.From.Id;
+            var userId = telegramService.Message.From.Id;
             var sudoers = BotSettings.GlobalConfiguration.GetSection("Sudoers").Get<List<string>>();
             var match = sudoers.FirstOrDefault(x => x == userId.ToString());
             
@@ -41,30 +42,30 @@ namespace WinTenBot.Helpers
             return  isSudoer;
         }
         
-        public static async Task<bool> IsAdminOrPrivateChat(this TelegramProvider telegramProvider)
+        public static async Task<bool> IsAdminOrPrivateChat(this TelegramService telegramService)
         {
-            var isAdmin = await IsAdminGroup(telegramProvider);
-            var isPrivateChat = IsPrivateChat(telegramProvider);
+            var isAdmin = await IsAdminGroup(telegramService);
+            var isPrivateChat = IsPrivateChat(telegramService);
 
             return isAdmin || isPrivateChat;
         }
         
-        public static bool IsPrivateChat(this TelegramProvider telegramProvider)
+        public static bool IsPrivateChat(this TelegramService telegramService)
         {
-            var messageOrEdited = telegramProvider.MessageOrEdited;
+            var messageOrEdited = telegramService.MessageOrEdited;
             return messageOrEdited.Chat.Type == ChatType.Private;
         }
         
-        public static async Task<bool> IsAdminGroup(this TelegramProvider telegramProvider, int userId = -1)
+        public static async Task<bool> IsAdminGroup(this TelegramService telegramService, int userId = -1)
         {
-            var message = telegramProvider.MessageOrEdited;
-            var client = telegramProvider.Client;
+            var message = telegramService.MessageOrEdited;
+            var client = telegramService.Client;
             
             var chatId = message.Chat.Id;
             var fromId = message.From.Id;
             var isAdmin = false;
             
-            if (IsPrivateChat(telegramProvider)) return false;
+            if (IsPrivateChat(telegramService)) return false;
             if (userId >= 0) fromId = userId;
             
             var admins = await client.GetChatAdministratorsAsync(chatId);
@@ -81,10 +82,10 @@ namespace WinTenBot.Helpers
             return isAdmin;
         }
 
-        public static async Task<ChatMember[]> GetAllAdmins(this TelegramProvider telegramProvider)
+        public static async Task<ChatMember[]> GetAllAdmins(this TelegramService telegramService)
         {
-            var client = telegramProvider.Client;
-            var message = telegramProvider.Message;
+            var client = telegramService.Client;
+            var message = telegramService.Message;
             var chatId = message.Chat.Id;
             
             var allAdmins = await client.GetChatAdministratorsAsync(chatId);

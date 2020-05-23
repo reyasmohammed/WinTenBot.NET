@@ -37,11 +37,11 @@ namespace WinTenBot.Helpers
             return $"<a href='tg://user?id={message.From.Id}'>{(firstName + " " + lastName).Trim()}</a>";
         }
 
-        public static async Task AfkCheckAsync(this TelegramProvider telegramProvider)
+        public static async Task AfkCheckAsync(this TelegramService telegramService)
         {
             Log.Information("Starting check AFK");
 
-            var message = telegramProvider.MessageOrEdited;
+            var message = telegramService.MessageOrEdited;
 
             var settingService = new SettingsService(message);
             var chatSettings = await settingService.ReadCache();
@@ -57,13 +57,13 @@ namespace WinTenBot.Helpers
                 var repMsg = message.ReplyToMessage;
                 var isAfkReply = await afkService.IsAfkAsync(repMsg);
                 if (isAfkReply)
-                    await telegramProvider.SendTextAsync($"{repMsg.GetFromNameLink()} sedang afk");
+                    await telegramService.SendTextAsync($"{repMsg.GetFromNameLink()} sedang afk");
             }
 
             var isAfk = await afkService.IsAfkAsync(message);
             if (isAfk)
             {
-                await telegramProvider.SendTextAsync($"{message.GetFromNameLink()} sudah tidak afk");
+                await telegramService.SendTextAsync($"{message.GetFromNameLink()} sudah tidak afk");
 
                 var data = new Dictionary<string, object>
                 {
@@ -75,11 +75,11 @@ namespace WinTenBot.Helpers
             }
         }
 
-        public static async Task CheckMataZiziAsync(this TelegramProvider telegramProvider)
+        public static async Task CheckMataZiziAsync(this TelegramService telegramService)
         {
             try
             {
-                var message = telegramProvider.Message;
+                var message = telegramService.Message;
                 var fromId = message.From.Id;
                 var fromUsername = message.From.Username;
                 var fromFName = message.From.FirstName;
@@ -134,7 +134,7 @@ namespace WinTenBot.Helpers
                 }
 
                 if(changesCount>0)
-                    await telegramProvider.SendTextAsync(msgBuild.ToString().Trim());
+                    await telegramService.SendTextAsync(msgBuild.ToString().Trim());
 
             }
             catch (Exception ex)
@@ -145,12 +145,12 @@ namespace WinTenBot.Helpers
 
         #region AntiSpam
 
-        public static async Task<bool> CheckGlobalBanAsync(this TelegramProvider telegramProvider,
+        public static async Task<bool> CheckGlobalBanAsync(this TelegramService telegramService,
             User userTarget = null)
         {
             Log.Information("Starting check Global Ban");
 
-            var message = telegramProvider.MessageOrEdited;
+            var message = telegramService.MessageOrEdited;
             var user = message.From;
 
             var settingService = new SettingsService(message);
@@ -169,19 +169,19 @@ namespace WinTenBot.Helpers
             Log.Information($"IsBan: {isBan}");
             if (isBan)
             {
-                await telegramProvider.DeleteAsync(messageId);
-                await telegramProvider.KickMemberAsync(user);
-                await telegramProvider.UnbanMemberAsync(user);
+                await telegramService.DeleteAsync(messageId);
+                await telegramService.KickMemberAsync(user);
+                await telegramService.UnbanMemberAsync(user);
             }
 
             return isBan;
         }
 
-        public static async Task<bool> CheckCasBanAsync(this TelegramProvider telegramProvider)
+        public static async Task<bool> CheckCasBanAsync(this TelegramService telegramService)
         {
             bool isBan;
             Log.Information("Starting check in Cas Ban");
-            var message = telegramProvider.MessageOrEdited;
+            var message = telegramService.MessageOrEdited;
             var user = message.From;
 
             var settingService = new SettingsService(message);
@@ -197,20 +197,20 @@ namespace WinTenBot.Helpers
             if (isBan)
             {
                 var sendText = $"{user} is banned in CAS!";
-                await telegramProvider.SendTextAsync(sendText);
-                await telegramProvider.KickMemberAsync(user);
-                await telegramProvider.UnbanMemberAsync(user);
+                await telegramService.SendTextAsync(sendText);
+                await telegramService.KickMemberAsync(user);
+                await telegramService.UnbanMemberAsync(user);
             }
 
             return isBan;
         }
 
-        public static async Task<bool> CheckSpamWatchAsync(this TelegramProvider telegramProvider)
+        public static async Task<bool> CheckSpamWatchAsync(this TelegramService telegramService)
         {
             bool isBan;
             Log.Information("Starting Run SpamWatch");
 
-            var message = telegramProvider.MessageOrEdited;
+            var message = telegramService.MessageOrEdited;
             var settingService = new SettingsService(message);
             var chatSettings = await settingService.ReadCache();
             if (!chatSettings.EnableFedSpamWatch)
@@ -230,9 +230,9 @@ namespace WinTenBot.Helpers
                 var sendText = $"{user} is banned in SpamWatch!" +
                                "\nFed: @SpamWatch" +
                                $"\nReason: {spamWatch.Reason}";
-                await telegramProvider.SendTextAsync(sendText);
-                await telegramProvider.KickMemberAsync(user);
-                await telegramProvider.UnbanMemberAsync(user);
+                await telegramService.SendTextAsync(sendText);
+                await telegramService.KickMemberAsync(user);
+                await telegramService.UnbanMemberAsync(user);
             }
 
             return isBan;
@@ -242,12 +242,12 @@ namespace WinTenBot.Helpers
 
         #region Manual Warn Member
 
-        public static async Task WarnMemberAsync(this TelegramProvider telegramProvider)
+        public static async Task WarnMemberAsync(this TelegramService telegramService)
         {
             try
             {
                 Log.Information("Prepare Warning Member..");
-                var message = telegramProvider.Message;
+                var message = telegramService.Message;
                 var repMessage = message.ReplyToMessage;
                 var textMsg = message.Text;
                 var fromId = message.From.Id;
@@ -276,10 +276,10 @@ namespace WinTenBot.Helpers
                 {
                     var sendWarn = $"Batas peringatan telah di lampaui." +
                                    $"\n{nameLink} di tendang sekarang!";
-                    await telegramProvider.SendTextAsync(sendWarn);
+                    await telegramService.SendTextAsync(sendWarn);
 
-                    await telegramProvider.KickMemberAsync(user);
-                    await telegramProvider.UnbanMemberAsync(user);
+                    await telegramService.KickMemberAsync(user);
+                    await telegramService.UnbanMemberAsync(user);
                     await ResetWarnMemberStatAsync(message);
 
                     return;
@@ -293,8 +293,8 @@ namespace WinTenBot.Helpers
                     }
                 });
 
-                await telegramProvider.SendTextAsync(sendText, inlineKeyboard);
-                await message.UpdateLastWarnMemberMessageIdAsync(telegramProvider.SentMessageId);
+                await telegramService.SendTextAsync(sendText, inlineKeyboard);
+                await message.UpdateLastWarnMemberMessageIdAsync(telegramService.SentMessageId);
             }
             catch (Exception ex)
             {
@@ -434,12 +434,12 @@ namespace WinTenBot.Helpers
             Log.Information($"Update step: {insertHit}");
         }
 
-        public static async Task RemoveWarnMemberStatAsync(this TelegramProvider telegramProvider, int userId)
+        public static async Task RemoveWarnMemberStatAsync(this TelegramService telegramService, int userId)
         {
             Log.Information("Removing warn Member stat.");
 
             var tableName = "warn_member_history";
-            var message = telegramProvider.Message;
+            var message = telegramService.Message;
             var chatId = message.Chat.Id;
 
             var update = new Dictionary<string, object>
@@ -477,14 +477,14 @@ namespace WinTenBot.Helpers
 
         }
 
-        public static async Task CheckUsernameAsync(this TelegramProvider telegramProvider)
+        public static async Task CheckUsernameAsync(this TelegramService telegramService)
         {
             try
             {
                 Log.Information("Starting check Username");
 
                 var warnLimit = 4;
-                var message = telegramProvider.MessageOrEdited;
+                var message = telegramService.MessageOrEdited;
                 var fromUser = message.From;
                 var nameLink = fromUser.GetNameLink();
 
@@ -505,7 +505,7 @@ namespace WinTenBot.Helpers
                     var updatedStep = updateResult.StepCount;
                     var lastMessageId = updateResult.LastWarnMessageId;
 
-                    await telegramProvider.DeleteAsync(lastMessageId);
+                    await telegramService.DeleteAsync(lastMessageId);
 
                     var sendText = $"Hai {nameLink}, kamu belum memasang username!" +
                                    $"\nPeringatan ke {updatedStep} dari {warnLimit}";
@@ -516,24 +516,24 @@ namespace WinTenBot.Helpers
                     {
                         var sendWarn = $"Batas peringatan telah di lampaui." +
                                        $"\n{nameLink} di tendang sekarang!";
-                        await telegramProvider.SendTextAsync(sendWarn);
+                        await telegramService.SendTextAsync(sendWarn);
 
-                        await telegramProvider.KickMemberAsync(fromUser);
-                        await telegramProvider.UnbanMemberAsync(fromUser);
+                        await telegramService.KickMemberAsync(fromUser);
+                        await telegramService.UnbanMemberAsync(fromUser);
                         await ResetWarnUsernameStatAsync(message);
 
                         return;
                     }
 
-                    var urlStart = await telegramProvider.GetUrlStart("start=set-username");
+                    var urlStart = await telegramService.GetUrlStart("start=set-username");
                     Log.Information($"UrlStart: {urlStart}");
 
                     var keyboard = new InlineKeyboardMarkup(
                         InlineKeyboardButton.WithUrl("Cara Pasang Username", urlStart)
                     );
 
-                    await telegramProvider.SendTextAsync(sendText, keyboard);
-                    await message.UpdateLastWarnUsernameMessageIdAsync(telegramProvider.SentMessageId);
+                    await telegramService.SendTextAsync(sendText, keyboard);
+                    await message.UpdateLastWarnUsernameMessageIdAsync(telegramService.SentMessageId);
                 }
             }
             catch (Exception ex)

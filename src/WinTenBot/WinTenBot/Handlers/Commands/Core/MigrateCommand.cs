@@ -2,23 +2,24 @@
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Providers;
+using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Core
 {
     public class MigrateCommand : CommandBase
     {
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
 
-            await _telegramProvider.SendTextAsync("Migrate starting..");
+            await _telegramService.SendTextAsync("Migrate starting..");
 
             Thread.Sleep(3000);
 
-            await _telegramProvider.EditAsync("Migrate finish..");
+            await _telegramService.EditAsync("Migrate finish..");
         }
     }
 }

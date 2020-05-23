@@ -5,18 +5,19 @@ using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Helpers;
 using WinTenBot.Model;
 using WinTenBot.Providers;
+using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Core
 {
     class StartCommand : CommandBase
     {
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _telegramProvider = new TelegramProvider(context);
-            var msg = _telegramProvider.Message;
+            _telegramService = new TelegramService(context);
+            var msg = _telegramService.Message;
             var partText = msg.Text.SplitText(" ").ToArray();
             var paramStart = partText.ValueOfIndex(1);
 
@@ -30,8 +31,8 @@ namespace WinTenBot.Handlers.Commands.Core
                               $"Agar fungsi saya bekerja dengan fitur penuh, jadikan saya admin dengan level standard. " +
                               $"\nSaran dan fitur bisa di ajukan di @WinTenGroup atau @TgBotID.";
 
-            var urlStart = await _telegramProvider.GetUrlStart("start=help");
-            var urlAddTo = await _telegramProvider.GetUrlStart("startgroup=new");
+            var urlStart = await _telegramService.GetUrlStart("start=help");
+            var urlAddTo = await _telegramService.GetUrlStart("startgroup=new");
 
             switch (paramStart)
             {
@@ -44,7 +45,7 @@ namespace WinTenBot.Handlers.Commands.Core
                         }
                     });
                     var send = "Untuk cara pasang Username, silakan klik tombol di bawah ini";
-                    await _telegramProvider.SendTextAsync(send, setUsername);
+                    await _telegramService.SendTextAsync(send, setUsername);
                     break;
 
                 default:
@@ -52,7 +53,7 @@ namespace WinTenBot.Handlers.Commands.Core
                         InlineKeyboardButton.WithUrl("Dapatkan bantuan", urlStart)
                     );
 
-                    if (_telegramProvider.IsPrivateChat())
+                    if (_telegramService.IsPrivateChat())
                     {
                         keyboard = new InlineKeyboardMarkup(new[]
                         {
@@ -68,7 +69,7 @@ namespace WinTenBot.Handlers.Commands.Core
                         });
                     }
 
-                    await _telegramProvider.SendTextAsync(sendText, keyboard);
+                    await _telegramService.SendTextAsync(sendText, keyboard);
                     break;
             }
         }

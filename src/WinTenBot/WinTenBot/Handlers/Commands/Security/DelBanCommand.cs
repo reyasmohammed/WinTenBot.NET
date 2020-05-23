@@ -11,7 +11,7 @@ namespace WinTenBot.Handlers.Commands.Security
     public class DelBanCommand : CommandBase
     {
         private ElasticSecurityService _elasticSecurityService;
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
@@ -22,7 +22,7 @@ namespace WinTenBot.Handlers.Commands.Security
             var partedText = msg.Text.Split(" ");
             var param1 = partedText.ValueOfIndex(1); // User ID
 
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
             _elasticSecurityService = new ElasticSecurityService(msg);
 
             if (fromId.IsSudoer())
@@ -33,25 +33,25 @@ namespace WinTenBot.Handlers.Commands.Security
                 var userId = param1.ToInt();
 
                 Log.Information("Execute Global DelBan");
-                await _telegramProvider.SendTextAsync("Mempersiapkan..");
-                await _telegramProvider.DeleteAsync(msg.MessageId);
+                await _telegramService.SendTextAsync("Mempersiapkan..");
+                await _telegramService.DeleteAsync(msg.MessageId);
 
                 var isBan = await _elasticSecurityService.IsExist(userId);
                 Log.Information($"IsBan: {isBan}");
                 if (isBan)
                 {
-                    await _telegramProvider.EditAsync("Memperbarui informasi..");
+                    await _telegramService.EditAsync("Memperbarui informasi..");
                     var save = await _elasticSecurityService.DeleteBanAsync(userId);
                     Log.Information($"SaveBan: {save}");
 
-                    await _telegramProvider.EditAsync("Menulis ke Cache..");
+                    await _telegramService.EditAsync("Menulis ke Cache..");
                     await _elasticSecurityService.UpdateCacheAsync();
 
-                    await _telegramProvider.EditAsync("Misi berhasil.");
+                    await _telegramService.EditAsync("Misi berhasil.");
                 }
                 else
                 {
-                    await _telegramProvider.EditAsync("Pengguna tidak di ban");
+                    await _telegramService.EditAsync("Pengguna tidak di ban");
                 }
 
                 // }
@@ -62,10 +62,10 @@ namespace WinTenBot.Handlers.Commands.Security
             }
             else
             {
-                await _telegramProvider.SendTextAsync("Unauthorized");
+                await _telegramService.SendTextAsync("Unauthorized");
             }
 
-            await _telegramProvider.DeleteAsync(delay: 3000);
+            await _telegramService.DeleteAsync(delay: 3000);
         }
     }
 }

@@ -6,18 +6,19 @@ using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
+using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Additional
 {
     public class TranslateCommand:CommandBase
     {
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
         
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args, CancellationToken cancellationToken)
         { 
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
 
-            var message = _telegramProvider.Message;
+            var message = _telegramService.Message;
             var userLang = message.From.LanguageCode;
 
             if (message.ReplyToMessage != null)
@@ -40,7 +41,7 @@ namespace WinTenBot.Handlers.Commands.Additional
 
                 Log.Information($"Param: {param.ToJson(true)}");
 
-                await _telegramProvider.SendTextAsync("🔄 Translating into Your language..");
+                await _telegramService.SendTextAsync("🔄 Translating into Your language..");
 
                 var translate = await forTranslate.Translate(param1);
 
@@ -54,12 +55,12 @@ namespace WinTenBot.Handlers.Commands.Additional
 
                 var translateResult = translate.MergedTranslation;
 
-                await _telegramProvider.EditAsync(translateResult);
+                await _telegramService.EditAsync(translateResult);
             }
             else
             {
                 var hintTranslate = await "Balas pesan yang ingin anda terjemahkan".Translate(userLang);
-                await _telegramProvider.SendTextAsync(hintTranslate.MergedTranslation);
+                await _telegramService.SendTextAsync(hintTranslate.MergedTranslation);
             }
 
         }

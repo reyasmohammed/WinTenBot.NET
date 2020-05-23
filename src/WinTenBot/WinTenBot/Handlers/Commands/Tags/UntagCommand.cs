@@ -11,7 +11,7 @@ namespace WinTenBot.Handlers.Commands.Tags
     public class UntagCommand : CommandBase
     {
         private TagsService _tagsService;
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public UntagCommand()
         {
@@ -21,27 +21,27 @@ namespace WinTenBot.Handlers.Commands.Tags
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
             var msg = context.Update.Message;
 
-            var isAdmin = await _telegramProvider.IsAdminGroup();
+            var isAdmin = await _telegramService.IsAdminGroup();
             var tagVal = args[0];
             var sendText = "Perintah Untag hanya untuk ngadmin.";
 
             if (isAdmin)
             {
-                await _telegramProvider.SendTextAsync("Memeriksa..");
-                var isExist = await _tagsService.IsExist(_telegramProvider.Message.Chat.Id, tagVal);
+                await _telegramService.SendTextAsync("Memeriksa..");
+                var isExist = await _tagsService.IsExist(_telegramService.Message.Chat.Id, tagVal);
                 if (isExist)
                 {
                     Log.Information($"Sedang menghapus tag {tagVal}");
-                    var unTag = await _tagsService.DeleteTag(_telegramProvider.Message.Chat.Id, tagVal);
+                    var unTag = await _tagsService.DeleteTag(_telegramService.Message.Chat.Id, tagVal);
                     if (unTag)
                     {
                         sendText = $"Hapus tag {tagVal} berhasil";
                     }
 
-                    await _telegramProvider.EditAsync(sendText);
+                    await _telegramService.EditAsync(sendText);
                     return;
                 }
                 else
@@ -50,7 +50,7 @@ namespace WinTenBot.Handlers.Commands.Tags
                 }
             }
 
-            await _telegramProvider.SendTextAsync(sendText);
+            await _telegramService.SendTextAsync(sendText);
         }
     }
 }

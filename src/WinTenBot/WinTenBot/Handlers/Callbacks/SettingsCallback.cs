@@ -10,15 +10,15 @@ namespace WinTenBot.Handlers.Callbacks
 {
     public class SettingsCallback
     {
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
         private CallbackQuery CallbackQuery { get; set; }
         private Message Message { get; set; }
 
-        public SettingsCallback(TelegramProvider telegramProvider)
+        public SettingsCallback(TelegramService telegramService)
         {
-            _telegramProvider = telegramProvider;
-            Message = telegramProvider.Message;
-            CallbackQuery = telegramProvider.Context.Update.CallbackQuery;
+            _telegramService = telegramService;
+            Message = telegramService.Message;
+            CallbackQuery = telegramService.Context.Update.CallbackQuery;
 
             Log.Information("Receiving Setting Callback.");
 
@@ -31,7 +31,7 @@ namespace WinTenBot.Handlers.Callbacks
             var fromId = CallbackQuery.From.Id;
             var msgId = CallbackQuery.Message.MessageId;
 
-            var isAdmin = await _telegramProvider.IsAdminGroup(fromId);
+            var isAdmin = await _telegramService.IsAdminGroup(fromId);
             if (!isAdmin)
             {
                 Log.Information("He is not admin.");
@@ -66,11 +66,11 @@ namespace WinTenBot.Handlers.Callbacks
             var btnMarkup = await settingBtn.ToJson().JsonToButton(chunk: 2);
             Log.Debug($"Settings: {settingBtn.Count}");
 
-            _telegramProvider.SentMessageId = msgId;
+            _telegramService.SentMessageId = msgId;
             
             var editText = $"Settings Toggles" +
                            $"\nParam: {columnTarget} to {newValue}";
-            await _telegramProvider.EditMessageCallback(editText, btnMarkup);
+            await _telegramService.EditMessageCallback(editText, btnMarkup);
             
             // var lastReplyMarkup = CallbackQuery.Message.ReplyMarkup.InlineKeyboard;
             // Log.Debug($"LastReplyMarkup: {lastReplyMarkup.ToJson(true)}");

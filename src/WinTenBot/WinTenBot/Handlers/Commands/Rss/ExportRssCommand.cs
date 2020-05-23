@@ -14,24 +14,24 @@ namespace WinTenBot.Handlers.Commands.Rss
     public class ExportRssCommand : CommandBase
     {
         private RssService _rssService;
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _telegramProvider = new TelegramProvider(context);
-            _rssService = new RssService(_telegramProvider.Message);
-            var msg = _telegramProvider.Message;
+            _telegramService = new TelegramService(context);
+            _rssService = new RssService(_telegramService.Message);
+            var msg = _telegramService.Message;
             var chatId = msg.Chat.Id;
             var msgId = msg.MessageId;
             var msgText = msg.Text;
             var dateDate = DateTime.UtcNow.ToString("yyyy-MM-dd");
 
-            var isAdminOrPrivate = await _telegramProvider.IsAdminOrPrivateChat();
+            var isAdminOrPrivate = await _telegramService.IsAdminOrPrivateChat();
             if (!isAdminOrPrivate)
             {
                 var send = "Maaf, hanya Admin yang dapat mengekspor daftar RSS";
-                await _telegramProvider.SendTextAsync(send);
+                await _telegramService.SendTextAsync(send);
                 return;
             }
 
@@ -61,7 +61,7 @@ namespace WinTenBot.Handlers.Commands.Rss
             await listRssStr.WriteTextAsync(filePath);
 
             var fileSend = IoHelper.BaseDirectory + $"/{filePath}";
-            await _telegramProvider.SendMediaAsync(fileSend, MediaType.LocalDocument, sendText);
+            await _telegramService.SendMediaAsync(fileSend, MediaType.LocalDocument, sendText);
 
             fileSend.DeleteFile();
         }

@@ -55,13 +55,13 @@ namespace WinTenBot.Helpers
             return text.Trim();
         }
 
-        public static bool IsNeedRunTasks(this TelegramProvider telegramProvider)
+        public static bool IsNeedRunTasks(this TelegramService telegramService)
         {
-            var message = telegramProvider.Message;
+            var message = telegramService.Message;
 
             return message.NewChatMembers == null
                    || message.LeftChatMember == null
-                   || !telegramProvider.IsPrivateChat();
+                   || !telegramService.IsPrivateChat();
         }
 
         public static string GetMessageLink(this Message message)
@@ -117,13 +117,13 @@ namespace WinTenBot.Helpers
             return isMust;
         }
 
-        public static async Task CheckMessageAsync(this TelegramProvider telegramProvider)
+        public static async Task CheckMessageAsync(this TelegramService telegramService)
         {
             try
             {
                 Log.Information("Starting check Message");
 
-                var message = telegramProvider.MessageOrEdited;
+                var message = telegramService.MessageOrEdited;
 
                 var settingService = new SettingsService(message);
                 var chatSettings = await settingService.ReadCache();
@@ -140,7 +140,7 @@ namespace WinTenBot.Helpers
                     var isMustDelete = await IsMustDelete(text);
                     Log.Information($"Message {message.MessageId} IsMustDelete: {isMustDelete}");
 
-                    if (isMustDelete) await telegramProvider.DeleteAsync(message.MessageId);
+                    if (isMustDelete) await telegramService.DeleteAsync(message.MessageId);
                 }
                 else
                 {
@@ -153,14 +153,14 @@ namespace WinTenBot.Helpers
             }
         }
 
-        public static async Task FindNotesAsync(this TelegramProvider telegramProvider)
+        public static async Task FindNotesAsync(this TelegramService telegramService)
         {
             try
             {
                 Log.Information("Starting find Notes in Cloud");
                 InlineKeyboardMarkup inlineKeyboardMarkup = null;
 
-                var message = telegramProvider.MessageOrEdited;
+                var message = telegramService.MessageOrEdited;
                 var settingService = new SettingsService(message);
                 var chatSettings = await settingService.ReadCache();
                 if (!chatSettings.EnableFindNotes)
@@ -188,7 +188,7 @@ namespace WinTenBot.Helpers
                         inlineKeyboardMarkup = btnData.ToReplyMarkup(2);
                     }
 
-                    await telegramProvider.SendTextAsync(content, inlineKeyboardMarkup);
+                    await telegramService.SendTextAsync(content, inlineKeyboardMarkup);
 
                     foreach (var note in selectedNotes)
                     {
@@ -206,9 +206,9 @@ namespace WinTenBot.Helpers
             }
         }
 
-        public static async Task FindTagsAsync(this TelegramProvider telegramProvider)
+        public static async Task FindTagsAsync(this TelegramService telegramService)
         {
-            var message = telegramProvider.MessageOrEdited;
+            var message = telegramService.MessageOrEdited;
             var settingService = new SettingsService(message);
             var chatSettings = await settingService.ReadCache();
             if (!chatSettings.EnableFindTags)
@@ -256,11 +256,11 @@ namespace WinTenBot.Helpers
 
                 if (typeData != MediaType.Unknown)
                 {
-                    await telegramProvider.SendMediaAsync(idData, typeData, content, buttonMarkup);
+                    await telegramService.SendMediaAsync(idData, typeData, content, buttonMarkup);
                 }
                 else
                 {
-                    await telegramProvider.SendTextAsync(content, buttonMarkup);
+                    await telegramService.SendTextAsync(content, buttonMarkup);
                 }
 
                 // await telegramProvider.SendTextAsync(content, buttonMarkup);
@@ -268,7 +268,7 @@ namespace WinTenBot.Helpers
 
             if (allTags > limitedCount)
             {
-                await telegramProvider.SendTextAsync("Due performance reason, we limit 5 batch call tags");
+                await telegramService.SendTextAsync("Due performance reason, we limit 5 batch call tags");
             }
         }
     }

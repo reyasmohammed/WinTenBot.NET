@@ -4,16 +4,17 @@ using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
+using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Core
 {
     public class GlobalReportCommand:CommandBase
     {
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args, CancellationToken cancellationToken)
         {
-            _telegramProvider = new TelegramProvider(context);
-            var msg = _telegramProvider.Message;
+            _telegramService = new TelegramService(context);
+            var msg = _telegramService.Message;
 
             if (msg.ReplyToMessage != null)
             {
@@ -35,21 +36,21 @@ namespace WinTenBot.Handlers.Commands.Core
                 msgBuild.AppendLine($"<b>Reason:</b> {reason}");
                 msgBuild.AppendLine($"\nTerima kasih sudah melaporkan!");
 
-                var mentionAdmin = await _telegramProvider.GetMentionAdminsStr();
+                var mentionAdmin = await _telegramService.GetMentionAdminsStr();
 
-                var isAdmin = await _telegramProvider.IsAdminGroup();
+                var isAdmin = await _telegramService.IsAdminGroup();
                 if (!isAdmin) msgBuild.AppendLine(mentionAdmin);
                 
                 var sendText = msgBuild.ToString().Trim();
-                await _telegramProvider.ForwardMessageAsync(repMsg.MessageId);
-                await _telegramProvider.SendTextAsync(sendText);
+                await _telegramService.ForwardMessageAsync(repMsg.MessageId);
+                await _telegramService.SendTextAsync(sendText);
             }
             else
             {
                 var sendText = "ℹ️ <b>Balas</b> pesan yang mau di laporkan" +
                                "\n\n<b>Catatan:</b> GReport (Global Report) akan melaporkan pengguna ke Tim @WinTenDev " +
                                "dan memanggil admin di Grup ini.";
-                await _telegramProvider.SendTextAsync(sendText);
+                await _telegramService.SendTextAsync(sendText);
             }
         }
     }

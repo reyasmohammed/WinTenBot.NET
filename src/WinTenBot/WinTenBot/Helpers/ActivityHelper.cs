@@ -5,17 +5,18 @@ using Serilog;
 using SqlKata;
 using SqlKata.Execution;
 using WinTenBot.Providers;
+using WinTenBot.Services;
 
 namespace WinTenBot.Helpers
 {
     public static class ActivityHelper
     {
-        public static async Task HitActivityAsync(this TelegramProvider telegramProvider)
+        public static async Task HitActivityAsync(this TelegramService telegramService)
         {
             Log.Information("Starting Hit Activity");
 
-            var message = telegramProvider.MessageOrEdited;
-            var botUser = await telegramProvider.GetMeAsync();
+            var message = telegramService.MessageOrEdited;
+            var botUser = await telegramService.GetMeAsync();
             var data = new Dictionary<string, object>()
             {
                 {"via_bot", botUser.Username},
@@ -38,9 +39,9 @@ namespace WinTenBot.Helpers
             Log.Information($"Insert Hit: {insertHit}");
         }
 
-        public static void HitActivityBackground(this TelegramProvider telegramProvider)
+        public static void HitActivityBackground(this TelegramService telegramService)
         {
-            BackgroundJob.Enqueue(() => HitActivityAsync(telegramProvider));
+            BackgroundJob.Enqueue(() => HitActivityAsync(telegramService));
 
             Log.Information("Hit Activity scheduled in Background");
         }

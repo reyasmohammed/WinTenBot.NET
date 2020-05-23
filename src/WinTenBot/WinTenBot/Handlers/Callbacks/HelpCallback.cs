@@ -2,18 +2,19 @@
 using Serilog;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
+using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Callbacks
 {
     public class HelpCallback
     {
         private string CallBackData { get; set; }
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
         
-        public HelpCallback(TelegramProvider telegramProvider)
+        public HelpCallback(TelegramService telegramService)
         {
-            _telegramProvider = telegramProvider;
-            CallBackData = telegramProvider.CallbackQuery.Data;
+            _telegramService = telegramService;
+            CallBackData = telegramService.CallbackQuery.Data;
             
             Parallel.Invoke(async ()=> await ExecuteAsync());
         }
@@ -43,7 +44,7 @@ namespace WinTenBot.Handlers.Callbacks
             var keyboard = await $"Storage/Buttons/{jsonButton}.json".JsonToButton();
 
 
-            await _telegramProvider.EditMessageCallback(sendText, keyboard);
+            await _telegramService.EditMessageCallback(sendText, keyboard);
         }
         
         

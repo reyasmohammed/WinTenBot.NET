@@ -11,7 +11,7 @@ namespace WinTenBot.Handlers.Commands.Group
     public class AfkCommand : CommandBase
     {
         private AfkService _afkService;
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public AfkCommand()
         {
@@ -21,7 +21,7 @@ namespace WinTenBot.Handlers.Commands.Group
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
             var msg = context.Update.Message;
 
             var data = new Dictionary<string, object>()
@@ -41,7 +41,7 @@ namespace WinTenBot.Handlers.Commands.Group
                 sendText += $"\n<i>{afkReason}</i>";
             }
 
-            await _telegramProvider.SendTextAsync(sendText);
+            await _telegramService.SendTextAsync(sendText);
             await _afkService.SaveAsync(data);
             await _afkService.UpdateCacheAsync();
         }

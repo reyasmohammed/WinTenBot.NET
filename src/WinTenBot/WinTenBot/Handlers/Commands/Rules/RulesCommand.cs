@@ -12,14 +12,14 @@ namespace WinTenBot.Handlers.Commands.Rules
     public class RulesCommand : CommandBase
     {
         private SettingsService _settingsService;
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
             var msg = context.Update.Message;
 
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
             _settingsService = new SettingsService(msg);
 
 
@@ -42,7 +42,7 @@ namespace WinTenBot.Handlers.Commands.Rules
                 sendText = "Rules hanya untuk grup";
             }
 
-            await _telegramProvider.SendTextAsync(sendText);
+            await _telegramService.SendTextAsync(sendText);
         }
     }
 }

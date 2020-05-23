@@ -12,21 +12,21 @@ namespace WinTenBot.Handlers.Commands.Core
     public class TestCommand : CommandBase
     {
         private RssService _rssService;
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
             _rssService = new RssService(context.Update.Message);
 
-            var chatId = _telegramProvider.Message.Chat.Id;
-            var fromId = _telegramProvider.Message.From.Id;
+            var chatId = _telegramService.Message.Chat.Id;
+            var fromId = _telegramService.Message.From.Id;
 
             if (fromId.IsSudoer())
             {
                 Log.Information("Test started..");
-                await _telegramProvider.SendTextAsync("Sedang mengetes sesuatu");
+                await _telegramService.SendTextAsync("Sedang mengetes sesuatu");
 
                 // var data = await new Query("rss_history")
                 //     .Where("chat_id", chatId)
@@ -71,7 +71,7 @@ namespace WinTenBot.Handlers.Commands.Core
                     }
                 });
 
-                await _telegramProvider.EditAsync("Warn Username Limit", inlineKeyboard);
+                await _telegramService.EditAsync("Warn Username Limit", inlineKeyboard);
             }
 
             // else

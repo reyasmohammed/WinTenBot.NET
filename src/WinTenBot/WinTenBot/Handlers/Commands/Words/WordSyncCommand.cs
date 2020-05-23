@@ -3,30 +3,31 @@ using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
+using WinTenBot.Services;
 
-namespace WinTenBot.Handlers.Commands.Security
+namespace WinTenBot.Handlers.Commands.Words
 {
     public class WordSyncCommand : CommandBase
     {
-        private TelegramProvider _telegramProvider;
+        private TelegramService _telegramService;
 
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            _telegramProvider = new TelegramProvider(context);
+            _telegramService = new TelegramService(context);
 
-            var isSudoer = _telegramProvider.IsSudoer();
-            var isAdmin = await _telegramProvider.IsAdminGroup();
+            var isSudoer = _telegramService.IsSudoer();
+            var isAdmin = await _telegramService.IsAdminGroup();
 
             if (isSudoer)
             {
-                await _telegramProvider.DeleteAsync(_telegramProvider.Message.MessageId);
+                await _telegramService.DeleteAsync(_telegramService.Message.MessageId);
 
-                await _telegramProvider.AppendTextAsync("Sedang mengsinkronkan Word Filter");
+                await _telegramService.AppendTextAsync("Sedang mengsinkronkan Word Filter");
                 await DataHelper.SyncWordToLocalAsync();
-                await _telegramProvider.AppendTextAsync("Selesai mengsinkronkan.");
+                await _telegramService.AppendTextAsync("Selesai mengsinkronkan.");
 
-                await _telegramProvider.DeleteAsync(delay: 3000);
+                await _telegramService.DeleteAsync(delay: 3000);
             }
         }
     }

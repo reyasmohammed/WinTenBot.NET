@@ -17,21 +17,21 @@ namespace WinTenBot.Helpers
 {
     public static class BotHelper
     {
-        public static async Task<string> GetUrlStart(this TelegramProvider telegramProvider, string param)
+        public static async Task<string> GetUrlStart(this TelegramService telegramService, string param)
         {
-            var bot = await telegramProvider.Client.GetMeAsync();
+            var bot = await telegramService.Client.GetMeAsync();
             var username = bot.Username;
             return $"https://t.me/{username}?{param}";
         }
 
-        public static async Task<User> GetMeAsync(this TelegramProvider telegramProvider)
+        public static async Task<User> GetMeAsync(this TelegramService telegramService)
         {
-            return await telegramProvider.Client.GetMeAsync();
+            return await telegramService.Client.GetMeAsync();
         }
 
-        public static async Task<bool> IsBeta(this TelegramProvider telegramProvider)
+        public static async Task<bool> IsBeta(this TelegramService telegramService)
         {
-            var me = await GetMeAsync(telegramProvider);
+            var me = await GetMeAsync(telegramService);
             var isBeta = me.Username.ToLower().Contains("beta");
             Log.Information($"IsBeta: {isBeta}");
             return isBeta;
@@ -73,11 +73,11 @@ namespace WinTenBot.Helpers
             }
         }
 
-        public static async Task<bool> EnsureChatRestrictionAsync(this TelegramProvider telegramProvider)
+        public static async Task<bool> EnsureChatRestrictionAsync(this TelegramService telegramService)
         {
             Log.Information("Starting ensure Chat Restriction");
 
-            var message = telegramProvider.MessageOrEdited;
+            var message = telegramService.MessageOrEdited;
             var chatId = message.Chat.Id;
 
             if (!chatId.CheckRestriction()) return false;
@@ -85,8 +85,8 @@ namespace WinTenBot.Helpers
             Log.Information("I must leave right now!");
             var msgOut = $"Sepertinya saya salah alamat, saya pamit dulu..";
 
-            await telegramProvider.SendTextAsync(msgOut);
-            await telegramProvider.LeaveChat(chatId);
+            await telegramService.SendTextAsync(msgOut);
+            await telegramService.LeaveChat(chatId);
             return true;
         }
 
@@ -189,11 +189,11 @@ namespace WinTenBot.Helpers
             }
         }
 
-        public static async Task EnsureChatHealthAsync(this TelegramProvider telegramProvider)
+        public static async Task EnsureChatHealthAsync(this TelegramService telegramService)
         {
             Log.Information("Ensuring chat health..");
 
-            var message = telegramProvider.Message;
+            var message = telegramService.Message;
             var settingsService = new SettingsService
             {
                 Message = message
