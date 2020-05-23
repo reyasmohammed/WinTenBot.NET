@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
-using WinTenBot.Providers;
+using WinTenBot.Model;
 using WinTenBot.Services;
 
 namespace WinTenBot.Handlers
@@ -22,7 +22,8 @@ namespace WinTenBot.Handlers
                           context.Update.EditedMessage ?? context.Update.CallbackQuery.Message;
             var fromUser = message.From;
 
-            Log.Information($"New Update: {context.Update.ToJson(true)}");
+            if(BotSettings.IsDevelopment)
+                Log.Information($"New Update: {context.Update.ToJson(true)}");
 
             await EnqueuePreTask();
 
