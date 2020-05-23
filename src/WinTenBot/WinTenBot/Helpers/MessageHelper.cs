@@ -125,8 +125,8 @@ namespace WinTenBot.Helpers
 
                 var message = telegramService.MessageOrEdited;
 
-                var settingService = new SettingsService(message);
-                var chatSettings = await settingService.ReadCache();
+                // var settingService = new SettingsService(message);
+                var chatSettings = telegramService.CurrentSetting;
 
                 if (!chatSettings.EnableWordFilterGroupWide)
                 {
@@ -161,8 +161,8 @@ namespace WinTenBot.Helpers
                 InlineKeyboardMarkup inlineKeyboardMarkup = null;
 
                 var message = telegramService.MessageOrEdited;
-                var settingService = new SettingsService(message);
-                var chatSettings = await settingService.ReadCache();
+                // var settingService = new SettingsService(message);
+                var chatSettings = telegramService.CurrentSetting;
                 if (!chatSettings.EnableFindNotes)
                 {
                     Log.Information("Find Notes is disabled in this Group!");
@@ -209,8 +209,8 @@ namespace WinTenBot.Helpers
         public static async Task FindTagsAsync(this TelegramService telegramService)
         {
             var message = telegramService.MessageOrEdited;
-            var settingService = new SettingsService(message);
-            var chatSettings = await settingService.ReadCache();
+            // var settingService = new SettingsService(message);
+            var chatSettings = telegramService.CurrentSetting;
             if (!chatSettings.EnableFindTags)
             {
                 Log.Information("Find Tags is disabled in this Group!");

@@ -43,8 +43,8 @@ namespace WinTenBot.Helpers
 
             var message = telegramService.MessageOrEdited;
 
-            var settingService = new SettingsService(message);
-            var chatSettings = await settingService.ReadCache();
+            // var settingService = new SettingsService(message);
+            var chatSettings = telegramService.CurrentSetting;
             if (!chatSettings.EnableAfkStat)
             {
                 Log.Information("Afk Stat is disabled in this Group!");
@@ -153,8 +153,8 @@ namespace WinTenBot.Helpers
             var message = telegramService.MessageOrEdited;
             var user = message.From;
 
-            var settingService = new SettingsService(message);
-            var chatSettings = await settingService.ReadCache();
+            // var settingService = new SettingsService(message);
+            var chatSettings = telegramService.CurrentSetting;
             if (!chatSettings.EnableFedEs2)
             {
                 Log.Information("Fed ES2 Ban is disabled in this Group!");
@@ -184,8 +184,8 @@ namespace WinTenBot.Helpers
             var message = telegramService.MessageOrEdited;
             var user = message.From;
 
-            var settingService = new SettingsService(message);
-            var chatSettings = await settingService.ReadCache();
+            // var settingService = new SettingsService(message);
+            var chatSettings = telegramService.CurrentSetting;
             if (!chatSettings.EnableFedCasBan)
             {
                 Log.Information("Fed Cas Ban is disabled in this Group!");
@@ -211,8 +211,8 @@ namespace WinTenBot.Helpers
             Log.Information("Starting Run SpamWatch");
 
             var message = telegramService.MessageOrEdited;
-            var settingService = new SettingsService(message);
-            var chatSettings = await settingService.ReadCache();
+            // var settingService = new SettingsService(message);
+            var chatSettings = telegramService.CurrentSetting;
             if (!chatSettings.EnableFedSpamWatch)
             {
                 Log.Information("Fed SpamWatch is disabled in this Group!");
@@ -488,8 +488,8 @@ namespace WinTenBot.Helpers
                 var fromUser = message.From;
                 var nameLink = fromUser.GetNameLink();
 
-                var settingService = new SettingsService(message);
-                var chatSettings = await settingService.ReadCache();
+                // var settingService = new SettingsService(message);
+                var chatSettings = telegramService.CurrentSetting;
                 if (!chatSettings.EnableWarnUsername)
                 {
                     Log.Information("Warn Username is disabled in this Group!");
