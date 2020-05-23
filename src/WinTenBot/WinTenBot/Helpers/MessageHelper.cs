@@ -134,7 +134,7 @@ namespace WinTenBot.Helpers
                     return;
                 }
 
-                var text = message.Text;
+                var text = message.Text ?? message.Caption;
                 if (!text.IsNullOrEmpty())
                 {
                     var isMustDelete = await IsMustDelete(text);
