@@ -3,7 +3,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
 using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
@@ -25,57 +24,59 @@ namespace WinTenBot.Handlers.Events
 
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
-            Message msg = context.Update.Message;
+            var msg = context.Update.Message;
             _telegramService = new TelegramService(context);
             _settingsService = new SettingsService(msg);
             _elasticSecurityService = new ElasticSecurityService(context.Update.Message);
 
             Log.Information("New Chat Members...");
-            
-            var chatSettings = await _settingsService.ReadCache();
+
+            var chatSettings = _telegramService.CurrentSetting;
             Settings = chatSettings;
-            
-            if(!chatSettings.EnableWelcomeMessage){
+
+            if (!chatSettings.EnableWelcomeMessage)
+            {
                 Log.Information("Welcome message is disabled!");
                 return;
             }
-            
+
             var newMembers = msg.NewChatMembers;
-            var isBootAdded = await newMembers.IsBotAdded();
+            var isBootAdded = await newMembers.IsBotAdded().ConfigureAwait(false);
             if (isBootAdded)
             {
-                var isRestricted = await _telegramService.EnsureChatRestrictionAsync();
+                var isRestricted = await _telegramService.EnsureChatRestrictionAsync()
+                    .ConfigureAwait(false);
                 if (isRestricted) return;
 
                 var botName = BotSettings.GlobalConfiguration["Engines:ProductName"];
                 var sendText = $"Hai, perkenalkan saya {botName}" +
-                               $"\nFYI saya di bangun ulang menggunakan .NET Core, tepatnya ASP .NET Core." +
+                               $"\nFYI saya di bangun ulang menggunakan .NET." +
                                $"\n\nAku adalah bot pendebug dan grup manajemen yang di lengkapi dengan alat keamanan. " +
                                $"Agar saya berfungsi penuh, jadikan saya admin dengan level standard. " +
                                $"\n\nAku akan menerapkan konfigurasi standard jika aku baru pertama kali masuk kesini. " +
                                $"\n\nUntuk melihat daftar perintah bisa ketikkan /help";
 
-                await _telegramService.SendTextAsync(sendText);
+                await _telegramService.SendTextAsync(sendText).ConfigureAwait(false);
                 await _settingsService.SaveSettingsAsync(new Dictionary<string, object>()
                 {
                     {"chat_id", msg.Chat.Id},
                     {"chat_title", msg.Chat.Title}
-                });
+                }).ConfigureAwait(false);
 
                 if (newMembers.Length == 1) return;
             }
 
-            var parsedNewMember = await ParseMemberCategory(newMembers);
+            var parsedNewMember = await ParseMemberCategory(newMembers).ConfigureAwait(false);
             var allNewMember = parsedNewMember.AllNewMember;
             var allNoUsername = parsedNewMember.AllNoUsername;
             var allNewBot = parsedNewMember.AllNewBot;
 
             if (allNewMember.Length > 0)
             {
-
                 var chatTitle = msg.Chat.Title;
                 var greet = TimeHelper.GetTimeGreet();
-                var memberCount = await _telegramService.GetMemberCount();
+                var memberCount = await _telegramService.GetMemberCount()
+                    .ConfigureAwait(false);
                 var newMemberCount = newMembers.Length;
 
                 Log.Information("Preparing send Welcome..");
@@ -104,14 +105,15 @@ namespace WinTenBot.Handlers.Events
                     keyboard = chatSettings.WelcomeButton.ToReplyMarkup(2);
                 }
 
-                if(chatSettings.EnableHumanVerification){
+                if (chatSettings.EnableHumanVerification)
+                {
                     Log.Information("Human verification is enabled!");
                     Log.Information("Adding verify button..");
-                    
+
                     var userId = newMembers[0].Id;
                     var verifyButton = $"Saya Manusia!|verify {userId}";
 
-                    var withVerifyArr = new string [] { chatSettings.WelcomeButton, verifyButton };
+                    var withVerifyArr = new string[] {chatSettings.WelcomeButton, verifyButton};
                     var withVerify = string.Join(",", withVerifyArr);
 
                     keyboard = withVerify.ToReplyMarkup(2);
@@ -120,7 +122,7 @@ namespace WinTenBot.Handlers.Events
                 var prevMsgId = chatSettings.LastWelcomeMessageId.ToInt();
 
 
-                int sentMsgId = -1;
+                var sentMsgId = -1;
 
                 if (chatSettings.WelcomeMediaType != MediaType.Unknown)
                 {
@@ -129,27 +131,28 @@ namespace WinTenBot.Handlers.Events
                         chatSettings.WelcomeMedia,
                         mediaType,
                         sendText,
-                        keyboard)).MessageId;
+                        keyboard).ConfigureAwait(false)).MessageId;
                 }
                 else
                 {
-                    sentMsgId = (await _telegramService.SendTextAsync(sendText, keyboard)).MessageId;
+                    sentMsgId = (await _telegramService.SendTextAsync(sendText, keyboard)
+                        .ConfigureAwait(false)).MessageId;
                 }
 
                 if (!chatSettings.EnableHumanVerification)
                 {
-                    await _telegramService.DeleteAsync(prevMsgId);
+                    await _telegramService.DeleteAsync(prevMsgId).ConfigureAwait(false);
                 }
-                
+
                 await _settingsService.SaveSettingsAsync(new Dictionary<string, object>()
                 {
                     {"chat_id", msg.Chat.Id},
                     {"chat_title", msg.Chat.Title},
                     {"members_count", memberCount},
                     {"last_welcome_message_id", sentMsgId}
-                });
+                }).ConfigureAwait(false);
 
-                await _settingsService.UpdateCache();
+                await _settingsService.UpdateCache().ConfigureAwait(false);
             }
             else
             {
@@ -169,20 +172,22 @@ namespace WinTenBot.Handlers.Events
             foreach (var newMember in users)
             {
                 var newMemberId = newMember.Id;
-                
+
                 if (Settings.EnableHumanVerification)
                 {
                     Log.Information($"Restricting {newMemberId}");
-                    await _telegramService.RestrictMemberAsync(newMemberId);
+                    await _telegramService.RestrictMemberAsync(newMemberId)
+                        .ConfigureAwait(false);
                 }
-                
-                var isBan = await _telegramService.CheckGlobalBanAsync(newMember);
+
+                var isBan = await _telegramService.CheckGlobalBanAsync(newMember)
+                    .ConfigureAwait(false);
                 if (isBan) continue;
 
-                if (BotSettings.HostingEnvironment.IsProduction())
+                if (BotSettings.IsProduction)
                 {
                     // var isCasBan = await IsCasBan(newMember.Id);
-                    await newMember.IsCasBanAsync();
+                    await newMember.IsCasBanAsync().ConfigureAwait(false);
                 }
 
                 var fullName = (newMember.FirstName + " " + newMember.LastName).Trim();
@@ -197,7 +202,7 @@ namespace WinTenBot.Handlers.Events
                     allNewMember.Append(nameLink);
                 }
 
-                if (newMember.Username == "")
+                if (newMember.Username.IsNullOrEmpty())
                 {
                     allNoUsername.Append(nameLink);
                 }
@@ -221,15 +226,15 @@ namespace WinTenBot.Handlers.Events
             var isKicked = false;
 
             // var isBan = await _elasticSecurityService.IsExistInCache(userId);
-            var isBan = await user.Id.CheckGBan();
+            var isBan = await user.Id.CheckGBan().ConfigureAwait(false);
             Log.Information($"{user} IsBan: {isBan}");
-            if (!isBan) return isKicked;
+            if (!isBan) return false;
 
             var sendText = $"{user} terdeteksi pada penjaringan WinTenDev ES2 tapi gagal di tendang.";
-            isKicked = await _telegramService.KickMemberAsync(user);
+            isKicked = await _telegramService.KickMemberAsync(user).ConfigureAwait(false);
             if (isKicked)
             {
-                await _telegramService.UnbanMemberAsync(user);
+                await _telegramService.UnbanMemberAsync(user).ConfigureAwait(false);
                 sendText = sendText.Replace("tapi gagal", "dan berhasil");
             }
             else
@@ -237,7 +242,7 @@ namespace WinTenBot.Handlers.Events
                 sendText += " Pastikan saya admin yang dapat menghapus Pengguna";
             }
 
-            await _telegramService.SendTextAsync(sendText);
+            await _telegramService.SendTextAsync(sendText).ConfigureAwait(false);
 
             return isKicked;
         }
