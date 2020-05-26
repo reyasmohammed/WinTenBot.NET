@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -94,21 +94,33 @@ namespace WinTenBot.Helpers
                 StringSplitOptions.RemoveEmptyEntries);
             foreach (var word in partedWord)
             {
+                var forCompare = word.ToLower();
+                if (!forCompare.CheckUrlValid())
+                {
+                    forCompare = forCompare.CleanExceptAlphaNumeric();
+                }
+
                 foreach (WordFilter wordFilter in mappedWords)
                 {
-                    var forFilter = wordFilter.Word;
+                    var forFilter = wordFilter.Word.ToLower();
                     var isGlobal = wordFilter.IsGlobal;
                     var isDeep = wordFilter.DeepFilter;
-                    var forCompare = word;
-                    if(isDeep)   forCompare = word .ToLower();
-                    
+
+                    if (!forFilter.CheckUrlValid())
+                    {
+                        forFilter = forFilter.CleanExceptAlphaNumeric();
+                    }
+
+
+                    // if(isDeep)   forCompare = word .ToLower();
+
                     if (forFilter == forCompare)
                     {
                         isMust = true;
                     }
 
                     var result = $"'{forCompare}' == '{forFilter}' ? {isMust}. Deep: {isDeep}, Global: {isGlobal}";
-                    // if (BotSettings.IsDevelopment) Log.Debug(result);
+                    if (BotSettings.IsDevelopment) Log.Debug(result);
 
                     if (isMust) break;
                 }
