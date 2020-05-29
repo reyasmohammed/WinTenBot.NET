@@ -86,7 +86,8 @@ namespace WinTenBot.Helpers
             var isMust = false;
             var query = await new Query("word_filter")
                 .ExecForSqLite(true)
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             var mappedWords = query.ToJson().MapObject<List<WordFilter>>();
 
@@ -100,8 +101,8 @@ namespace WinTenBot.Helpers
                     var isGlobal = wordFilter.IsGlobal;
                     var isDeep = wordFilter.DeepFilter;
                     var forCompare = word;
-                    if(isDeep)   forCompare = word .ToLower();
-                    
+                    if (isDeep) forCompare = word.ToLower();
+
                     if (forFilter == forCompare)
                     {
                         isMust = true;
@@ -115,6 +116,60 @@ namespace WinTenBot.Helpers
             }
 
             return isMust;
+        }
+
+        public static async Task ScanMessageAsync(this TelegramService telegramService)
+        {
+            var message = telegramService.Message;
+            var chatId = message.Chat.Id;
+            var msgId = message.MessageId;
+
+            var text = message.Text ?? message.Caption;
+            if (!text.IsNullOrEmpty())
+            {
+                var isMustDelete = await IsMustDelete(text)
+                    .ConfigureAwait(false);
+
+                Log.Information($"Message {message.MessageId} IsMustDelete: {isMustDelete}");
+
+                if (isMustDelete)
+                    await telegramService.DeleteAsync(message.MessageId)
+                        .ConfigureAwait(false);
+            }
+            else
+            {
+                Log.Information("No message Text for scan.");
+            }
+        }
+
+        public static async Task ScanPhotoAsync(this TelegramService telegramService)
+        {
+            var message = telegramService.Message;
+            var chatId = message.Chat.Id;
+            var msgId = message.MessageId;
+
+            if (message.Photo != null)
+            {
+                Log.Information("");
+
+                var fileName = $"{chatId}/ocr-{msgId}.jpg";
+                Log.Information("Preparing photo");
+                var savedFile = await telegramService.DownloadFileAsync(fileName)
+                    .ConfigureAwait(false);
+
+                var ocr = await TesseractProvider.OcrSpace(savedFile)
+                    .ConfigureAwait(false);
+
+                Log.Information("Scanning message..");
+                var isMustDelete = await IsMustDelete(ocr)
+                    .ConfigureAwait(false);
+
+                Log.Information($"Message {message.MessageId} IsMustDelete: {isMustDelete}");
+
+                if (isMustDelete)
+                    await telegramService.DeleteAsync(message.MessageId)
+                        .ConfigureAwait(false);
+            }
         }
 
         public static async Task CheckMessageAsync(this TelegramService telegramService)
@@ -134,18 +189,26 @@ namespace WinTenBot.Helpers
                     return;
                 }
 
-                var text = message.Text ?? message.Caption;
-                if (!text.IsNullOrEmpty())
-                {
-                    var isMustDelete = await IsMustDelete(text);
-                    Log.Information($"Message {message.MessageId} IsMustDelete: {isMustDelete}");
+                // var text = message.Text ?? message.Caption;
+                // if (!text.IsNullOrEmpty())
+                // {
+                //     var isMustDelete = await IsMustDelete(text);
+                //     Log.Information($"Message {message.MessageId} IsMustDelete: {isMustDelete}");
+                //
+                //     if (isMustDelete) await telegramService.DeleteAsync(message.MessageId);
+                // }
+                // else
+                // {
+                //     Log.Information("No message Text for scan.");
+                // }
 
-                    if (isMustDelete) await telegramService.DeleteAsync(message.MessageId);
-                }
-                else
+                var listAction = new List<Task>
                 {
-                    Log.Information("No message Text for scan.");
-                }
+                    ScanMessageAsync(telegramService),
+                    ScanPhotoAsync(telegramService)
+                };
+
+                await Task.WhenAll(listAction).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
