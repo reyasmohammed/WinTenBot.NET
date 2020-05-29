@@ -39,22 +39,36 @@ namespace WinTenBot.Providers
                 var fs = File.OpenRead(filePath);
                 var url = "https://api.ocr.space/Parse/Image";
                 var ocrKey = BotSettings.OcrSpaceKey;
+                var fileName = Path.GetFileName(filePath);
 
+                if (ocrKey.IsNullOrEmpty())
+                {
+                    Log.Warning("OCR can't be continue because API KEY is missing.");
+                    return string.Empty;
+                }
+                
                 Log.Information($"Sending {filePath} to {url}");
-                var post = await url.PostMultipartAsync(post =>
-                    post.AddFile("image", fs, Path.GetFileName(filePath))
+                var postResult = await url
+                    .PostMultipartAsync(post =>
+                    post.AddFile("image", fs, fileName)
                         .AddString("apikey", ocrKey)
-                        .AddString("language", "eng"));
+                        .AddString("language", "eng"))
+                    .ConfigureAwait(false);
 
-                Log.Information("Reading result..");
-                var json = await post.Content.ReadAsStringAsync();
+                Log.Information($"OCR: {postResult.StatusCode}");
+                var json = await postResult.Content.ReadAsStringAsync()
+                    .ConfigureAwait(false);
+                
                 var map = JsonConvert.DeserializeObject<OcrSpace>(json);
 
                 if (map.OCRExitCode == 1)
                 {
-                    result = map.ParsedResults.Aggregate(result, (current, t) => current + t.ParsedText);
+                    result = map.ParsedResults.Aggregate(result, (current, t) => 
+                        current + t.ParsedText);
                 }
 
+                await fs.DisposeAsync().ConfigureAwait(false);
+                
                 Log.Information("Scan complete.");
             }
             catch (Exception ex)
