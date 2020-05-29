@@ -116,13 +116,26 @@ namespace WinTenBot.Helpers
             Log.Information("Getting data from MySql");
             var cloudQuery = await new Query("word_filter")
                 .ExecForMysql(true)
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             var cloudWords = cloudQuery.ToJson().MapObject<List<WordFilter>>();
+            
+            var localQuery = await new Query("word_filter")
+                .ExecForSqLite(true)
+                .GetAsync()
+                .ConfigureAwait(false);
+
+            if (cloudQuery.Count() == localQuery.Count())
+            {
+                Log.Information("Seem not need sync words to Local storage");
+                return;
+            }
 
             var clearData = await new Query("word_filter")
                 .ExecForSqLite(true)
-                .DeleteAsync();
+                .DeleteAsync()
+                .ConfigureAwait(false);
 
             Log.Information($"Deleting local Word Filter: {clearData} rows");
 
@@ -140,7 +153,8 @@ namespace WinTenBot.Helpers
 
                 var insert = await new Query("word_filter")
                     .ExecForSqLite()
-                    .InsertAsync(data);
+                    .InsertAsync(data)
+                    .ConfigureAwait(false);
             }
             
             Log.Information($"Synced {cloudQuery.Count()} row(s)");
