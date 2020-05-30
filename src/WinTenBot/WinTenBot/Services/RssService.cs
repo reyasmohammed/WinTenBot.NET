@@ -8,6 +8,7 @@ using Telegram.Bot.Types;
 using WinTenBot.Helpers;
 using WinTenBot.Model;
 using WinTenBot.Providers;
+using WinTenBot.Text;
 
 namespace WinTenBot.Services
 {

@@ -3,7 +3,7 @@ using Serilog;
 
 namespace WinTenBot.Helpers
 {
-    public static class TimeHelper
+    public static class Time
     {
         public static string GetDelay(this DateTime time)
         {

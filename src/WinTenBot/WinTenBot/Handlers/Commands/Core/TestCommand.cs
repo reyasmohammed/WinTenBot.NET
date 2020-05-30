@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types.ReplyMarkups;
-using WinTenBot.Helpers;
-using WinTenBot.Providers;
 using WinTenBot.Services;
+using WinTenBot.Telegram;
+using WinTenBot.Tools;
 
 namespace WinTenBot.Handlers.Commands.Core
 {
@@ -22,6 +22,7 @@ namespace WinTenBot.Handlers.Commands.Core
 
             var chatId = _telegramService.Message.Chat.Id;
             var fromId = _telegramService.Message.From.Id;
+            var msg = _telegramService.Message;
 
             if (fromId.IsSudoer())
             {
@@ -71,7 +72,25 @@ namespace WinTenBot.Handlers.Commands.Core
                     }
                 });
 
-                await _telegramService.EditAsync("Warn Username Limit", inlineKeyboard);
+                // await _telegramService.EditAsync("Warn Username Limit", inlineKeyboard);
+
+                // LearningHelper.Setup2();
+                // LearningHelper.Predict();
+
+
+                if (msg.ReplyToMessage != null)
+                {
+                    var repMsg = msg.ReplyToMessage;
+                    var repMsgText = repMsg.Text;
+                    
+                    Log.Information("Predicting message");
+                    var isSpam = MachineLearning.PredictMessage(repMsgText);
+                    await _telegramService.EditAsync($"IsSpam: {isSpam}");
+                    
+                    return;
+                }
+
+                await _telegramService.EditAsync("Complete");
             }
 
             // else

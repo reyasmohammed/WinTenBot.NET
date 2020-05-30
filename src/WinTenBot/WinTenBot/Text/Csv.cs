@@ -6,9 +6,9 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using Serilog;
 
-namespace WinTenBot.Helpers
+namespace WinTenBot.Text
 {
-    public static class CsvHelper
+    public static class Csv
     {
         public static void Write<T>(string filePath, IEnumerable<T> records, string delimiter = ",")
         {

@@ -3,10 +3,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Telegram.Bot.Framework.Abstractions;
-using WinTenBot.Helpers;
 using WinTenBot.Model;
-using WinTenBot.Providers;
 using WinTenBot.Services;
+using WinTenBot.Telegram;
 
 namespace WinTenBot.Handlers
 {

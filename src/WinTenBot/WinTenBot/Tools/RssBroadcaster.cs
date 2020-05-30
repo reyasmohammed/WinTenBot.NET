@@ -8,12 +8,14 @@ using CodeHollow.FeedReader;
 using Serilog;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types.Enums;
+using WinTenBot.Helpers;
 using WinTenBot.Model;
 using WinTenBot.Services;
+using WinTenBot.Text;
 
-namespace WinTenBot.Helpers
+namespace WinTenBot.Tools
 {
-    public static class RssHelper
+    public static class RssBroadcaster
     {
         public static async Task<int> ExecBroadcasterAsync(long chatId)
         {

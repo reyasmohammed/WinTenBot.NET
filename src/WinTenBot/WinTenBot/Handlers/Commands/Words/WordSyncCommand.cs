@@ -1,9 +1,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
-using WinTenBot.Helpers;
-using WinTenBot.Providers;
 using WinTenBot.Services;
+using WinTenBot.Telegram;
+using WinTenBot.Tools;
 
 namespace WinTenBot.Handlers.Commands.Words
 {
@@ -24,7 +24,7 @@ namespace WinTenBot.Handlers.Commands.Words
                 await _telegramService.DeleteAsync(_telegramService.Message.MessageId);
 
                 await _telegramService.AppendTextAsync("Sedang mengsinkronkan Word Filter");
-                await DataHelper.SyncWordToLocalAsync();
+                await Sync.SyncWordToLocalAsync();
                 await _telegramService.AppendTextAsync("Selesai mengsinkronkan.");
 
                 await _telegramService.DeleteAsync(delay: 3000);

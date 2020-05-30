@@ -1,15 +1,18 @@
-﻿using Serilog;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Serilog;
 using SqlKata;
 using SqlKata.Execution;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using WinTenBot.Helpers;
 using WinTenBot.Model;
 using WinTenBot.Providers;
+using WinTenBot.Text;
 
-namespace WinTenBot.Helpers
+namespace WinTenBot.Tools
 {
-    public static class SyncHelper
+    public static class Sync
     {
         public static async Task SyncRssHistoryToCloud()
         {
@@ -119,6 +122,56 @@ namespace WinTenBot.Helpers
             // }
 
             await "fban_user".DeleteDuplicateRow("user_id");
+        }
+        
+        
+        public static async Task SyncWordToLocalAsync()
+        {
+            Log.Information("Getting data from MySql");
+            var cloudQuery = await new Query("word_filter")
+                .ExecForMysql(true)
+                .GetAsync()
+                .ConfigureAwait(false);
+
+            var cloudWords = cloudQuery.ToJson().MapObject<List<WordFilter>>();
+            
+            var localQuery = await new Query("word_filter")
+                .ExecForSqLite(true)
+                .GetAsync()
+                .ConfigureAwait(false);
+
+            if (cloudQuery.Count() == localQuery.Count())
+            {
+                Log.Information("Seem not need sync words to Local storage");
+                return;
+            }
+
+            var clearData = await new Query("word_filter")
+                .ExecForSqLite(true)
+                .DeleteAsync()
+                .ConfigureAwait(false);
+
+            Log.Information($"Deleting local Word Filter: {clearData} rows");
+
+            foreach (var row in cloudWords)
+            {
+                var data = new Dictionary<string, object>()
+                {
+                    {"word", row.Word},
+                    {"is_global", row.IsGlobal},
+                    {"deep_filter", row.DeepFilter},
+                    {"from_id", row.FromId},
+                    {"chat_id", row.ChatId},
+                    {"created_at", row.CreatedAt}
+                };
+
+                var insert = await new Query("word_filter")
+                    .ExecForSqLite()
+                    .InsertAsync(data)
+                    .ConfigureAwait(false);
+            }
+            
+            Log.Information($"Synced {cloudQuery.Count()} row(s)");
         }
     }
 }

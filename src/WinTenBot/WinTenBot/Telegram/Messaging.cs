@@ -9,13 +9,15 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Enums;
+using WinTenBot.Helpers;
 using WinTenBot.Model;
 using WinTenBot.Providers;
 using WinTenBot.Services;
+using WinTenBot.Text;
 
-namespace WinTenBot.Helpers
+namespace WinTenBot.Telegram
 {
-    public static class MessageHelper
+    public static class Messaging
     {
         public static string GetFileId(this Message message)
         {

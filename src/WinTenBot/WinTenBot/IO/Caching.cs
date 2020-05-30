@@ -1,20 +1,21 @@
 ﻿using System;
-using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
 using Serilog;
+using WinTenBot.Helpers;
+using WinTenBot.Text;
 
-namespace WinTenBot.Helpers
+namespace WinTenBot.IO
 {
-    public static class CacheHelper
+    public static class Caching
     {
         private static string workingDir = "Storage/Caches";
 
         public static async Task WriteCacheAsync(this object data, string fileJson, bool indented = true)
         {
-            var filePath = $"{workingDir}/{fileJson}".EnsureDirectory();
+            var filePath = Directory.EnsureDirectory($"{workingDir}/{fileJson}");
             var json = data.ToJson(indented);
             
             await json.ToFile(filePath);
@@ -30,7 +31,7 @@ namespace WinTenBot.Helpers
         public static async Task<T> ReadCacheAsync<T>(this string fileJson)
         {
             var filePath = $"{workingDir}/{fileJson}";
-            var json = await File.ReadAllTextAsync(filePath);
+            var json = await System.IO.File.ReadAllTextAsync(filePath);
             var dataTable = json.MapObject<T>();
             
             // var dataTable = json.ToDataTable();
@@ -41,7 +42,7 @@ namespace WinTenBot.Helpers
         public static bool IsFileCacheExist(this string fileName)
         {
             var filePath = $"{workingDir}/{fileName}";
-            var isExist = File.Exists(filePath);
+            var isExist = System.IO.File.Exists(filePath);
             Log.Information($"IsCache {fileName} Exist: {isExist}");
             
             return isExist;
@@ -51,7 +52,7 @@ namespace WinTenBot.Helpers
         {
             Log.Information($"Deleting caches. Keyword {keyword}");
             
-            var listFile = Directory.GetFiles(workingDir);
+            var listFile = System.IO.Directory.GetFiles(workingDir);
             var listFiltered = listFile.Where(file => 
                 file.Contains(keyword)).ToArray();
             
@@ -59,7 +60,7 @@ namespace WinTenBot.Helpers
             foreach (var file in listFiltered)
             {
                 Log.Information($"Deleting {file}");
-                File.Delete(file);
+                System.IO.File.Delete(file);
             }
         }
         
@@ -78,7 +79,7 @@ namespace WinTenBot.Helpers
             foreach (FileInfo file in filteredFiles)
             {
                 Log.Information($"Deleting {file.FullName}");
-                File.Delete(file.FullName);
+                System.IO.File.Delete(file.FullName);
             }
         }
     }

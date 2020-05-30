@@ -12,6 +12,8 @@ using WinTenBot.Helpers;
 using WinTenBot.Model;
 using WinTenBot.Providers;
 using WinTenBot.Services;
+using WinTenBot.Telegram;
+using WinTenBot.Text;
 
 namespace WinTenBot.Handlers.Events
 {
@@ -74,7 +76,7 @@ namespace WinTenBot.Handlers.Events
             if (allNewMember.Length > 0)
             {
                 var chatTitle = msg.Chat.Title;
-                var greet = TimeHelper.GetTimeGreet();
+                var greet = Time.GetTimeGreet();
                 var memberCount = await _telegramService.GetMemberCount()
                     .ConfigureAwait(false);
                 var newMemberCount = newMembers.Length;

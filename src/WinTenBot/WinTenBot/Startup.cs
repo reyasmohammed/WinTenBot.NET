@@ -29,13 +29,13 @@ using WinTenBot.Handlers.Commands.Tags;
 using WinTenBot.Handlers.Commands.Welcome;
 using WinTenBot.Handlers.Commands.Words;
 using WinTenBot.Handlers.Events;
-using WinTenBot.Helpers;
 using WinTenBot.Interfaces;
 using WinTenBot.Model;
 using WinTenBot.Options;
 using WinTenBot.Providers;
 using WinTenBot.Scheduler;
 using WinTenBot.Services;
+using WinTenBot.Tools;
 
 namespace WinTenBot
 {
@@ -165,7 +165,7 @@ namespace WinTenBot
             services.AddHangfire(config =>
             {
                 // config.UseStorage(HangfireProvider.GetMysqlStorage());
-                config.UseStorage(HangfireProvider.GetSqliteStorage());
+                config.UseStorage(Tools.Hangfire.GetSqliteStorage());
                 // config.UseStorage(HangfireProvider.GetLiteDbStorage());
 
                 config.UseSimpleAssemblyNameTypeSerializer()

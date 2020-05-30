@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
-using WinTenBot.Providers;
 using WinTenBot.Services;
+using WinTenBot.Text;
 
 namespace WinTenBot.Handlers.Commands.Additional
 {
@@ -27,12 +27,12 @@ namespace WinTenBot.Handlers.Commands.Additional
             {
                 Log.Information("Getting Covid info Global");
                 // var sendText = await CovidHelper.GetCovidUpdatesAsync();
-                sendText = await CovidHelper.GetCovidAll();
+                sendText = await Covid.GetCovidAll();
             }
             else
             {
                 Log.Information($"Getting Covid info by Region: {part1}");
-                sendText = await CovidHelper.GetCovidByCountry(part1);
+                sendText = await Covid.GetCovidByCountry(part1);
             }
 
             await _telegramService.EditAsync(sendText);

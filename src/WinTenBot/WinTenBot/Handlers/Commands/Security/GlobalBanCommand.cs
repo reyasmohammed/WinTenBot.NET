@@ -3,9 +3,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Framework.Abstractions;
-using WinTenBot.Helpers;
-using WinTenBot.Providers;
 using WinTenBot.Services;
+using WinTenBot.Telegram;
+using WinTenBot.Text;
+using WinTenBot.Tools;
 
 namespace WinTenBot.Handlers.Commands.Security
 {
@@ -33,7 +34,7 @@ namespace WinTenBot.Handlers.Commands.Security
                     case "sync":
                         await _telegramService.SendTextAsync("Memperbarui cache..");
                         // await _elasticSecurityService.UpdateCacheAsync();
-                        await SyncHelper.SyncGBanToLocalAsync();
+                        await Sync.SyncGBanToLocalAsync();
 
                         await _telegramService.EditAsync("Selesai memperbarui..");
 
@@ -70,7 +71,7 @@ namespace WinTenBot.Handlers.Commands.Security
 
                                 await _telegramService.EditAsync("Menulis ke Cache..");
                                 // await _elasticSecurityService.UpdateCacheAsync();
-                                await SyncHelper.SyncGBanToLocalAsync();
+                                await Sync.SyncGBanToLocalAsync();
                                 
 
                                 await _telegramService.EditAsync("Misi berhasil.");

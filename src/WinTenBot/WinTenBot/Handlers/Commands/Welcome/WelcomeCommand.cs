@@ -6,8 +6,8 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Enums;
 using WinTenBot.Helpers;
-using WinTenBot.Providers;
 using WinTenBot.Services;
+using WinTenBot.Text;
 
 namespace WinTenBot.Handlers.Commands.Welcome
 {

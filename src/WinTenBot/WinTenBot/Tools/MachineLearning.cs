@@ -10,10 +10,11 @@ using SqlKata.Execution;
 using WinTenBot.Model;
 using WinTenBot.Providers;
 using WinTenBot.Services;
+using WinTenBot.Text;
 
-namespace WinTenBot.Helpers
+namespace WinTenBot.Tools
 {
-    public static class LearningHelper
+    public static class MachineLearning
     {
         private static string tableName = "words_learning";
         private static MLContext mlContext;
@@ -137,7 +138,7 @@ namespace WinTenBot.Helpers
                 .ExecForMysql(true)
                 .Get<LearnCsv>();
 
-            CsvHelper.Write(filePath, data, delimiter: "\t");
+            Csv.Write(filePath, data, delimiter: "\t");
         }
 
         public static async Task ImportCsv(this TelegramService telegramService, string filePath,
@@ -150,7 +151,7 @@ namespace WinTenBot.Helpers
 
             Log.Information($"Loading file {filePath}");
 
-            var csvRecords = CsvHelper.ReadCsv<LearnCsv>(filePath, hasHeader: hasHeader, delimiter: delimiter);
+            var csvRecords = Csv.ReadCsv<LearnCsv>(filePath, hasHeader: hasHeader, delimiter: delimiter);
 
             var values = csvRecords.Select(row =>
             {

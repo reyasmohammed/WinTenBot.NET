@@ -1,12 +1,11 @@
-﻿using System.Text;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
-using GoogleTranslateFreeApi;
 using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Providers;
 using WinTenBot.Services;
+using WinTenBot.Text;
 
 namespace WinTenBot.Handlers.Commands.Additional
 {

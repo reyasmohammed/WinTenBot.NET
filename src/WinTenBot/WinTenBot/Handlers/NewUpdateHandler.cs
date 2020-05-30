@@ -6,6 +6,8 @@ using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Helpers;
 using WinTenBot.Model;
 using WinTenBot.Services;
+using WinTenBot.Telegram;
+using WinTenBot.Text;
 
 namespace WinTenBot.Handlers
 {

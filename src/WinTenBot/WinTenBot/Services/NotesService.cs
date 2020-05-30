@@ -4,9 +4,10 @@ using System.Threading.Tasks;
 using Serilog;
 using SqlKata;
 using SqlKata.Execution;
-using WinTenBot.Helpers;
+using WinTenBot.IO;
 using WinTenBot.Model;
 using WinTenBot.Providers;
+using WinTenBot.Text;
 
 namespace WinTenBot.Services
 {

@@ -1,7 +1,14 @@
-﻿namespace WinTenBot.Handlers.Commands.Words
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Telegram.Bot.Framework.Abstractions;
+
+namespace WinTenBot.Handlers.Commands.Words
 {
-    public class DeleteKataCommand
+    public class DeleteKataCommand:CommandBase
     {
-        
+        public override Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args, CancellationToken cancellationToken)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

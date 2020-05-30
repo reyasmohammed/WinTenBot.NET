@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types.Enums;
-using WinTenBot.Helpers;
-using WinTenBot.Providers;
 using WinTenBot.Services;
+using WinTenBot.Telegram;
+using WinTenBot.Text;
 
 namespace WinTenBot.Handlers.Commands.Welcome
 {
@@ -43,7 +43,7 @@ namespace WinTenBot.Handlers.Commands.Welcome
                     {
                         var mediaFileId = repMsg.GetFileId();
                         var mediaType = repMsg.Type;
-                        
+
                         await _telegramService.SendTextAsync("Sedang menyimpan Welcome Media..");
                         Log.Information($"MediaId: {mediaFileId}");
 

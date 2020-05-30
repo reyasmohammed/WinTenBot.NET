@@ -1,8 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
-using WinTenBot.Helpers;
 using WinTenBot.Services;
+using WinTenBot.Tools;
 
 namespace WinTenBot.Handlers.Commands.SpamLearning
 {
@@ -24,7 +24,7 @@ namespace WinTenBot.Handlers.Commands.SpamLearning
                 await _telegramService.SendTextAsync("Sedang memprediksi pesan")
                     .ConfigureAwait(false);
 
-                var isSpam = LearningHelper.PredictMessage(repMsgText);
+                var isSpam = MachineLearning.PredictMessage(repMsgText);
                 await _telegramService.EditAsync($"IsSpam: {isSpam}").ConfigureAwait(false);
 
                 return;

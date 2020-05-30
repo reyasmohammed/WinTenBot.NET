@@ -6,12 +6,12 @@ using Serilog;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using WinTenBot.Model;
-using WinTenBot.Providers;
 using WinTenBot.Services;
+using WinTenBot.Text;
 
-namespace WinTenBot.Helpers
+namespace WinTenBot.Telegram
 {
-    public static class PrevilegeHelper
+    public static class Privilege
     {
         public static bool IsSudoer(this int userId)
         {

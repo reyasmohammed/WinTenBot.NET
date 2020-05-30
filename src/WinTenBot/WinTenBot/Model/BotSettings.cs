@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Telegram.Bot;
-using WinTenBot.Helpers;
+using WinTenBot.IO;
+using WinTenBot.Text;
 
 namespace WinTenBot.Model
 {
@@ -36,7 +37,8 @@ namespace WinTenBot.Model
 
             LearningDataSetPath = @"Storage\Learning\".EnsureDirectory();
             TesseractTrainedData = @"Storage\Data\Tesseract\";
-            
+            PathCache = "Storage/Caches";
+
             OcrSpaceKey=GlobalConfiguration["OcrSpace:ApiKey"];
         }
         
@@ -60,6 +62,7 @@ namespace WinTenBot.Model
             return HostingEnvironment.IsEnvironment(envName);
         }
         
+        public static string PathCache { get; set; }
         public static string LearningDataSetPath { get; set; }
 
         public static List<string> Sudoers { get; set; }

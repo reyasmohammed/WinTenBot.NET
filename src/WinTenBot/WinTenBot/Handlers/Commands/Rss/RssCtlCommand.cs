@@ -2,10 +2,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Framework.Abstractions;
-using WinTenBot.Helpers;
-using WinTenBot.Providers;
 using WinTenBot.Scheduler;
 using WinTenBot.Services;
+using WinTenBot.Telegram;
+using WinTenBot.Text;
 
 namespace WinTenBot.Handlers.Commands.Rss
 {
@@ -37,7 +37,7 @@ namespace WinTenBot.Handlers.Commands.Rss
 
                     case "stop":
                         await _telegramService.AppendTextAsync("Stopping RSS Service");
-                        HangfireHelper.DeleteAllJobs();
+                        Tools.Hangfire.DeleteAllJobs();
                         await _telegramService.AppendTextAsync("Stop successfully.");
                         break;
                 }

@@ -1,12 +1,12 @@
 ﻿using FluentMigrator;
-using WinTenBot.Helpers;
+using WinTenBot.Tools;
 
 namespace WinTenBot.Migrations
 {
     [Migration(120200517224914)]
     public class CreateTableChatSettings : Migration
     {
-        private const string TableName = "group_settings2";
+        private const string TableName = "group_settings";
 
         public override void Up()
         {

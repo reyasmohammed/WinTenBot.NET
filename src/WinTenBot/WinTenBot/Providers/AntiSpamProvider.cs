@@ -8,8 +8,8 @@ using Serilog;
 using SqlKata;
 using SqlKata.Execution;
 using Telegram.Bot.Types;
-using WinTenBot.Helpers;
 using WinTenBot.Model;
+using WinTenBot.Text;
 
 namespace WinTenBot.Providers
 {

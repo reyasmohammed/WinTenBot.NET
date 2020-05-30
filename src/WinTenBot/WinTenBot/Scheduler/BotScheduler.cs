@@ -1,6 +1,7 @@
 ﻿using Hangfire;
 using Serilog;
-using WinTenBot.Helpers;
+using WinTenBot.Telegram;
+using WinTenBot.Tools;
 
 namespace WinTenBot.Scheduler
 {
@@ -24,7 +25,7 @@ namespace WinTenBot.Scheduler
 
             Log.Debug($"Starting cron Log Cleaner with id {jobId}");
 
-            RecurringJob.AddOrUpdate(jobId, () => BotHelper.ClearLog(), Cron.Hourly);
+            RecurringJob.AddOrUpdate(jobId, () => Health.ClearLog(), Cron.Hourly);
             RecurringJob.Trigger(jobId);
         }
 
@@ -44,7 +45,7 @@ namespace WinTenBot.Scheduler
             const string jobId = "cron-sync-word-filter";
             
             Log.Debug("Starting cron Sync Word Filter to Local Storage");
-            RecurringJob.AddOrUpdate(jobId, () => DataHelper.SyncWordToLocalAsync(), Cron.Minutely);
+            RecurringJob.AddOrUpdate(jobId, () => Sync.SyncWordToLocalAsync(), Cron.Minutely);
             RecurringJob.Trigger(jobId);
         }
     }

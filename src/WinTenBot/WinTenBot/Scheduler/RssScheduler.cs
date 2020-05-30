@@ -1,9 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Hangfire;
 using Serilog;
-using WinTenBot.Helpers;
 using WinTenBot.Model;
 using WinTenBot.Services;
+using WinTenBot.Text;
+using WinTenBot.Tools;
 
 namespace WinTenBot.Scheduler
 {
@@ -30,7 +31,7 @@ namespace WinTenBot.Scheduler
 
                     RecurringJob.RemoveIfExists(recurringId);
                     RecurringJob.AddOrUpdate(recurringId, ()
-                        => RssHelper.ExecBroadcasterAsync(chatId), $"*/{cronInMinute} * * * *");
+                        => RssBroadcaster.ExecBroadcasterAsync(chatId), $"*/{cronInMinute} * * * *");
                 }
 
                 Log.Information("Registering RSS Scheduler complete.");
@@ -49,7 +50,7 @@ namespace WinTenBot.Scheduler
 
             RecurringJob.RemoveIfExists(recurringId);
             RecurringJob.AddOrUpdate(recurringId, ()
-                => RssHelper.ExecBroadcasterAsync(chatId), $"*/{cronInMinute} * * * *");
+                => RssBroadcaster.ExecBroadcasterAsync(chatId), $"*/{cronInMinute} * * * *");
             
             Log.Information("Registering RSS Scheduler complete.");
         }

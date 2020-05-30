@@ -1,9 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
-using WinTenBot.Helpers;
-using WinTenBot.Providers;
 using WinTenBot.Services;
+using WinTenBot.Telegram;
+using WinTenBot.Tools;
 
 namespace WinTenBot.Handlers.Commands.Rss
 {
@@ -34,7 +34,7 @@ namespace WinTenBot.Handlers.Commands.Rss
                     await response.SendTextAsync("Sedang memeriksa RSS feed baru..");
                     // await "Sedang memeriksa RSS feed baru..".SendTextAsync();
 
-                    var newRssCount = await RssHelper.ExecBroadcasterAsync(chatId);
+                    var newRssCount = await RssBroadcaster.ExecBroadcasterAsync(chatId);
                     if (newRssCount == 0)
                     {
                         await response.EditAsync("Tampaknya tidak ada RSS baru saat ini");

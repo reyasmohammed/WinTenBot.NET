@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 using Serilog;
 using WinTenBot.Providers;
 
-namespace WinTenBot.Helpers
+namespace WinTenBot.Tools
 {
+    [Obsolete("Soon replace with FluentMigration")]
     public static class MigrationHelper
     {
         public static async Task MigrateLocalStorage(this string tableName)
@@ -19,7 +20,7 @@ namespace WinTenBot.Helpers
         public static void MigrateMysql()
         {
             var path = Environment.CurrentDirectory + @"/Storage/SQL/MySql";
-            var listFiles = Directory.GetFiles(path).Where(f => f.EndsWith(".sql"));
+            var listFiles = System.IO.Directory.GetFiles(path).Where(f => f.EndsWith(".sql"));
             foreach (var file in listFiles)
             {
                 Log.Information($"Migrating => {file}");
@@ -33,7 +34,7 @@ namespace WinTenBot.Helpers
         public static void MigrateSqlite()
         {
             var path = Environment.CurrentDirectory + @"/Storage/SQL/Sqlite";
-            var listFiles = Directory.GetFiles(path);
+            var listFiles = System.IO.Directory.GetFiles(path);
             foreach (var file in listFiles)
             {
                 Log.Information($"Migrating => {file}");

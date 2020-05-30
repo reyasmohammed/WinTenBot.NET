@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Types;
-using WinTenBot.Helpers;
-using WinTenBot.Providers;
 using WinTenBot.Services;
+using WinTenBot.Telegram;
+using WinTenBot.Text;
 
 namespace WinTenBot.Handlers.Callbacks
 {

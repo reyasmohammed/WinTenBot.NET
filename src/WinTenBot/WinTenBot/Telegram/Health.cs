@@ -8,14 +8,15 @@ using Serilog;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
+using WinTenBot.IO;
 using WinTenBot.Model;
-using WinTenBot.Providers;
 using WinTenBot.Services;
+using WinTenBot.Text;
 using File = System.IO.File;
 
-namespace WinTenBot.Helpers
+namespace WinTenBot.Telegram
 {
-    public static class BotHelper
+    public static class Health
     {
         public static async Task<string> GetUrlStart(this TelegramService telegramService, string param)
         {

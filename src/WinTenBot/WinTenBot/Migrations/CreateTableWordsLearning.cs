@@ -1,5 +1,5 @@
 ﻿using FluentMigrator;
-using WinTenBot.Helpers;
+using WinTenBot.Tools;
 
 namespace WinTenBot.Migrations
 {

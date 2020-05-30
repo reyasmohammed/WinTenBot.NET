@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,8 +7,11 @@ using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Enums;
 using WinTenBot.Helpers;
-using WinTenBot.Providers;
+using WinTenBot.IO;
+using WinTenBot.Model;
 using WinTenBot.Services;
+using WinTenBot.Telegram;
+using WinTenBot.Text;
 
 namespace WinTenBot.Handlers.Commands.Rss
 {
@@ -25,17 +29,21 @@ namespace WinTenBot.Handlers.Commands.Rss
             var chatId = msg.Chat.Id;
             var msgId = msg.MessageId;
             var msgText = msg.Text;
-            var dateDate = DateTime.UtcNow.ToString("yyyy-MM-dd");
+            var dateDate = DateTime.UtcNow.ToString("yyyy-MM-dd", new DateTimeFormatInfo());
 
-            var isAdminOrPrivate = await _telegramService.IsAdminOrPrivateChat();
+            var isAdminOrPrivate = await _telegramService.IsAdminOrPrivateChat()
+                .ConfigureAwait(false);
+            
             if (!isAdminOrPrivate)
             {
                 var send = "Maaf, hanya Admin yang dapat mengekspor daftar RSS";
-                await _telegramService.SendTextAsync(send);
+                await _telegramService.SendTextAsync(send).ConfigureAwait(false);
                 return;
             }
 
-            var rssSettings = await _rssService.GetRssSettingsAsync();
+            var rssSettings = await _rssService.GetRssSettingsAsync()
+                .ConfigureAwait(false);
+            
             Log.Information($"RssSettings: {rssSettings.ToJson(true)}");
 
             var listRss = new StringBuilder();
@@ -50,7 +58,7 @@ namespace WinTenBot.Handlers.Commands.Rss
             var sendText = "Daftar RSS ini tidak terenkripsi, dapat di pulihkan di obrolan mana saja. " +
                            "Tambahkan parameter -e agar daftar RSS terenkripsi.";
 
-            if (msgText.Contains("-e"))
+            if (msgText.Contains("-e", StringComparison.CurrentCulture))
             {
                 Log.Information("List RSS will be encrypted.");
                 listRssStr = listRssStr.AesEncrypt();
@@ -58,10 +66,11 @@ namespace WinTenBot.Handlers.Commands.Rss
             }
 
             var filePath = $"{chatId}/rss-feed_{dateDate}_{msgId}.txt";
-            await listRssStr.WriteTextAsync(filePath);
+            await listRssStr.WriteTextAsync(filePath).ConfigureAwait(false);
 
-            var fileSend = IoHelper.BaseDirectory + $"/{filePath}";
-            await _telegramService.SendMediaAsync(fileSend, MediaType.LocalDocument, sendText);
+            var fileSend = BotSettings.PathCache + $"/{filePath}";
+            await _telegramService.SendMediaAsync(fileSend, MediaType.LocalDocument, sendText)
+                .ConfigureAwait(false);
 
             fileSend.DeleteFile();
         }

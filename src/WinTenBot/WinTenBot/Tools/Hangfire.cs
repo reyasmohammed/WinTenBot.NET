@@ -1,15 +1,27 @@
-using System;
+﻿using System;
+using Hangfire;
 using Hangfire.LiteDB;
+using Hangfire.Storage;
 using Hangfire.Storage.SQLite;
 using Serilog;
 using WinTenBot.Model;
 
-// using Hangfire.MySql;
-
-namespace WinTenBot.Providers
+namespace WinTenBot.Tools
 {
-    public static class HangfireProvider
+    public static class Hangfire
     {
+        public static void DeleteAllJobs()
+        {
+            using var connection = JobStorage.Current.GetConnection();
+            foreach (var recurringJob in connection.GetRecurringJobs())
+            {
+                var recurringJobId = recurringJob.Id;
+                Log.Information($"Deleting {recurringJobId}");
+                    
+                RecurringJob.RemoveIfExists(recurringJobId);
+            }
+        }
+        
         // public static MySqlStorage GetMysqlStorage()
         // {
         //     var connectionString = BotSettings.DbConnectionString;

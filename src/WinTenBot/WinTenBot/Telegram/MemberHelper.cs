@@ -11,6 +11,8 @@ using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Model;
 using WinTenBot.Providers;
 using WinTenBot.Services;
+using WinTenBot.Telegram;
+using WinTenBot.Text;
 
 namespace WinTenBot.Helpers
 {

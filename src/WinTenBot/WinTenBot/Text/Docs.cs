@@ -1,9 +1,9 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 
-namespace WinTenBot.Helpers
+namespace WinTenBot.Text
 {
-    public static class CoreHelper
+    public static class Docs
     {
         public static async Task<string> LoadInBotDocs(this string slug)
         {

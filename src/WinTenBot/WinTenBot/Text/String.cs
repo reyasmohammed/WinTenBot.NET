@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -8,41 +7,12 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CodeHollow.FeedReader;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Serilog;
-using WinTenBot.Helpers.JsonSettings;
 
 namespace WinTenBot.Helpers
 {
-    public static class TextHelper
+    public static class String
     {
-        public static string ToJson(this object dataTable, bool indented = false, bool followProperty = false)
-        {
-            var serializerSetting = new JsonSerializerSettings();
-
-            if (followProperty) serializerSetting.ContractResolver = new CamelCaseFollowProperty();
-            serializerSetting.Formatting = indented ? Formatting.Indented : Formatting.None;
-
-            return JsonConvert.SerializeObject(dataTable, serializerSetting);
-        }
-
-        public static T MapObject<T>(this string json)
-        {
-            // return JsonSerializer.Deserialize<T>(json);
-            return JsonConvert.DeserializeObject<T>(json);
-        }
-
-        public static DataTable ToDataTable(this string data)
-        {
-            return JsonConvert.DeserializeObject<DataTable>(data);
-        }
-
-        public static JArray ToArray(this string data)
-        {
-            return JArray.Parse(data);
-        }
-
         public static List<string> SplitText(this string text, string delimiter)
         {
             return text.Split(delimiter).ToList();
@@ -178,7 +148,7 @@ namespace WinTenBot.Helpers
 
         public static string MkJoin(this ICollection<string> obj, string delim)
         {
-            return String.Join(delim, obj.ToArray());
+            return System.String.Join(delim, obj.ToArray());
         }
 
         public static string ToTitleCase(this string text)
@@ -223,6 +193,16 @@ namespace WinTenBot.Helpers
         {
             Regex r = new Regex(@"^\s+", RegexOptions.Multiline);
             return r.Replace(s, string.Empty);
+        }
+        
+        public static bool IsNullOrEmpty(this string str)
+        {
+            return string.IsNullOrEmpty(str);
+        }
+
+        public static bool IsNotNullOrEmpty(this string str)
+        {
+            return !str.IsNullOrEmpty();
         }
     }
 }

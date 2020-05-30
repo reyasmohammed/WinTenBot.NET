@@ -6,10 +6,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Types.ReplyMarkups;
+using WinTenBot.Helpers;
 
-namespace WinTenBot.Helpers
+namespace WinTenBot.Text
 {
-    public static class KeyboardHelper
+    public static class Keyboard
     {
         public static Dictionary<string,string> StringToDict(string buttonStr)
         {

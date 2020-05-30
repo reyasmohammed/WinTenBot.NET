@@ -8,11 +8,11 @@ using Newtonsoft.Json.Linq;
 
 namespace WinTenBot.Helpers
 {
-    public class EmojiHelper
+    public static class Emoji
     {
         static readonly Dictionary<string, string> ColonedEmojis;
         static readonly Regex ColonedRegex;
-        static EmojiHelper() {
+        static Emoji() {
             // load mentioned json from somewhere
             var data = JArray.Parse(File.ReadAllText(Environment.CurrentDirectory + @"/Storage/Common/emoji.json"));
             ColonedEmojis = data.OfType<JObject>().ToDictionary(
@@ -33,7 +33,7 @@ namespace WinTenBot.Helpers
                     return new string(chars.ToArray());
                 });
             // build huge regex (all 1500 emojies combined) by join all names with OR ("|")
-            ColonedRegex =  new Regex(String.Join("|", ColonedEmojis.Keys.Select(Regex.Escape)));
+            ColonedRegex =  new Regex(System.String.Join("|", ColonedEmojis.Keys.Select(Regex.Escape)));
         }
 
         public static string ReplaceColonNames(string input) {

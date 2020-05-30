@@ -2,8 +2,9 @@
 using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Framework.Abstractions;
-using WinTenBot.Helpers;
 using WinTenBot.Services;
+using WinTenBot.Telegram;
+using WinTenBot.Tools;
 
 namespace WinTenBot.Handlers.Commands.SpamLearning
 {
@@ -46,7 +47,7 @@ namespace WinTenBot.Handlers.Commands.SpamLearning
 
                     await _telegramService.EditAsync("Sedang mempelajari dataset")
                         .ConfigureAwait(false);
-                    await LearningHelper.SetupEngineAsync()
+                    await MachineLearning.SetupEngineAsync()
                         .ConfigureAwait(false);
 
                     await _telegramService.EditAsync("Import selesai")

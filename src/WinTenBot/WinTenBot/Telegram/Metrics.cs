@@ -7,9 +7,9 @@ using SqlKata.Execution;
 using WinTenBot.Providers;
 using WinTenBot.Services;
 
-namespace WinTenBot.Helpers
+namespace WinTenBot.Telegram
 {
-    public static class ActivityHelper
+    public static class Metrics
     {
         public static async Task HitActivityAsync(this TelegramService telegramService)
         {

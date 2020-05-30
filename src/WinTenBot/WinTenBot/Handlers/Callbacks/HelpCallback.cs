@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Serilog;
 using WinTenBot.Helpers;
-using WinTenBot.Providers;
 using WinTenBot.Services;
+using WinTenBot.Text;
 
 namespace WinTenBot.Handlers.Callbacks
 {
@@ -10,13 +10,13 @@ namespace WinTenBot.Handlers.Callbacks
     {
         private string CallBackData { get; set; }
         private TelegramService _telegramService;
-        
+
         public HelpCallback(TelegramService telegramService)
         {
             _telegramService = telegramService;
             CallBackData = telegramService.CallbackQuery.Data;
-            
-            Parallel.Invoke(async ()=> await ExecuteAsync());
+
+            Parallel.Invoke(async () => await ExecuteAsync());
         }
 
         private async Task ExecuteAsync()
@@ -46,7 +46,5 @@ namespace WinTenBot.Handlers.Callbacks
 
             await _telegramService.EditMessageCallback(sendText, keyboard);
         }
-        
-        
     }
 }

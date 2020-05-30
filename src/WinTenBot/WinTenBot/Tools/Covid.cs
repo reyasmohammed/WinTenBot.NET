@@ -3,12 +3,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Flurl.Http;
 using Serilog;
+using WinTenBot.IO;
 using WinTenBot.Model.Lmao;
 using CovidAll = WinTenBot.Model.CovidAll;
 
 namespace WinTenBot.Helpers
 {
-    public static class CovidHelper
+    public static class Covid
     {
         private static string CacheFilename
         {
@@ -125,7 +126,7 @@ namespace WinTenBot.Helpers
         {
             var urlApi = "https://coronavirus-tracker-api.herokuapp.com/all";
 
-            CacheHelper.ClearCacheOlderThan("covid-all", 1);
+            Caching.ClearCacheOlderThan("covid-all", 1);
 
             if (!CacheFilename.IsFileCacheExist())
             {
