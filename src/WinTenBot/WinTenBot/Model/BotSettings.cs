@@ -22,6 +22,8 @@ namespace WinTenBot.Model
 
             DbConnectionString = GlobalConfiguration["CommonConfig:ConnectionString"];
 
+            GoogleCloudCredentialsPath = GlobalConfiguration["GoogleCloud:CredentialsPath"];
+            
             HangfireSqliteDb = GlobalConfiguration["Hangfire:Sqlite"];
             HangfireLiteDb = GlobalConfiguration["Hangfire:LiteDb"];
 
@@ -31,7 +33,7 @@ namespace WinTenBot.Model
             DatadogHost = GlobalConfiguration["Datadog:Host"];
             DatadogSource = GlobalConfiguration["Datadog:Source"];
             DatadogTags = GlobalConfiguration.GetSection("Datadog:Tags").Get<List<string>>();
-            
+
             IbmWatsonTranslateUrl = GlobalConfiguration["IbmConfig:Watson:TranslateUrl"];
             IbmWatsonTranslateToken = GlobalConfiguration["IbmConfig:Watson:TranslateToken"];
 
@@ -39,15 +41,16 @@ namespace WinTenBot.Model
             TesseractTrainedData = @"Storage\Data\Tesseract\";
             PathCache = "Storage/Caches";
 
-            OcrSpaceKey=GlobalConfiguration["OcrSpace:ApiKey"];
+            OcrSpaceKey = GlobalConfiguration["OcrSpace:ApiKey"];
         }
-        
+
         public static string ProductName { get; set; }
         public static string ProductVersion { get; set; }
         public static string ProductCompany { get; set; }
         public static ITelegramBotClient Client { get; set; }
 
-        public static Dictionary<string,ITelegramBotClient> Clients { get;set;} = new Dictionary<string, ITelegramBotClient>();
+        public static Dictionary<string, ITelegramBotClient> Clients { get; set; } =
+            new Dictionary<string, ITelegramBotClient>();
 
         public static string DbConnectionString { get; set; }
 
@@ -57,34 +60,36 @@ namespace WinTenBot.Model
         public static bool IsDevelopment => HostingEnvironment.IsDevelopment();
         public static bool IsStaging => HostingEnvironment.IsStaging();
         public static bool IsProduction => HostingEnvironment.IsProduction();
+
         public static bool IsEnvironment(string envName)
         {
             return HostingEnvironment.IsEnvironment(envName);
         }
-        
+
         public static string PathCache { get; set; }
         public static string LearningDataSetPath { get; set; }
 
         public static List<string> Sudoers { get; set; }
         public static long BotChannelLogs { get; set; }
         public static string SpamWatchToken { get; set; }
-        
-        
+
+        public static string GoogleCloudCredentialsPath { get; set; }
+
         public static string HangfireSqliteDb { get; set; }
         public static string HangfireLiteDb { get; set; }
-        
+
         public static string SerilogLogglyToken { get; set; }
-        
+
         public static string DatadogApiKey { get; set; }
         public static string DatadogHost { get; set; }
         public static string DatadogSource { get; set; }
         public static List<string> DatadogTags { get; set; }
-        
+
         public static string IbmWatsonTranslateUrl { get; set; }
         public static string IbmWatsonTranslateToken { get; set; }
-        
+
         public static string TesseractTrainedData { get; set; }
-        
+
         public static string OcrSpaceKey { get; set; }
     }
 }

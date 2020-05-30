@@ -2,8 +2,8 @@
 using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Framework.Abstractions;
-using WinTenBot.Providers;
 using WinTenBot.Services;
+using WinTenBot.Tools;
 
 namespace WinTenBot.Handlers.Commands.Additional
 {
@@ -35,10 +35,11 @@ namespace WinTenBot.Handlers.Commands.Additional
                         .ConfigureAwait(false);
 
                     // var ocr = TesseractProvider.ScanImage(savedFile);
-                    var ocr = await TesseractProvider.OcrSpace(savedFile)
-                        .ConfigureAwait(false);
+                    var ocr = GoogleVision.ScanText(savedFile);
+                    // var ocr = await TesseractProvider.OcrSpace(savedFile)
+                        // .ConfigureAwait(false);
 
-                    var txt = @$"<b>Scan Result</b>\n{ocr}";
+                    // var txt = @$"<b>Scan Result</b>\n{ocr}";
                     await _telegramService.EditAsync(ocr)
                         .ConfigureAwait(false);
                     

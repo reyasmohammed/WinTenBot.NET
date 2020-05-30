@@ -14,6 +14,7 @@ using WinTenBot.Model;
 using WinTenBot.Providers;
 using WinTenBot.Services;
 using WinTenBot.Text;
+using WinTenBot.Tools;
 
 namespace WinTenBot.Telegram
 {
@@ -159,8 +160,10 @@ namespace WinTenBot.Telegram
                 var savedFile = await telegramService.DownloadFileAsync(fileName)
                     .ConfigureAwait(false);
 
-                var ocr = await TesseractProvider.OcrSpace(savedFile)
-                    .ConfigureAwait(false);
+                // var ocr = await TesseractProvider.OcrSpace(savedFile)
+                //     .ConfigureAwait(false);
+                var ocr = GoogleVision.ScanText(savedFile);
+
 
                 Log.Information("Scanning message..");
                 var isMustDelete = await IsMustDelete(ocr)
