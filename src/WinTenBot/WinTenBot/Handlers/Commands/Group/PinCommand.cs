@@ -1,7 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
-using WinTenBot.Providers;
 using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Group
@@ -24,6 +23,7 @@ namespace WinTenBot.Handlers.Commands.Group
                 var pin = client.PinChatMessageAsync(
                     msg.Chat.Id,
                     msg.ReplyToMessage.MessageId);
+                return;
 //                ConsoleHelper.WriteLine(pin.);
             }
 
