@@ -275,7 +275,7 @@ namespace WinTenBot.Helpers
                 }
 
                 var muteUntil = DateTime.UtcNow.AddMinutes(3);
-                await telegramProvider.RestrictMemberAsync(fromId, until: muteUntil);
+                await telegramService.RestrictMemberAsync(fromId, until: muteUntil);
 
                 if (updatedStep > warnLimit)
                 {
