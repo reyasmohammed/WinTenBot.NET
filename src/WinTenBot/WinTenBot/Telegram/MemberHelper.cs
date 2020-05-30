@@ -274,6 +274,9 @@ namespace WinTenBot.Helpers
                     sendText += $"\n<b>Reason:</b> {reasonWarn}";
                 }
 
+                var muteUntil = DateTime.UtcNow.AddMinutes(3);
+                await telegramProvider.RestrictMemberAsync(fromId, until: muteUntil);
+
                 if (updatedStep > warnLimit)
                 {
                     var sendWarn = $"Batas peringatan telah di lampaui." +
