@@ -37,7 +37,8 @@ namespace WinTenBot.Providers
                     .WithGlobalConnectionString(ConnectionString)
                     // Define the assembly containing the migrations
                     .ScanIn(typeof(RssMigration).Assembly).For.Migrations()
-                    .ScanIn(typeof(CreateTableChatSettings).Assembly).For.Migrations())
+                    .ScanIn(typeof(CreateTableChatSettings).Assembly).For.Migrations()
+                    .ScanIn(typeof(CreateTableWordsLearning).Assembly).For.Migrations())
                 // Enable logging to console in the FluentMigrator way
                 .AddLogging(lb => lb.AddSerilog())
                 // Build the service provider

@@ -34,6 +34,7 @@ namespace WinTenBot.Model
             IbmWatsonTranslateUrl = GlobalConfiguration["IbmConfig:Watson:TranslateUrl"];
             IbmWatsonTranslateToken = GlobalConfiguration["IbmConfig:Watson:TranslateToken"];
 
+            LearningDataSetPath = @"Storage\Learning\".EnsureDirectory();
             TesseractTrainedData = @"Storage\Data\Tesseract\";
             
             OcrSpaceKey=GlobalConfiguration["OcrSpace:ApiKey"];
@@ -58,6 +59,8 @@ namespace WinTenBot.Model
         {
             return HostingEnvironment.IsEnvironment(envName);
         }
+        
+        public static string LearningDataSetPath { get; set; }
 
         public static List<string> Sudoers { get; set; }
         public static long BotChannelLogs { get; set; }

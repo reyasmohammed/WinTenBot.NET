@@ -24,6 +24,7 @@ using WinTenBot.Handlers.Commands.Notes;
 using WinTenBot.Handlers.Commands.Rss;
 using WinTenBot.Handlers.Commands.Rules;
 using WinTenBot.Handlers.Commands.Security;
+using WinTenBot.Handlers.Commands.SpamLearning;
 using WinTenBot.Handlers.Commands.Tags;
 using WinTenBot.Handlers.Commands.Welcome;
 using WinTenBot.Handlers.Commands.Words;
@@ -156,6 +157,10 @@ namespace WinTenBot
 
             services.AddScoped<TranslateCommand>();
 
+            services.AddScoped<LearnCommand>()
+                .AddScoped<PredictCommand>()
+                .AddScoped<ImportLearnCommand>();
+
             services.AddHangfireServer();
             services.AddHangfire(config =>
             {
@@ -269,6 +274,7 @@ namespace WinTenBot
                                     .UseCommand<GlobalReportCommand>("greport")
                                     .UseCommand<HelpCommand>("help")
                                     .UseCommand<IdCommand>("id")
+                                    .UseCommand<ImportLearnCommand>("importlearn")
                                     .UseCommand<ImportRssCommand>("importrss")
                                     .UseCommand<InfoCommand>("info")
                                     .UseCommand<KickCommand>("kick")
@@ -278,6 +284,7 @@ namespace WinTenBot
                                     .UseCommand<OutCommand>("out")
                                     .UseCommand<PinCommand>("pin")
                                     // .UseCommand<PingCommand>("ping")
+                                    .UseCommand<PredictCommand>("predict")
                                     .UseCommand<PromoteCommand>("promote")
                                     .UseCommand<QrCommand>("qr")
                                     .UseCommand<ReportCommand>("report")
@@ -293,6 +300,7 @@ namespace WinTenBot
                                     .UseCommand<TagCommand>("tag")
                                     .UseCommand<TagsCommand>("notes")
                                     .UseCommand<TagsCommand>("tags")
+                                    .UseCommand<LearnCommand>("learn")
                                     .UseCommand<TesseractOcrCommand>("ocr")
                                     .UseCommand<TestCommand>("test")
                                     .UseCommand<TranslateCommand>("tr")
