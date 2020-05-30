@@ -10,6 +10,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Enums;
 using WinTenBot.Helpers;
+using WinTenBot.IO;
 using WinTenBot.Model;
 using WinTenBot.Providers;
 using WinTenBot.Services;
@@ -174,6 +175,8 @@ namespace WinTenBot.Telegram
                 if (isMustDelete)
                     await telegramService.DeleteAsync(message.MessageId)
                         .ConfigureAwait(false);
+
+                savedFile.GetDirectory().RemoveFiles("ocr");
             }
         }
 

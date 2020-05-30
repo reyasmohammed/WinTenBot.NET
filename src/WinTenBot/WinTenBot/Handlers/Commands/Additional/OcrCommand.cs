@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Framework.Abstractions;
+using WinTenBot.IO;
 using WinTenBot.Services;
 using WinTenBot.Tools;
 
@@ -43,6 +44,8 @@ namespace WinTenBot.Handlers.Commands.Additional
                     await _telegramService.EditAsync(ocr)
                         .ConfigureAwait(false);
                     
+                    savedFile.GetDirectory().RemoveFiles("ocr");
+
                     return;
                 }
             }
