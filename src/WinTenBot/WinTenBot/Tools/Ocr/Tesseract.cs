@@ -1,7 +1,7 @@
 ﻿using Serilog;
 using Tesseract;
-using WinTenBot.Helpers;
 using WinTenBot.Model;
+using WinTenBot.Text;
 
 namespace WinTenBot.Tools.Ocr
 {

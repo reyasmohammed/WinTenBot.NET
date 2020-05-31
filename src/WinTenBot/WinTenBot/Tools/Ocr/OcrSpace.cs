@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Flurl.Http;
 using Newtonsoft.Json;
 using Serilog;
-using WinTenBot.Helpers;
 using WinTenBot.Model;
+using WinTenBot.Text;
 
 namespace WinTenBot.Tools.Ocr
 {
@@ -27,7 +27,7 @@ namespace WinTenBot.Tools.Ocr
                     Log.Warning("OCR can't be continue because API KEY is missing.");
                     return string.Empty;
                 }
-                
+
                 Log.Information($"Sending {filePath} to {url}");
                 var postResult = await url
                     .PostMultipartAsync(post =>
@@ -35,16 +35,16 @@ namespace WinTenBot.Tools.Ocr
                             .AddString("apikey", ocrKey)
                             .AddString("language", "eng"))
                     .ConfigureAwait(false);
-                
+
                 Log.Information($"OCR: {postResult.StatusCode}");
                 var json = await postResult.Content.ReadAsStringAsync()
                     .ConfigureAwait(false);
-                
+
                 var map = JsonConvert.DeserializeObject<OcrResult>(json);
 
                 if (map.OcrExitCode == 1)
                 {
-                    result = map.ParsedResults.Aggregate(result, (current, t) => 
+                    result = map.ParsedResults.Aggregate(result, (current, t) =>
                         current + t.ParsedText);
                 }
 

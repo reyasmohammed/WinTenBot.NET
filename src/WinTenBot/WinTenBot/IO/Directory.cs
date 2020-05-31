@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Linq;
 using Serilog;
-using WinTenBot.Helpers;
+using WinTenBot.Text;
 using sysIO = System.IO;
 
 namespace WinTenBot.IO
@@ -14,7 +14,7 @@ namespace WinTenBot.IO
 
             var path = sysIO.Path.GetDirectoryName(dirPath);
             if (!path.IsNullOrEmpty())
-                System.IO.Directory.CreateDirectory(path);
+                sysIO.Directory.CreateDirectory(path);
 
             return dirPath;
         }
