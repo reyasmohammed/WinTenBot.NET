@@ -33,6 +33,11 @@ namespace WinTenBot.Handlers.Commands.Words
                 return;
             }
 
+            if (word.IsValidUrl())
+            {
+                word = word.ParseUrl().Path;
+            }
+
             var where = new Dictionary<string, object>() { { "word", word } };
 
             if (paramOption.Contains("-"))

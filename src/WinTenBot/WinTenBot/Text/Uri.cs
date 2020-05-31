@@ -19,5 +19,17 @@ namespace WinTenBot.Text
             webClient.DownloadFile(remoteFileUrl, localFileName);
             webClient.Dispose();
         }
+
+        public static Url ParseUrl(this string urlPath)
+        {
+            var url = new Url(urlPath);
+
+            return url;
+        }
+
+        public static bool IsValidUrl(this string urlPath)
+        {
+            return Url.IsValid(urlPath);
+        }
     }
 }

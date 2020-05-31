@@ -99,12 +99,14 @@ namespace WinTenBot.Telegram
                 StringSplitOptions.RemoveEmptyEntries);
             foreach (var word in partedWord)
             {
+                var forCompare = word;
+                if (forCompare.IsValidUrl()) forCompare = forCompare.ParseUrl().Path;
+
                 foreach (WordFilter wordFilter in mappedWords)
                 {
                     var forFilter = wordFilter.Word;
                     var isGlobal = wordFilter.IsGlobal;
                     var isDeep = wordFilter.DeepFilter;
-                    var forCompare = word;
                     if (isDeep) forCompare = word.ToLower();
 
                     if (forFilter == forCompare)
