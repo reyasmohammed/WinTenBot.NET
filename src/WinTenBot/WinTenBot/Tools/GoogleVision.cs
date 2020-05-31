@@ -32,10 +32,14 @@ namespace WinTenBot.Tools
 
             Log.Information("Performs text detection on the image file");
             var response = client.DetectText(image);
-
+            
+            Log.Information($"ResponseCount: {response.Count}");
+            if (response.Count != 0) return response[0].Description;
+            
+            Log.Information("Seem no string result.");
+            return null;
+            
             // PrintAnnotation(response);
-
-            return response[0].Description;
         }
 
         private static void PrintAnnotation(IReadOnlyList<EntityAnnotation> entityAnnotations)

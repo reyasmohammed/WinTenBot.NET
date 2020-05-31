@@ -4,6 +4,7 @@ using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.IO;
 using WinTenBot.Services;
+using WinTenBot.Text;
 using WinTenBot.Tools;
 
 namespace WinTenBot.Handlers.Commands.Additional
@@ -41,6 +42,12 @@ namespace WinTenBot.Handlers.Commands.Additional
                         // .ConfigureAwait(false);
 
                     // var txt = @$"<b>Scan Result</b>\n{ocr}";
+
+                    if (ocr.IsNullOrEmpty())
+                    {
+                        ocr = "Tidak terdeteksi adanya teks di gambar tersebut";
+                    }
+                    
                     await _telegramService.EditAsync(ocr)
                         .ConfigureAwait(false);
                     
