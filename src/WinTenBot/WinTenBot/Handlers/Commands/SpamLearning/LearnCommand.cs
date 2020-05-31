@@ -69,7 +69,7 @@ namespace WinTenBot.Handlers.Commands.SpamLearning
 
                 await _telegramService.EditAsync("Memperbarui local dataset")
                     .ConfigureAwait(false);
-                MachineLearning.WriteToCsv();
+                // MachineLearning.WriteToCsv();
 
                 await _telegramService.EditAsync("Sedang mempelajari dataset")
                     .ConfigureAwait(false);

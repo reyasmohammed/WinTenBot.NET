@@ -45,7 +45,7 @@ namespace WinTenBot.Services
                 .ExecForMysql(true)
                 .InsertAsync(new Dictionary<string, object>()
                 {
-                    {"mark", learnData.Label},
+                    {"label", learnData.Label},
                     {"message", learnData.Message},
                     {"from_id", _message.From.Id},
                     {"chat_id", _message.Chat.Id}

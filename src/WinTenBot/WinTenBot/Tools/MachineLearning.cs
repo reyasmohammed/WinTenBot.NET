@@ -26,7 +26,7 @@ namespace WinTenBot.Tools
             mlContext = new MLContext();
             var basePath = BotSettings.LearningDataSetPath;
             // var filePath = basePath + "SMSSpamCollection.csv";
-            var filePath = basePath + "SpamCollection.csv";
+            // var filePath = basePath + "SpamCollection.csv";
 
             Log.Information("Loading dataset.");
             // Specify the schema for spam data and read it into DataView.
