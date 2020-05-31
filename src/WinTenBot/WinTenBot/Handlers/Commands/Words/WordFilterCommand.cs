@@ -27,7 +27,8 @@ namespace WinTenBot.Handlers.Commands.Words
             var isGlobalBlock = false;
 
             var isSudoer = _telegramService.IsSudoer();
-            var isAdmin = await _telegramService.IsAdminGroup();
+            var isAdmin = await _telegramService.IsAdminGroup()
+                .ConfigureAwait(false);
             if (!isSudoer && !isAdmin)
             {
                 return;
@@ -40,55 +41,64 @@ namespace WinTenBot.Handlers.Commands.Words
 
             var where = new Dictionary<string, object>() { { "word", word } };
 
-            if (paramOption.Contains("-"))
+            if (paramOption.IsContains("-"))
             {
-                if (paramOption.Contains("g") && isSudoer) // Global
+                if (paramOption.IsContains("g") && isSudoer) // Global
                 {
                     isGlobalBlock = true;
-                    await _telegramService.AppendTextAsync("Kata ini akan di blokir dengan mode Group-wide!");
+                    await _telegramService.AppendTextAsync("Kata ini akan di blokir dengan mode Group-wide!")
+                        .ConfigureAwait(false);
                 }
 
-                if (paramOption.Contains("d"))
+                if (paramOption.IsContains("d"))
                 {
                 }
 
-                if (paramOption.Contains("c"))
+                if (paramOption.IsContains("c"))
                 {
                 }
             }
 
-            if (!paramOption.Contains("g"))
+            if (!paramOption.IsContains("g"))
             {
                 @where.Add("chat_id", msg.Chat.Id);
             }
 
             if (!isSudoer)
             {
-                await _telegramService.AppendTextAsync("Hanya Sudoer yang dapat memblokir Kata mode Group-wide!");
+                await _telegramService.AppendTextAsync("Hanya Sudoer yang dapat memblokir Kata mode Group-wide!")
+                    .ConfigureAwait(false);
             }
 
-            if (word != "")
+            if (word.IsNotNullOrEmpty())
             {
-                await _telegramService.AppendTextAsync("Sedang menambahkan kata");
+                await _telegramService.AppendTextAsync("Sedang menambahkan kata")
+                    .ConfigureAwait(false);
 
-                var isExist = await _wordFilterService.IsExistAsync(@where);
+                var isExist = await _wordFilterService.IsExistAsync(@where)
+                    .ConfigureAwait(false);
                 if (!isExist)
                 {
-                    var save = await _wordFilterService.SaveWordAsync(word, isGlobalBlock);
+                    var save = await _wordFilterService.SaveWordAsync(word, isGlobalBlock)
+                        .ConfigureAwait(false);
 
-                    await _telegramService.AppendTextAsync("Kata berhasil di tambahkan");
+                    await _telegramService.AppendTextAsync("Kata berhasil di tambahkan")
+                        .ConfigureAwait(false);
                 }
                 else
                 {
-                    await _telegramService.AppendTextAsync("Kata sudah di tambahkan");
+                    await _telegramService.AppendTextAsync("Kata sudah di tambahkan")
+                        .ConfigureAwait(false);
                 }
             }
             else
             {
-                await _telegramService.SendTextAsync("Apa kata yg mau di blok?");
+                await _telegramService.SendTextAsync("Apa kata yg mau di blok?")
+                    .ConfigureAwait(false);
             }
 
-            await _telegramService.DeleteAsync(delay: 3000);
+            await _telegramService.DeleteAsync(delay: 3000)
+                .ConfigureAwait(false);
         }
     }
 }

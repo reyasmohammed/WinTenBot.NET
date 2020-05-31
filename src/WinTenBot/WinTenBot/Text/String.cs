@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using CodeHollow.FeedReader;
 using Serilog;
 
-namespace WinTenBot.Helpers
+namespace WinTenBot.Text
 {
     public static class String
     {
@@ -115,13 +115,13 @@ namespace WinTenBot.Helpers
 
         public static bool CheckUrlValid(this string source)
         {
-            return Uri.TryCreate(source, UriKind.Absolute, out Uri uriResult)
-                   && (uriResult.Scheme == Uri.UriSchemeHttps || uriResult.Scheme == Uri.UriSchemeHttp);
+            return System.Uri.TryCreate(source, UriKind.Absolute, out System.Uri uriResult)
+                   && (uriResult.Scheme == System.Uri.UriSchemeHttps || uriResult.Scheme == System.Uri.UriSchemeHttp);
         }
 
         public static string GetBaseUrl(this string url)
         {
-            var uri = new Uri(url);
+            var uri = new System.Uri(url);
             return uri.Host;
         }
 
@@ -203,6 +203,11 @@ namespace WinTenBot.Helpers
         public static bool IsNotNullOrEmpty(this string str)
         {
             return !str.IsNullOrEmpty();
+        }
+
+        public static bool IsContains(this string str, string filter)
+        {
+            return str.Contains(filter);
         }
     }
 }
