@@ -1,7 +1,9 @@
-﻿using Google.Cloud.Vision.V1;
+﻿using System.Collections.Generic;
+using Google.Cloud.Vision.V1;
 using Serilog;
 using WinTenBot.IO;
 using WinTenBot.Model;
+using WinTenBot.Text;
 
 namespace WinTenBot.Tools
 {
@@ -31,14 +33,19 @@ namespace WinTenBot.Tools
             Log.Information("Performs text detection on the image file");
             var response = client.DetectText(image);
 
-            // foreach (var annotation in response)
-            // {
-            // if (annotation.Description != null)
-            // Log.Information($"Annotation {annotation.ToJson(true)}");
-            // Log.Information($"Desc {annotation.Score}{annotation.Description}");
-            // }
+            // PrintAnnotation(response);
 
             return response[0].Description;
+        }
+
+        private static void PrintAnnotation(IReadOnlyList<EntityAnnotation> entityAnnotations)
+        {
+            foreach (var annotation in entityAnnotations)
+            {
+                // if (annotation.Description != null)
+                Log.Information($"Annotation {annotation.ToJson(true)}");
+                Log.Information($"Desc {annotation.Score} - {annotation.Description}");
+            }
         }
     }
 }
