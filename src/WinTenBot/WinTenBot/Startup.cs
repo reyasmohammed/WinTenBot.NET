@@ -134,8 +134,11 @@ namespace WinTenBot
                 .AddScoped<LeftChatMemberEvent>()
                 .AddScoped<PinnedMessageEvent>();
 
-            services.AddScoped<WelcomeCommand>();
-            services.AddScoped<SetWelcomeCommand>();
+            services.AddScoped<WelcomeCommand>()
+                .AddScoped<SetWelcomeCommand>()
+                .AddScoped<WelcomeMessageCommand>()
+                .AddScoped<WelcomeButtonCommand>()
+                .AddScoped<WelcomeDocumentCommand>();
 
             services.AddScoped<SettingsCommand>()
                 .AddScoped<ResetSettingsCommand>();
@@ -307,6 +310,9 @@ namespace WinTenBot
                                     .UseCommand<UntagCommand>("untag")
                                     .UseCommand<WarnCommand>("warn")
                                     .UseCommand<WelcomeCommand>("welcome")
+                                    .UseCommand<WelcomeMessageCommand>("welmsg")
+                                    .UseCommand<WelcomeButtonCommand>("welbtn")
+                                    .UseCommand<WelcomeDocumentCommand>("weldoc")
                                     .UseCommand<WordFilterCommand>("wfil")
                                     .UseCommand<WordSyncCommand>("wsync")
                                 )

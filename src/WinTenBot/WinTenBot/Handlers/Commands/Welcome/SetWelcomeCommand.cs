@@ -27,6 +27,9 @@ namespace WinTenBot.Handlers.Commands.Welcome
                 await _telegramService.SendTextAsync("Welcome hanya untuk grup saja");
                 return;
             }
+            
+            await _telegramService.SendTextAsync("/setwelcome sudah di pisah menjadi /welmsg, /welbtn dan /weldoc");
+            return;
 
             var partsMsg = msg.Text.Split(' ').ToArray();
 
