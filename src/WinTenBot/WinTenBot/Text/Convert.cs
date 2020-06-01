@@ -13,7 +13,7 @@ namespace WinTenBot.Text
 //            return bool.Parse(obj);
             return System.Convert.ToBoolean(obj);
         }
-        
+
         public static bool ToBool(this string obj)
         {
             return System.Convert.ToBoolean(obj);
@@ -23,7 +23,7 @@ namespace WinTenBot.Text
         {
             return System.Convert.ToInt32(obj);
         }
-        
+
         public static long ToInt64(this object obj)
         {
             return System.Convert.ToInt64(obj);
@@ -33,7 +33,7 @@ namespace WinTenBot.Text
         {
             return str.ToLower() == "disable" ? 0 : 1;
         }
-        
+
         public static DataTable ToDataTable<T>(this IEnumerable<T> ts) where T : class
         {
             var dt = new DataTable();
@@ -60,13 +60,19 @@ namespace WinTenBot.Text
 
             return dt;
         }
-        
+
         public static IEnumerable<DataRow> AsEnumerableX(this DataTable table)
         {
             for (int i = 0; i < table.Rows.Count; i++)
             {
                 yield return table.Rows[i];
             }
+        }
+
+        public static bool IsNumeric(this string str)
+        {
+            if (str.IsNullOrEmpty()) return false;
+            return str.All(char.IsDigit);
         }
     }
 }
