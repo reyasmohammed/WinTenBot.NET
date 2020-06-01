@@ -9,7 +9,6 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using WinTenBot.Enums;
-using WinTenBot.Helpers;
 using WinTenBot.IO;
 using WinTenBot.Model;
 using WinTenBot.Providers;
@@ -126,7 +125,7 @@ namespace WinTenBot.Telegram
 
         public static async Task ScanMessageAsync(this TelegramService telegramService)
         {
-            var message = telegramService.Message;
+            var message = telegramService.MessageOrEdited;
             var chatId = message.Chat.Id;
             var msgId = message.MessageId;
 
@@ -150,7 +149,7 @@ namespace WinTenBot.Telegram
 
         public static async Task ScanPhotoAsync(this TelegramService telegramService)
         {
-            var message = telegramService.Message;
+            var message = telegramService.MessageOrEdited;
             var chatId = message.Chat.Id;
             var msgId = message.MessageId;
 

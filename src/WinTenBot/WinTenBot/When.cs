@@ -5,15 +5,15 @@ namespace WinTenBot
 {
     public static class When
     {
-        public static bool Webhook(IUpdateContext context)  => 
+        public static bool Webhook(IUpdateContext context) =>
             context.Items.ContainsKey(nameof(HttpContext));
 
         public static bool NewUpdate(IUpdateContext context) =>
             context.Update != null;
-        
+
         public static bool NewMessage(IUpdateContext context) =>
             context.Update.Message != null;
-        
+
         public static bool EditedMessage(IUpdateContext context) =>
             context.Update.EditedMessage != null;
 
@@ -22,7 +22,8 @@ namespace WinTenBot
             context.Update.EditedMessage != null;
 
         public static bool NewTextMessage(IUpdateContext context) =>
-            context.Update.Message?.Text != null;
+            context.Update.Message?.Text != null ||
+            context.Update.EditedMessage?.Text != null;
 
         public static bool NewCommand(IUpdateContext context) =>
             context.Update.Message.Text.StartsWith("/");
@@ -31,7 +32,7 @@ namespace WinTenBot
         public static bool PingReceived(IUpdateContext context) =>
             context.Update.Message?.Text.ToLower() == "ping" ||
             context.Update.Message?.Text.ToLower() == "/ping";
-        
+
         public static bool CallTagReceived(IUpdateContext context) =>
             context.Update.Message.Text.Contains('#');
 

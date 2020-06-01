@@ -20,8 +20,7 @@ namespace WinTenBot.Handlers
             _telegramService = new TelegramService(context);
             if (context.Update.ChannelPost != null) return;
 
-            var message = context.Update.Message ??
-                          context.Update.EditedMessage ?? context.Update.CallbackQuery.Message;
+            var message = _telegramService.MessageOrEdited;
             var fromUser = message.From;
 
             if(BotSettings.IsDevelopment)
@@ -38,7 +37,7 @@ namespace WinTenBot.Handlers
         {
             Log.Information("Enqueue pre tasks");
 
-            var message = _telegramService.Message;
+            var message = _telegramService.MessageOrEdited;
             var callbackQuery = _telegramService.CallbackQuery;
 
             // var actions = new List<Action>();
@@ -72,7 +71,7 @@ namespace WinTenBot.Handlers
         private void EnqueueBackgroundTask()
         {
             var nonAwaitTasks = new List<Task>();
-            var message = _telegramService.Message;
+            var message = _telegramService.MessageOrEdited;
 
             //Exec nonAwait Tasks
             Log.Information("Running nonAwait task..");

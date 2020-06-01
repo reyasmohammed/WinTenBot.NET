@@ -81,7 +81,7 @@ namespace WinTenBot.Helpers
         {
             try
             {
-                var message = telegramService.Message;
+                var message = telegramService.MessageOrEdited;
                 var fromId = message.From.Id;
                 var fromUsername = message.From.Username;
                 var fromFName = message.From.FirstName;

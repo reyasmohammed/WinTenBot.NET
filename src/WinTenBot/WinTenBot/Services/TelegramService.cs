@@ -40,6 +40,8 @@ namespace WinTenBot.Services
         {
             Context = updateContext;
             Client = updateContext.Bot.Client;
+            EditedMessage = updateContext.Update.EditedMessage;
+            
             Message = updateContext.Update.CallbackQuery != null
                 ? updateContext.Update.CallbackQuery.Message
                 : updateContext.Update.Message;
@@ -47,12 +49,9 @@ namespace WinTenBot.Services
             if (updateContext.Update.CallbackQuery != null)
                 CallbackQuery = updateContext.Update.CallbackQuery;
 
-            EditedMessage = updateContext.Update.EditedMessage;
-            MessageOrEdited = updateContext.Update.Message
-                              ?? updateContext.Update.EditedMessage
-                              ?? updateContext.Update.CallbackQuery?.Message;
+            MessageOrEdited = Message ?? EditedMessage;
 
-            var settingService = new SettingsService(Message);
+            var settingService = new SettingsService(MessageOrEdited);
             CurrentSetting = settingService.ReadCache().Result;
             
             if (Message != null)
