@@ -37,7 +37,7 @@ namespace WinTenBot.Text
 
         public static string ValueOfIndex(this string[] array, int index)
         {
-            string value = string.Empty;
+            string value = null;
             if (array.Length > index && array[index] != null)
             {
                 value = array[index];
