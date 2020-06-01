@@ -10,7 +10,7 @@ namespace WinTenBot.Scheduler
         public static void StartScheduler()
         {
             StartLogCleanupScheduler();
-            StartLogglyCleanup();
+            // StartLogglyCleanup();
             StartSyncWordFilter();
         }
 
