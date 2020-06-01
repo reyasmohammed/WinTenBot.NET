@@ -154,11 +154,11 @@ namespace WinTenBot
             services.AddScoped<OutCommand>();
 
             services.AddScoped<QrCommand>()
-                .AddScoped<OcrCommand>();
-
+                .AddScoped<OcrCommand>()
+                .AddScoped<CatCommand>()
+                .AddScoped<TranslateCommand>();
+            
             services.AddScoped<CovidCommand>();
-
-            services.AddScoped<TranslateCommand>();
 
             services.AddScoped<LearnCommand>()
                 .AddScoped<PredictCommand>()
@@ -266,6 +266,7 @@ namespace WinTenBot
                                     .UseCommand<AfkCommand>("afk")
                                     .UseCommand<BanCommand>("ban")
                                     .UseCommand<BotCommand>("bot")
+                                    .UseCommand<CatCommand>("cat")
                                     .UseCommand<CovidCommand>("covid")
                                     .UseCommand<DebugCommand>("dbg")
                                     .UseCommand<DelBanCommand>("dban")
