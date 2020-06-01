@@ -1,6 +1,9 @@
-﻿using System.Net;
+﻿using System.IO;
+using System.Net;
 using Flurl;
 using Serilog;
+using WinTenBot.IO;
+using WinTenBot.Model;
 
 namespace WinTenBot.Text
 {
@@ -18,6 +21,20 @@ namespace WinTenBot.Text
             Log.Information($"Saving {remoteFileUrl} to {localFileName}");
             webClient.DownloadFile(remoteFileUrl, localFileName);
             webClient.Dispose();
+        }
+
+        public static string SaveToCache(this string remoteFileUrl, string localFileName)
+        {
+            var webClient = new WebClient();
+
+            var cachePath = BotSettings.PathCache;
+            var localPath = Path.Combine(cachePath, localFileName).EnsureDirectory();
+
+            Log.Information($"Saving {remoteFileUrl} to {localPath}");
+            webClient.DownloadFile(remoteFileUrl, localPath);
+            webClient.Dispose();
+
+            return localPath;
         }
 
         public static Url ParseUrl(this string urlPath)
