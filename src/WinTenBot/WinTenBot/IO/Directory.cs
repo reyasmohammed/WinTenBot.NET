@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Serilog;
 using WinTenBot.Text;
@@ -17,6 +17,26 @@ namespace WinTenBot.IO
                 sysIO.Directory.CreateDirectory(path);
 
             return dirPath;
+        }
+        
+        public static long DirSize(string path) 
+        {    
+            long size = 0;
+
+            var d = new sysIO.DirectoryInfo(path);
+            // Add file sizes.
+            sysIO.FileInfo[] fis = d.GetFiles();
+            foreach (sysIO.FileInfo fi in fis) 
+            {      
+                size += fi.Length;    
+            }
+            // Add subdirectory sizes.
+            sysIO.DirectoryInfo[] dis = d.GetDirectories();
+            foreach (sysIO.DirectoryInfo di in dis) 
+            {
+                size += DirSize(path);   
+            }
+            return size;  
         }
 
         public static string SanitizeSlash(this string path)
