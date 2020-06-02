@@ -53,7 +53,7 @@ namespace WinTenBot.Handlers.Commands.Tags
             var lastTagsMsgId = currentSetting.LastTagsMessageId;
             Log.Information($"LastTagsMsgId: {lastTagsMsgId}");
 
-            await _telegramService.DeleteAsync(lastTagsMsgId.ToInt());
+            if (lastTagsMsgId.ToInt() > 0) await _telegramService.DeleteAsync(lastTagsMsgId.ToInt());
             await _tagsService.UpdateCacheAsync(msg);
             await _settingsService.UpdateCell("last_tags_message_id", _telegramService.SentMessageId);
 

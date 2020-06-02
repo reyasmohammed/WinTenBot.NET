@@ -21,35 +21,39 @@ namespace WinTenBot.Handlers.Commands.Tags
             CancellationToken cancellationToken)
         {
             _telegramService = new TelegramService(context);
-            var msg = context.Update.Message;
+            var msg = _telegramService.Message;
 
-            var isAdmin = await _telegramService.IsAdminGroup();
+            var isSudoer = _telegramService.IsSudoer();
+            var isAdmin = await _telegramService.IsAdminOrPrivateChat();
             var tagVal = args[0];
-            var sendText = "Perintah Untag hanya untuk ngadmin.";
+            var chatId = _telegramService.Message.Chat.Id;
+            var sendText = "Hanya admin yang bisa membuat Tag.";
 
-            if (isAdmin)
+            if (!isAdmin && !isSudoer)
             {
-                await _telegramService.SendTextAsync("Memeriksa..");
-                var isExist = await _tagsService.IsExist(_telegramService.Message.Chat.Id, tagVal);
-                if (isExist)
-                {
-                    Log.Information($"Sedang menghapus tag {tagVal}");
-                    var unTag = await _tagsService.DeleteTag(_telegramService.Message.Chat.Id, tagVal);
-                    if (unTag)
-                    {
-                        sendText = $"Hapus tag {tagVal} berhasil";
-                    }
-
-                    await _telegramService.EditAsync(sendText);
-                    return;
-                }
-                else
-                {
-                    sendText = $"Tag {tagVal} tidak di temukan";
-                }
+                await _telegramService.SendTextAsync(sendText);
+                Log.Information("This User is not Admin or Sudo!");
+                return;
             }
 
-            await _telegramService.SendTextAsync(sendText);
+            await _telegramService.SendTextAsync("Memeriksa..");
+            var isExist = await _tagsService.IsExist(chatId, tagVal);
+            if (isExist)
+            {
+                Log.Information($"Sedang menghapus tag {tagVal}");
+                var unTag = await _tagsService.DeleteTag(chatId, tagVal);
+                if (unTag)
+                {
+                    sendText = $"Hapus tag {tagVal} berhasil";
+                }
+
+                await _telegramService.EditAsync(sendText);
+                return;
+            }
+            else
+            {
+                sendText = $"Tag {tagVal} tidak di temukan";
+            }
         }
     }
 }

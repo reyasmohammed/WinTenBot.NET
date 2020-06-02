@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Framework.Abstractions;
-using WinTenBot.Helpers;
 using WinTenBot.Services;
 using WinTenBot.Telegram;
 using WinTenBot.Text;
@@ -24,21 +23,21 @@ namespace WinTenBot.Handlers.Commands.Tags
         public override async Task HandleAsync(IUpdateContext context, UpdateDelegate next, string[] args,
             CancellationToken cancellationToken)
         {
-            var msg = context.Update.Message;
             _telegramService = new TelegramService(context);
-            var isSudoer = msg.From.Id.IsSudoer();
-            var isAdmin =await _telegramService.IsAdminGroup();
+            var msg = _telegramService.Message;
+            var isSudoer = _telegramService.IsSudoer();
+            var isAdmin = await _telegramService.IsAdminOrPrivateChat();
+            var sendText = "Hanya admin yang bisa membuat Tag";
             
-            if (!isSudoer || !isAdmin)
+            if (!isSudoer && !isAdmin)
             {
-                // var sendText = "This feature currently limited";
-                await _telegramService.DeleteAsync(msg.MessageId);
-                Log.Information("This User is not Admin!");
-                // await _telegramProvider.SendTextAsync("This feature currently limited");
+                // await _telegramService.DeleteAsync(msg.MessageId);
+                await _telegramService.SendTextAsync(sendText);
+                Log.Information("This User is not Admin or Sudo!");
                 return;
             }
-            
-            var sendText = "ℹ Simpan tag ke Cloud Tags" +
+
+            sendText = "ℹ Simpan tag ke Cloud Tags" +
                            "\nContoh: <code>/tag tagnya [tombol|link.tombol]</code> - Reply pesan" +
                            "\nPanjang tag minimal 3 karakter." +
                            "\nTanda [ ] artinya tidak harus" +
@@ -49,20 +48,20 @@ namespace WinTenBot.Handlers.Commands.Tags
             if (msg.ReplyToMessage != null)
             {
                 Log.Information("Replied message detected..");
-                
+
                 var msgText = msg.Text;
-                
+
                 var repMsg = msg.ReplyToMessage;
                 var repFileId = repMsg.GetFileId();
                 var repMsgText = repMsg.Text;
                 var partsMsgText = msgText.SplitText(" ").ToArray();
-                
+
                 Log.Information($"Part1: {partsMsgText.ToJson(true)}");
 
                 var slugTag = partsMsgText.ValueOfIndex(1);
                 var tagAndCmd = partsMsgText.Take(2).ToArray();
                 var buttonData = msgText.RemoveThisString(tagAndCmd);
-                
+
                 if (slugTag.Length >= 3)
                 {
                     await _telegramService.SendTextAsync("📖 Sedang mempersiapkan..");
@@ -79,14 +78,14 @@ namespace WinTenBot.Handlers.Commands.Tags
                             {"id_chat", msg.Chat.Id},
                             {"id_user", msg.From.Id},
                             {"tag", slugTag.Trim()},
-                            {"btn_data",buttonData},
+                            {"btn_data", buttonData},
                             {"content", content}
                         };
 
                         if (repFileId.IsNotNullOrEmpty())
                         {
-                            data.Add("id_data",repFileId);
-                            data.Add("type_data",repMsg.Type);
+                            data.Add("id_data", repFileId);
+                            data.Add("type_data", repMsg.Type);
                         }
 
                         await _telegramService.EditAsync("📝 Menyimpan tag data..");
@@ -97,15 +96,15 @@ namespace WinTenBot.Handlers.Commands.Tags
                         // );
 
                         await _telegramService.EditAsync("✅ Tag berhasil di simpan.." +
-                                                          $"\nTag: <code>#{slugTag}</code>" +
-                                                          $"\nKetik /tags untuk melihat semua Tag.");
+                                                         $"\nTag: <code>#{slugTag}</code>" +
+                                                         $"\n\nKetik /tags untuk melihat semua Tag.");
 
                         await _tagsService.UpdateCacheAsync(msg);
                         return;
                     }
 
                     await _telegramService.EditAsync("✅ Tag sudah ada. " +
-                                                             "Silakan ganti Tag jika ingin isi konten berbeda");
+                                                     "Silakan ganti Tag jika ingin isi konten berbeda");
                     return;
                 }
 
