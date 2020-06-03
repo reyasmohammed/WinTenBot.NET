@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Serilog;
 using SqlKata;
 using SqlKata.Execution;
-using WinTenBot.Helpers;
 using WinTenBot.Model;
 using WinTenBot.Providers;
 using WinTenBot.Text;
@@ -72,7 +71,7 @@ namespace WinTenBot.Tools
                 .ExecForMysql()
                 .GetAsync();
 
-            var mappedQuery = cloudQuery.ToJson(followProperty:true).MapObject<List<GlobalBan>>();
+            var mappedQuery = cloudQuery.ToJson(followProperty:true).MapObject<List<GlobalBanData>>();
 
             Log.Information($"Gban User: {mappedQuery.Count} rows");
             

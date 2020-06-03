@@ -7,7 +7,7 @@ using WinTenBot.Services;
 using WinTenBot.Telegram;
 using WinTenBot.Text;
 
-namespace WinTenBot.Handlers.Commands.Security
+namespace WinTenBot.Handlers.Commands.GlobalBan
 {
     public class MediaFilterCommand : CommandBase
     {

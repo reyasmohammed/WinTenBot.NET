@@ -7,19 +7,22 @@ using SqlKata;
 using SqlKata.Execution;
 using Telegram.Bot.Types;
 using WinTenBot.IO;
+using WinTenBot.Model;
 using WinTenBot.Providers;
 using WinTenBot.Text;
 
 namespace WinTenBot.Services
 {
-    public class ElasticSecurityService
+    public class GlobalBanService
     {
-        private string fbanTable = "fbans";
+        private string fbanTable = "global_bans";
+
         private string fileJson = "fban_user.json";
+
         // private MySqlProvider _mySqlProvider;
         private readonly Message _message;
 
-        public ElasticSecurityService(Message message)
+        public GlobalBanService(Message message)
         {
             _message = message;
             // _mySqlProvider = new MySqlProvider();
@@ -32,14 +35,36 @@ namespace WinTenBot.Services
                 {"user_id", userId}
             };
             // return await IsDataExist(fbanTable, where);
-            
+
             var query = await new Query(fbanTable)
                 .ExecForMysql(true)
                 .Where(where)
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
+            
             var isBan = query.Any();
             Log.Information($"{userId} IsBan: {isBan}");
-            
+
+            return isBan;
+        }
+
+        public async Task<bool> IsExist(GlobalBanData globalBanData)
+        {
+            var userId = globalBanData.UserId;
+            var where = new Dictionary<string, object>()
+            {
+                {"user_id", userId}
+            };
+
+            var query = await new Query(fbanTable)
+                .ExecForMysql(true)
+                .Where(where)
+                .GetAsync()
+                .ConfigureAwait(false);
+
+            var isBan = query.Any();
+            Log.Information($"{globalBanData} is Banned?: {isBan}");
+
             return isBan;
         }
 
@@ -47,7 +72,7 @@ namespace WinTenBot.Services
         {
             var data = await ReadCacheAsync();
             DataTable filtered = new DataTable(null);
-            
+
             Log.Information($"Checking {userId} in Global Ban Cache");
             var search = data.AsEnumerable()
                 .Where(row => row.Field<string>("user_id") == userId.ToString());
@@ -71,9 +96,33 @@ namespace WinTenBot.Services
             // return await Insert(fbanTable, data);
         }
 
+        public async Task<bool> SaveBanAsync(GlobalBanData globalBanData)
+        {
+            var userId = globalBanData.UserId;
+            var fromId = globalBanData.BannedBy;
+            var chatId = globalBanData.BannedFrom;
+            var reason = globalBanData.ReasonBan;
+
+            var data = new Dictionary<string, object>()
+            {
+                {"user_id", userId},
+                {"from_id", fromId},
+                {"chat_id", chatId},
+                {"reason", reason}
+            };
+
+            Log.Information($"Inserting new GBan: {globalBanData.ToJson(true)}");
+            var query = await new Query(fbanTable)
+                .ExecForMysql(true)
+                .InsertAsync(data)
+                .ConfigureAwait(false);
+
+            return query > 0;
+        }
+
         public async Task<bool> DeleteBanAsync(int userId)
         {
-            var where = new Dictionary<string, object>() {{"user_id",userId}};
+            var where = new Dictionary<string, object>() {{"user_id", userId}};
             var delete = await new Query(fbanTable)
                 .ExecForMysql(true)
                 .Where(where)

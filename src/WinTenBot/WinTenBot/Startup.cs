@@ -19,11 +19,11 @@ using WinTenBot.Handlers;
 using WinTenBot.Handlers.Commands.Additional;
 using WinTenBot.Handlers.Commands.Chat;
 using WinTenBot.Handlers.Commands.Core;
+using WinTenBot.Handlers.Commands.GlobalBan;
 using WinTenBot.Handlers.Commands.Group;
 using WinTenBot.Handlers.Commands.Notes;
 using WinTenBot.Handlers.Commands.Rss;
 using WinTenBot.Handlers.Commands.Rules;
-using WinTenBot.Handlers.Commands.Security;
 using WinTenBot.Handlers.Commands.SpamLearning;
 using WinTenBot.Handlers.Commands.Tags;
 using WinTenBot.Handlers.Commands.Welcome;
@@ -87,7 +87,7 @@ namespace WinTenBot
                 .AddScoped<IWeatherService, WeatherService>();
 
             services.AddScoped<GlobalBanCommand>()
-                .AddScoped<DelBanCommand>();
+                .AddScoped<DeleteBanCommand>();
 
             services.AddScoped<WordFilterCommand>()
                 .AddScoped<WordSyncCommand>();
@@ -269,7 +269,7 @@ namespace WinTenBot
                                     .UseCommand<CatCommand>("cat")
                                     .UseCommand<CovidCommand>("covid")
                                     .UseCommand<DebugCommand>("dbg")
-                                    .UseCommand<DelBanCommand>("dban")
+                                    .UseCommand<DeleteBanCommand>("dban")
                                     .UseCommand<DelRssCommand>("delrss")
                                     .UseCommand<DemoteCommand>("demote")
                                     .UseCommand<ExportRssCommand>("exportrss")

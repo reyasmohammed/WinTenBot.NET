@@ -19,7 +19,7 @@ namespace WinTenBot.Handlers.Events
 {
     public class NewChatMembersEvent : IUpdateHandler
     {
-        private ElasticSecurityService _elasticSecurityService;
+        private GlobalBanService _globalBanService;
         private SettingsService _settingsService;
         private TelegramService _telegramService;
         private ChatSetting Settings { get; set; }
@@ -29,7 +29,7 @@ namespace WinTenBot.Handlers.Events
             var msg = context.Update.Message;
             _telegramService = new TelegramService(context);
             _settingsService = new SettingsService(msg);
-            _elasticSecurityService = new ElasticSecurityService(context.Update.Message);
+            _globalBanService = new GlobalBanService(context.Update.Message);
 
             Log.Information("New Chat Members...");
 
@@ -193,7 +193,7 @@ namespace WinTenBot.Handlers.Events
                 }
 
                 var fullName = (newMember.FirstName + " " + newMember.LastName).Trim();
-                var nameLink = MemberHelper.GetNameLink(newMemberId, fullName);
+                var nameLink = Members.GetNameLink(newMemberId, fullName);
 
                 if (newMember != lastMember)
                 {
