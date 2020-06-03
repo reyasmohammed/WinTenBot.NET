@@ -2,15 +2,15 @@
 using FluentMigrator.Runner;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using WinTenBot.Migrations;
+using WinTenBot.Migrations.MySql;
 
 namespace WinTenBot.Providers
 {
-    public class FluentMigratorProvider
+    public static class FluentMigratorProvider
     {
         public static string ConnectionString { get; set; }
         
-        public static void RunMigration()
+        public static void RunMySqlMigration()
         {
             var serviceProvider = CreateMysqlServices();
 
@@ -18,7 +18,7 @@ namespace WinTenBot.Providers
             // that all resources will be disposed.
             using (var scope = serviceProvider.CreateScope())
             {
-                UpdateDatabase(scope.ServiceProvider);
+                UpdateMySqlDatabase(scope.ServiceProvider);
             }
         }
         
@@ -28,27 +28,27 @@ namespace WinTenBot.Providers
         private static IServiceProvider CreateMysqlServices()
         {
             return new ServiceCollection()
-                // Add common FluentMigrator services
                 .AddFluentMigratorCore()
                 .ConfigureRunner(rb => rb
-                    // Add SQLite support to FluentMigrator
                     .AddMySql5()
-                    // Set the connection string
                     .WithGlobalConnectionString(ConnectionString)
-                    // Define the assembly containing the migrations
-                    .ScanIn(typeof(RssMigration).Assembly).For.Migrations()
+                    
+                    .ScanIn(typeof(CreateTableAfk).Assembly).For.Migrations()
                     .ScanIn(typeof(CreateTableChatSettings).Assembly).For.Migrations()
-                    .ScanIn(typeof(CreateTableWordsLearning).Assembly).For.Migrations())
-                // Enable logging to console in the FluentMigrator way
+                    .ScanIn(typeof(CreateTableGlobalBan).Assembly).For.Migrations()
+                    .ScanIn(typeof(CreateTableRssSettings).Assembly).For.Migrations()
+                    .ScanIn(typeof(CreateTableSpells).Assembly).For.Migrations()
+                    .ScanIn(typeof(CreateTableTags).Assembly).For.Migrations()
+                    .ScanIn(typeof(CreateTableWordsLearning).Assembly).For.Migrations()
+                )
                 .AddLogging(lb => lb.AddSerilog())
-                // Build the service provider
                 .BuildServiceProvider(false);
         }
 
         /// <summary>
         /// Update the database
         /// </summary>
-        private static void UpdateDatabase(IServiceProvider serviceProvider)
+        private static void UpdateMySqlDatabase(IServiceProvider serviceProvider)
         {
             // Instantiate the runner
             var runner = serviceProvider.GetRequiredService<IMigrationRunner>();

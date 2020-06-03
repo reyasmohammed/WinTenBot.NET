@@ -67,7 +67,7 @@ namespace WinTenBot
                 .UseSerilogLogProvider()
                 .UseColouredConsoleLogProvider();
 
-            FluentMigratorProvider.RunMigration();
+            FluentMigratorProvider.RunMySqlMigration();
         }
 
         public void ConfigureServices(IServiceCollection services)

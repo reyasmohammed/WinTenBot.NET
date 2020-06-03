@@ -1,6 +1,6 @@
 ﻿using FluentMigrator;
 
-namespace WinTenBot.Migrations
+namespace WinTenBot.Migrations.MySql
 {
     public class CreateTableAfk:Migration
     {

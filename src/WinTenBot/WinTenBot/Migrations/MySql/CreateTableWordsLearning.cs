@@ -1,7 +1,7 @@
 ﻿using FluentMigrator;
 using WinTenBot.Tools;
 
-namespace WinTenBot.Migrations
+namespace WinTenBot.Migrations.MySql
 {
     [Migration(20200530065305)]
     public class CreateTableWordsLearning:Migration
