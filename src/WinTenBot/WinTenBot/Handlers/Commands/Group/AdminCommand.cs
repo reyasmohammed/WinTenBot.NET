@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types.Enums;
 using WinTenBot.Helpers;
-using WinTenBot.Providers;
 using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Group
@@ -27,7 +26,7 @@ namespace WinTenBot.Handlers.Commands.Group
             foreach (var admin in admins)
             {
                 var user = admin.User;
-                var nameLink = MemberHelper.GetNameLink(user.Id, (user.FirstName + " " + user.LastName).Trim());
+                var nameLink = Members.GetNameLink(user.Id, (user.FirstName + " " + user.LastName).Trim());
                 if (admin.Status == ChatMemberStatus.Creator)
                 {
                     creatorStr = nameLink;

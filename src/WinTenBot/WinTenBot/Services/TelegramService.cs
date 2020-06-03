@@ -68,7 +68,7 @@ namespace WinTenBot.Services
             foreach (var admin in admins)
             {
                 var user = admin.User;
-                var nameLink = MemberHelper.GetNameLink(user.Id, "&#8203;");
+                var nameLink = Members.GetNameLink(user.Id, "&#8203;");
 
                 adminStr += $"{nameLink}";
             }

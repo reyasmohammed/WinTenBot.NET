@@ -16,7 +16,7 @@ using WinTenBot.Text;
 
 namespace WinTenBot.Helpers
 {
-    public static class MemberHelper
+    public static class Members
     {
         public static string GetNameLink(int userId, string name)
         {
