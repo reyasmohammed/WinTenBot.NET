@@ -18,14 +18,15 @@ namespace WinTenBot.Providers
         public static async Task<SpamWatch> CheckSpamWatch(this int userId)
         {
             var spamWatch  = new SpamWatch();
-            var spamWatchToken = BotSettings.GlobalConfiguration["CommonConfig:SpamWatchToken"];
+            var spamWatchToken = BotSettings.SpamWatchToken;
             
             try
             {
                 var baseUrl = $"https://api.spamwat.ch/banlist/{userId}";
                 spamWatch = await baseUrl
                     .WithOAuthBearerToken(spamWatchToken)
-                    .GetJsonAsync<SpamWatch>();
+                    .GetJsonAsync<SpamWatch>()
+                    .ConfigureAwait(false);
                 spamWatch.IsBan = spamWatch.Code != 404;
                 Log.Debug(spamWatch.ToJson(true));
             }
@@ -58,7 +59,8 @@ namespace WinTenBot.Providers
             var query = await new Query("fban_user")
                 .Where("user_id",userId)
                 .ExecForSqLite(true)
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
             
             var isGBan = query.Any();
             Log.Information($"UserId {userId} isGBan : {isGBan}");
@@ -70,7 +72,8 @@ namespace WinTenBot.Providers
         {
             var userId = user.Id;
             var url = "https://api.cas.chat/check".SetQueryParam("user_id", userId);
-            var resp = await url.GetJsonAsync<CasBan>();
+            var resp = await url.GetJsonAsync<CasBan>()
+                .ConfigureAwait(false);
             
             Log.Debug("CasBan Response", resp);
 
