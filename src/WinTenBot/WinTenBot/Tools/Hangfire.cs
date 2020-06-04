@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Data;
 using Hangfire;
 using Hangfire.LiteDB;
+using Hangfire.MySql.Core;
 using Hangfire.Storage;
 using Hangfire.Storage.SQLite;
 using Serilog;
@@ -22,24 +24,23 @@ namespace WinTenBot.Tools
             }
         }
         
-        // public static MySqlStorage GetMysqlStorage()
-        // {
-        //     var connectionString = BotSettings.DbConnectionString;
-        //
-        //     var options = new MySqlStorageOptions
-        //     {
-        //         TransactionIsolationLevel = IsolationLevel.ReadCommitted,
-        //         QueuePollInterval = TimeSpan.FromSeconds(15),
-        //         JobExpirationCheckInterval = TimeSpan.FromHours(1),
-        //         CountersAggregateInterval = TimeSpan.FromMinutes(5),
-        //         PrepareSchemaIfNecessary = true,
-        //         DashboardJobListLimit = 50000,
-        //         TransactionTimeout = TimeSpan.FromMinutes(1),
-        //         TablesPrefix = "Hangfire_"
-        //     };
-        //     var storage = new MySqlStorage(connectionString, options);
-        //     return storage;
-        // }
+        public static MySqlStorage GetMysqlStorage()
+        {
+            var connectionString = BotSettings.HangfireMysqlDb;
+        
+            var options = new MySqlStorageOptions
+            {
+                TransactionIsolationLevel = IsolationLevel.ReadCommitted,
+                QueuePollInterval = TimeSpan.FromSeconds(15),
+                JobExpirationCheckInterval = TimeSpan.FromHours(1),
+                CountersAggregateInterval = TimeSpan.FromMinutes(5),
+                PrepareSchemaIfNecessary = true,
+                DashboardJobListLimit = 50000,
+                TransactionTimeout = TimeSpan.FromMinutes(1),
+            };
+            var storage = new MySqlStorage(connectionString, options);
+            return storage;
+        }
 
         public static SQLiteStorage GetSqliteStorage()
         {
