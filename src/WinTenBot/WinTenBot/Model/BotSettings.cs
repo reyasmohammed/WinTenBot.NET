@@ -24,6 +24,7 @@ namespace WinTenBot.Model
 
             GoogleCloudCredentialsPath = GlobalConfiguration["GoogleCloud:CredentialsPath"];
             
+            HangfireMysqlDb = GlobalConfiguration["Hangfire:MySql"];
             HangfireSqliteDb = GlobalConfiguration["Hangfire:Sqlite"];
             HangfireLiteDb = GlobalConfiguration["Hangfire:LiteDb"];
 
@@ -75,6 +76,7 @@ namespace WinTenBot.Model
 
         public static string GoogleCloudCredentialsPath { get; set; }
 
+        public static string HangfireMysqlDb { get; set; }
         public static string HangfireSqliteDb { get; set; }
         public static string HangfireLiteDb { get; set; }
 
