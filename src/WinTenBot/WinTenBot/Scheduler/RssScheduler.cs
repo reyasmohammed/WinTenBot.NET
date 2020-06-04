@@ -3,6 +3,7 @@ using Hangfire;
 using Serilog;
 using WinTenBot.Model;
 using WinTenBot.Services;
+using WinTenBot.Telegram;
 using WinTenBot.Text;
 using WinTenBot.Tools;
 
@@ -16,16 +17,17 @@ namespace WinTenBot.Scheduler
             {
                 Log.Information("Initializing RSS Scheduler.");
 
-                var baseId = "rss-scheduler";
+                var baseId = "rss";
                 var cronInMinute = 5;
                 var rssService = new RssService();
 
                 Log.Information("Getting list Chat ID");
-                var listChatId = await rssService.GetListChatIdAsync();
+                var listChatId = await rssService.GetListChatIdAsync()
+                    .ConfigureAwait(false);
                 foreach (RssSetting row in listChatId)
                 {
-                    var chatId = row.ChatId.ToInt64();
-                    var recurringId = $"{chatId}-{baseId}";
+                    var chatId = row.ChatId.ToInt64().ReduceChatId();
+                    var recurringId = $"{baseId}-{chatId}";
 
                     Log.Information($"Creating Jobs for {chatId}");
 
