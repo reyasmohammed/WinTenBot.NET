@@ -12,6 +12,9 @@ namespace WinTenBot.Scheduler
             StartLogCleanupScheduler();
             // StartLogglyCleanup();
             StartSyncWordFilter();
+            // StartSyncGlobalBanToLocal();
+            
+            RssScheduler.InitScheduler();
         }
 
         public static void StopScheduler()
@@ -21,30 +24,31 @@ namespace WinTenBot.Scheduler
 
         private static void StartLogCleanupScheduler()
         {
-            var jobId = "cron-logfile-cleanup";
+            var jobId = "logfile-cleanup";
 
             Log.Debug($"Starting cron Log Cleaner with id {jobId}");
-
+            RecurringJob.RemoveIfExists(jobId);
             RecurringJob.AddOrUpdate(jobId, () => Health.ClearLog(), Cron.Hourly);
             RecurringJob.Trigger(jobId);
         }
 
         private static void StartLogglyCleanup()
         {
-            const string jobId = "cron-loggly-cleanup";
+            const string jobId = "loggly-cleanup";
             const string storageCaches = "Storage/Caches";
             
             Log.Debug($"Starting cron Loggly Cache Cleaner with id {jobId}");
-
+            RecurringJob.RemoveIfExists(jobId);
             RecurringJob.AddOrUpdate(jobId, () => storageCaches.ClearLogs("Loggly",false), Cron.Hourly);
             RecurringJob.Trigger(jobId);
         }
 
         private static void StartSyncWordFilter()
         {
-            const string jobId = "cron-sync-word-filter";
+            const string jobId = "sync-word-filter";
             
             Log.Debug("Starting cron Sync Word Filter to Local Storage");
+            RecurringJob.RemoveIfExists(jobId);
             RecurringJob.AddOrUpdate(jobId, () => Sync.SyncWordToLocalAsync(), Cron.Minutely);
             RecurringJob.Trigger(jobId);
         }
