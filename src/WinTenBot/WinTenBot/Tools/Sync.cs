@@ -21,7 +21,8 @@ namespace WinTenBot.Tools
             var localHistory = await queryBase
                 .WhereLike("created_at", $"%{prevDate}%")
                 .ExecForSqLite()
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             var mappedHistory = localHistory.ToJson().MapObject<List<RssHistory>>();
             Log.Information($"RSS History {prevDate} {mappedHistory.Count}");
@@ -57,7 +58,8 @@ namespace WinTenBot.Tools
                             $"(url, rss_source, chat_id, title, publish_date, author, created_at) " +
                             $"VALUES {valuesInsert.MkJoin(", ")}";
 
-            await sqlInsert.ExecForMysqlNonQueryAsync(printSql: true);
+            await sqlInsert.ExecForMysqlNonQueryAsync(printSql: true)
+                .ConfigureAwait(false);
 
             // queryBase.ExecForMysql()
 
@@ -67,24 +69,25 @@ namespace WinTenBot.Tools
         public static async Task SyncGBanToLocalAsync(bool cleanSync = false)
         {
             Log.Information("Getting FBam data..");
-            var cloudQuery = await new Query("fbans")
+            var cloudQuery = await new Query("global_bans")
                 .ExecForMysql()
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
-            var mappedQuery = cloudQuery.ToJson(followProperty:true).MapObject<List<GlobalBanData>>();
-
+            var mappedQuery = cloudQuery.ToJson(followProperty: true).MapObject<List<GlobalBanData>>();
             Log.Information($"Gban User: {mappedQuery.Count} rows");
-            
+
             var valuesBuilder = new List<string>();
             foreach (var globalBan in mappedQuery)
             {
-                var values = new List<string>();
-                values.Add($"'{globalBan.UserId}'");
-                values.Add($"'{globalBan.ReasonBan.SqlEscape().RemoveThisChar("[]'")}'");
-
-                values.Add($"'{globalBan.BannedBy}'");
-                values.Add($"'{globalBan.BannedFrom}'");
-                values.Add($"'{globalBan.CreatedAt}'");
+                var values = new List<string>
+                {
+                    $"'{globalBan.UserId}'",
+                    $"'{globalBan.ReasonBan.SqlEscape().RemoveThisChar("[]'")}'",
+                    $"'{globalBan.BannedBy}'",
+                    $"'{globalBan.BannedFrom}'",
+                    $"'{globalBan.CreatedAt}'"
+                };
 
                 valuesBuilder.Add($"({values.MkJoin(", ")})");
             }
@@ -102,9 +105,10 @@ namespace WinTenBot.Tools
                 var insertSql = $"INSERT INTO fban_user {insertCols} VALUES \n{values}";
 
                 Log.Information($"Insert part {step++}");
-                await insertSql.ExecForSqLite(true);
+                await insertSql.ExecForSqLite(true)
+                    .ConfigureAwait(false);
             }
-  
+
 
             // foreach (var globalBan in mappedQuery)
             // {
@@ -120,10 +124,11 @@ namespace WinTenBot.Tools
             //         .InsertAsync(data);
             // }
 
-            await "fban_user".DeleteDuplicateRow("user_id");
+            await "fban_user".DeleteDuplicateRow("user_id")
+                .ConfigureAwait(false);
         }
-        
-        
+
+
         public static async Task SyncWordToLocalAsync()
         {
             Log.Information("Getting data from MySql");
@@ -133,7 +138,7 @@ namespace WinTenBot.Tools
                 .ConfigureAwait(false);
 
             var cloudWords = cloudQuery.ToJson().MapObject<List<WordFilter>>();
-            
+
             var localQuery = await new Query("word_filter")
                 .ExecForSqLite(true)
                 .GetAsync()
@@ -169,7 +174,7 @@ namespace WinTenBot.Tools
                     .InsertAsync(data)
                     .ConfigureAwait(false);
             }
-            
+
             Log.Information($"Synced {cloudQuery.Count()} row(s)");
         }
     }
