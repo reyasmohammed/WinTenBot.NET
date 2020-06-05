@@ -14,7 +14,7 @@ namespace WinTenBot.IO
 
         public static async Task WriteCacheAsync(this object data, string fileJson, bool indented = true)
         {
-            var filePath = Directory.EnsureDirectory($"{workingDir}/{fileJson}");
+            var filePath = Dirs.EnsureDirectory($"{workingDir}/{fileJson}");
             var json = data.ToJson(indented);
             
             await json.ToFile(filePath);
