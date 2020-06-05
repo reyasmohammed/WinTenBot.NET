@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
+using WinTenBot.Common;
 using WinTenBot.Services;
-using WinTenBot.Text;
 
 namespace WinTenBot.Handlers.Commands.Tags
 {

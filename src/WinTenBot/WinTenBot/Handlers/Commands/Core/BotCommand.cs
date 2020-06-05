@@ -1,9 +1,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
+using WinTenBot.Common;
 using WinTenBot.Services;
 using WinTenBot.Telegram;
-using WinTenBot.Text;
 using WinTenBot.Tools;
 
 namespace WinTenBot.Handlers.Commands.Core

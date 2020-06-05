@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using EasyEncrypt2;
 using Serilog;
 
-namespace WinTenBot.Helpers
+namespace WinTenBot.Common
 {
     public static class EncryptionHelper
     {

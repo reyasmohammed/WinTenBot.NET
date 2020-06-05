@@ -4,10 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Framework.Abstractions;
-using WinTenBot.Helpers;
+using WinTenBot.Common;
 using WinTenBot.Services;
 using WinTenBot.Telegram;
-using WinTenBot.Text;
 
 namespace WinTenBot.Handlers.Commands.Notes
 {

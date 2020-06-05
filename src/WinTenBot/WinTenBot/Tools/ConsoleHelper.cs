@@ -1,7 +1,7 @@
 ﻿using System;
 using Serilog;
 
-namespace WinTenBot.Helpers
+namespace WinTenBot.Tools
 {
     [Obsolete("Please use Serilog directly.")]
     public static class ConsoleHelper

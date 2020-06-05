@@ -7,7 +7,7 @@ using WinTenBot.IO;
 using WinTenBot.Model.Lmao;
 using CovidAll = WinTenBot.Model.CovidAll;
 
-namespace WinTenBot.Helpers
+namespace WinTenBot.Tools
 {
     public static class Covid
     {

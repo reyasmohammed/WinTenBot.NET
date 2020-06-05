@@ -8,13 +8,12 @@ using SqlKata;
 using SqlKata.Execution;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
+using WinTenBot.Common;
 using WinTenBot.Model;
 using WinTenBot.Providers;
 using WinTenBot.Services;
-using WinTenBot.Telegram;
-using WinTenBot.Text;
 
-namespace WinTenBot.Helpers
+namespace WinTenBot.Telegram
 {
     public static class Members
     {

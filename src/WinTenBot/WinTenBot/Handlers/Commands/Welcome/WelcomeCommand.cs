@@ -4,10 +4,9 @@ using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
+using WinTenBot.Common;
 using WinTenBot.Enums;
-using WinTenBot.Helpers;
 using WinTenBot.Services;
-using WinTenBot.Text;
 
 namespace WinTenBot.Handlers.Commands.Welcome
 {

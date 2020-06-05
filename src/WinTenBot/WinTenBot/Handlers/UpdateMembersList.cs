@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Framework.Abstractions;
-using WinTenBot.Helpers;
 
 namespace WinTenBot.Handlers
 {

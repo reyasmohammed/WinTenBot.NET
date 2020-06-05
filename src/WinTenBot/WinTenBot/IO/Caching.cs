@@ -4,8 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
 using Serilog;
-using WinTenBot.Helpers;
-using WinTenBot.Text;
+using WinTenBot.Common;
 
 namespace WinTenBot.IO
 {

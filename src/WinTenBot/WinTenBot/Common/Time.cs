@@ -1,7 +1,7 @@
 ﻿using System;
 using Serilog;
 
-namespace WinTenBot.Helpers
+namespace WinTenBot.Common
 {
     public static class Time
     {

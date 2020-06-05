@@ -7,10 +7,10 @@ using Microsoft.ML.Data;
 using Serilog;
 using SqlKata;
 using SqlKata.Execution;
+using WinTenBot.Common;
 using WinTenBot.Model;
 using WinTenBot.Providers;
 using WinTenBot.Services;
-using WinTenBot.Text;
 
 namespace WinTenBot.Tools
 {

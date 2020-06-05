@@ -7,9 +7,9 @@ using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using WinTenBot.Common;
 using WinTenBot.Model;
 using WinTenBot.Services;
-using WinTenBot.Text;
 using sysIO = System.IO;
 
 namespace WinTenBot.Handlers.Commands.Additional

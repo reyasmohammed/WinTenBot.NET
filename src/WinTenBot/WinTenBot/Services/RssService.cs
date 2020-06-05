@@ -5,10 +5,10 @@ using Serilog;
 using SqlKata;
 using SqlKata.Execution;
 using Telegram.Bot.Types;
-using WinTenBot.Helpers;
+using WinTenBot.Common;
 using WinTenBot.Model;
 using WinTenBot.Providers;
-using WinTenBot.Text;
+using WinTenBot.Tools;
 
 namespace WinTenBot.Services
 {

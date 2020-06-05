@@ -7,13 +7,12 @@ using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
+using WinTenBot.Common;
 using WinTenBot.Enums;
-using WinTenBot.Helpers;
 using WinTenBot.Model;
 using WinTenBot.Providers;
 using WinTenBot.Services;
 using WinTenBot.Telegram;
-using WinTenBot.Text;
 
 namespace WinTenBot.Handlers.Events
 {

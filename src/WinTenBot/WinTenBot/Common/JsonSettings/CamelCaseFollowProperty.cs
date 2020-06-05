@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace WinTenBot.Helpers.JsonSettings
+namespace WinTenBot.Common.JsonSettings
 {
     public class CamelCaseFollowProperty:CamelCasePropertyNamesContractResolver
     {

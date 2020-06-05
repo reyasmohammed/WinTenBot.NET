@@ -4,7 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 
-namespace WinTenBot.Text
+namespace WinTenBot.Common
 {
     public static class Convert
     {

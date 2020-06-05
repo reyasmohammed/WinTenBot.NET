@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Flurl.Http;
 using Newtonsoft.Json;
 using Serilog;
+using WinTenBot.Common;
 using WinTenBot.Model;
-using WinTenBot.Text;
 
 namespace WinTenBot.Tools.Ocr
 {

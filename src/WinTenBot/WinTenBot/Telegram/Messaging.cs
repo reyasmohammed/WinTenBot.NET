@@ -8,12 +8,12 @@ using SqlKata.Execution;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
+using WinTenBot.Common;
 using WinTenBot.Enums;
 using WinTenBot.IO;
 using WinTenBot.Model;
 using WinTenBot.Providers;
 using WinTenBot.Services;
-using WinTenBot.Text;
 using WinTenBot.Tools;
 
 namespace WinTenBot.Telegram

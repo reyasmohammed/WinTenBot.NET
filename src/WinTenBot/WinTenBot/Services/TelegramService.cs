@@ -10,12 +10,11 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
+using WinTenBot.Common;
 using WinTenBot.Enums;
-using WinTenBot.Helpers;
 using WinTenBot.IO;
 using WinTenBot.Model;
 using WinTenBot.Telegram;
-using WinTenBot.Text;
 using File = System.IO.File;
 
 namespace WinTenBot.Services

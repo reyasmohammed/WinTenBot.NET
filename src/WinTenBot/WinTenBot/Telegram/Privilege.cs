@@ -5,9 +5,9 @@ using Microsoft.Extensions.Configuration;
 using Serilog;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using WinTenBot.Common;
 using WinTenBot.Model;
 using WinTenBot.Services;
-using WinTenBot.Text;
 
 namespace WinTenBot.Telegram
 {
