@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Serilog;
+using WinTenBot.Common;
 using WinTenBot.Services;
-using WinTenBot.Text;
 
 namespace WinTenBot.Telegram
 {

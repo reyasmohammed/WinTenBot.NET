@@ -2,9 +2,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
+using WinTenBot.Common;
 using WinTenBot.Services;
 using WinTenBot.Telegram;
-using WinTenBot.Text;
 
 namespace WinTenBot.Handlers.Commands.Words
 {

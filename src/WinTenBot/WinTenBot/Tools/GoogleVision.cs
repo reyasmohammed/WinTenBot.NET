@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using Google.Cloud.Vision.V1;
 using Serilog;
+using WinTenBot.Common;
 using WinTenBot.IO;
 using WinTenBot.Model;
-using WinTenBot.Text;
 
 namespace WinTenBot.Tools
 {

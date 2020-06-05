@@ -6,9 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Types.ReplyMarkups;
-using WinTenBot.Helpers;
 
-namespace WinTenBot.Text
+namespace WinTenBot.Common
 {
     public static class Keyboard
     {

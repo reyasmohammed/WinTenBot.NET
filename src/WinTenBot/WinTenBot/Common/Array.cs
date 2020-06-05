@@ -3,7 +3,7 @@ using System.Data;
 using System.Linq;
 using Serilog;
 
-namespace WinTenBot.Text
+namespace WinTenBot.Common
 {
     public static class Array
     {

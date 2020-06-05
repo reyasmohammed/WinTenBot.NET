@@ -1,4 +1,4 @@
-﻿using WinTenBot.Text;
+﻿using WinTenBot.Common;
 
 namespace WinTenBot.Telegram
 {

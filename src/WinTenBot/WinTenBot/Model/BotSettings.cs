@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Telegram.Bot;
+using WinTenBot.Common;
 using WinTenBot.IO;
-using WinTenBot.Text;
 
 namespace WinTenBot.Model
 {

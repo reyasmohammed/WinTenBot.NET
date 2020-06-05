@@ -6,9 +6,9 @@ using Serilog;
 using SqlKata;
 using SqlKata.Execution;
 using Telegram.Bot.Types;
+using WinTenBot.Common;
 using WinTenBot.IO;
 using WinTenBot.Providers;
-using WinTenBot.Text;
 
 namespace WinTenBot.Services
 {

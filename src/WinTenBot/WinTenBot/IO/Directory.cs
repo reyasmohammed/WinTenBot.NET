@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Serilog;
-using WinTenBot.Text;
+using WinTenBot.Common;
 using sysIO = System.IO;
 
 namespace WinTenBot.IO

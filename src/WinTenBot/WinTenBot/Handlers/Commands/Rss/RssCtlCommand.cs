@@ -2,10 +2,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Framework.Abstractions;
+using WinTenBot.Common;
 using WinTenBot.Scheduler;
 using WinTenBot.Services;
 using WinTenBot.Telegram;
-using WinTenBot.Text;
 
 namespace WinTenBot.Handlers.Commands.Rss
 {

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using CodeHollow.FeedReader;
 using Serilog;
 
-namespace WinTenBot.Text
+namespace WinTenBot.Common
 {
     public static class String
     {

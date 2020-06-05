@@ -1,9 +1,9 @@
 ﻿using System.Data;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using WinTenBot.Helpers.JsonSettings;
+using WinTenBot.Common.JsonSettings;
 
-namespace WinTenBot.Text
+namespace WinTenBot.Common
 {
     public static class Json
     {

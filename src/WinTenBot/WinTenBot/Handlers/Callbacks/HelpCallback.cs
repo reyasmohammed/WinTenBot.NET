@@ -1,8 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Serilog;
-using WinTenBot.Helpers;
+using WinTenBot.Common;
 using WinTenBot.Services;
-using WinTenBot.Text;
 
 namespace WinTenBot.Handlers.Callbacks
 {

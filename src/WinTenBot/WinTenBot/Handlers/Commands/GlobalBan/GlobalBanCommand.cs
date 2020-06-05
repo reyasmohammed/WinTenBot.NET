@@ -3,10 +3,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Framework.Abstractions;
+using WinTenBot.Common;
 using WinTenBot.Model;
 using WinTenBot.Services;
 using WinTenBot.Telegram;
-using WinTenBot.Text;
 using WinTenBot.Tools;
 
 namespace WinTenBot.Handlers.Commands.GlobalBan

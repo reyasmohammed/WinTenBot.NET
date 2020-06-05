@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 
-namespace WinTenBot.Text
+namespace WinTenBot.Common
 {
     public static class Docs
     {

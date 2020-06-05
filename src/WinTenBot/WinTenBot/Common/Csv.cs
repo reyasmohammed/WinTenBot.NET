@@ -6,7 +6,7 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using Serilog;
 
-namespace WinTenBot.Text
+namespace WinTenBot.Common
 {
     public static class Csv
     {

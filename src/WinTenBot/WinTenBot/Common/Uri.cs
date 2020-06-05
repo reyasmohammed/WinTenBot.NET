@@ -5,7 +5,7 @@ using Serilog;
 using WinTenBot.IO;
 using WinTenBot.Model;
 
-namespace WinTenBot.Text
+namespace WinTenBot.Common
 {
     public static class Uri
     {

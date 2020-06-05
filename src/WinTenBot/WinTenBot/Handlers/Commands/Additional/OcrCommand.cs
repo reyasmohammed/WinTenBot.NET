@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Framework.Abstractions;
+using WinTenBot.Common;
 using WinTenBot.IO;
 using WinTenBot.Services;
-using WinTenBot.Text;
 using WinTenBot.Tools;
 
 namespace WinTenBot.Handlers.Commands.Additional

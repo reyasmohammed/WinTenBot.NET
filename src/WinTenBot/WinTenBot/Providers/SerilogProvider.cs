@@ -3,8 +3,8 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.Datadog.Logs;
 using Serilog.Sinks.SystemConsole.Themes;
+using WinTenBot.Common;
 using WinTenBot.Model;
-using WinTenBot.Text;
 
 namespace WinTenBot.Providers
 {

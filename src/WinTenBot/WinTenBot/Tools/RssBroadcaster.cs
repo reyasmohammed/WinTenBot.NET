@@ -8,10 +8,9 @@ using CodeHollow.FeedReader;
 using Serilog;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types.Enums;
-using WinTenBot.Helpers;
+using WinTenBot.Common;
 using WinTenBot.Model;
 using WinTenBot.Services;
-using WinTenBot.Text;
 
 namespace WinTenBot.Tools
 {

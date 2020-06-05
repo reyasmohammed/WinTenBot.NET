@@ -2,8 +2,8 @@
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
 using Telegram.Bot.Types.Enums;
-using WinTenBot.Helpers;
 using WinTenBot.Services;
+using WinTenBot.Telegram;
 
 namespace WinTenBot.Handlers.Commands.Group
 {

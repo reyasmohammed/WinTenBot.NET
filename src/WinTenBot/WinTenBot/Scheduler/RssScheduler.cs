@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Hangfire;
 using Serilog;
+using WinTenBot.Common;
 using WinTenBot.Model;
 using WinTenBot.Services;
 using WinTenBot.Telegram;
-using WinTenBot.Text;
 using WinTenBot.Tools;
 
 namespace WinTenBot.Scheduler
