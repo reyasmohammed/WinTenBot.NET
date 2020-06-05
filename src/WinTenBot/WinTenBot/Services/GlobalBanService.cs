@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
@@ -41,7 +42,7 @@ namespace WinTenBot.Services
                 .Where(where)
                 .GetAsync()
                 .ConfigureAwait(false);
-            
+
             var isBan = query.Any();
             Log.Information($"{userId} IsBan: {isBan}");
 
@@ -70,7 +71,8 @@ namespace WinTenBot.Services
 
         public async Task<bool> IsExistInCache(int userId)
         {
-            var data = await ReadCacheAsync();
+            var data = await ReadCacheAsync()
+                .ConfigureAwait(false);
             DataTable filtered = new DataTable(null);
 
             Log.Information($"Checking {userId} in Global Ban Cache");
@@ -85,12 +87,14 @@ namespace WinTenBot.Services
             return filtered.Rows.Count > 0;
         }
 
+        [Obsolete("Please use GlobalBan model as parameter.")]
         public async Task<bool> SaveBanAsync(Dictionary<string, object> data)
         {
             Log.Information($"Inserting new data for {_message.Chat.Id}");
             var query = await new Query(fbanTable)
                 .ExecForMysql(true)
-                .InsertAsync(data);
+                .InsertAsync(data)
+                .ConfigureAwait(false);
 
             return query > 0;
             // return await Insert(fbanTable, data);
@@ -126,7 +130,8 @@ namespace WinTenBot.Services
             var delete = await new Query(fbanTable)
                 .ExecForMysql(true)
                 .Where(where)
-                .DeleteAsync();
+                .DeleteAsync()
+                .ConfigureAwait(false);
 
             return delete > 0;
             // return await Delete(fbanTable, where);
@@ -136,7 +141,8 @@ namespace WinTenBot.Services
         {
             var query = await new Query(fbanTable)
                 .ExecForMysql(true)
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             var data = query.ToJson().MapObject<DataTable>();
             // var sql = $"SELECT * FROM {fbanTable}";
@@ -146,15 +152,18 @@ namespace WinTenBot.Services
 
         public async Task UpdateCacheAsync()
         {
-            var data = await GetGlobalBanAll();
+            var data = await GetGlobalBanAll()
+                .ConfigureAwait(false);
 
             Log.Information($"Updating Global Ban caches to {fileJson}");
-            await data.WriteCacheAsync(fileJson);
+            await data.WriteCacheAsync(fileJson)
+                .ConfigureAwait(false);
         }
 
         public async Task<DataTable> ReadCacheAsync()
         {
-            var dataTable = await fileJson.ReadCacheAsync<DataTable>();
+            var dataTable = await fileJson.ReadCacheAsync<DataTable>()
+                .ConfigureAwait(false);
             return dataTable;
         }
     }
