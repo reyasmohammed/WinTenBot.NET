@@ -95,7 +95,7 @@ namespace WinTenBot.Telegram
         {
             return BotSettings.Clients[name];
         }
-
+        
         public static async Task ClearLog()
         {
             try
@@ -122,11 +122,15 @@ namespace WinTenBot.Telegram
                     {
                         var filePath = fileInfo.FullName;
                         Log.Information($"Uploading file {filePath}");
-                        var fileStream = File.OpenRead(filePath);
+                        await using var fileStream = File.OpenRead(filePath);
 
                         var media = new InputOnlineFile(fileStream, fileInfo.Name);
-                        await botClient.SendDocumentAsync(channelTarget, media);
+                        await botClient.SendDocumentAsync(channelTarget, media)
+                            .ConfigureAwait(false);
 
+                        fileStream.Close();
+                        await fileStream.DisposeAsync().ConfigureAwait(false);
+                        
                         filePath.DeleteFile();
                     }
                 }
@@ -173,10 +177,16 @@ namespace WinTenBot.Telegram
                             var fileStream = File.OpenRead(filePath);
 
                             var media = new InputOnlineFile(fileStream, fileInfo.Name);
-                            await botClient.SendDocumentAsync(channelTarget, media);
+                            await botClient.SendDocumentAsync(channelTarget, media)
+                                .ConfigureAwait(false);
+
+                            fileStream.Close();
+                            await fileStream.DisposeAsync().ConfigureAwait(false);
                         }
 
-                        filePath.DeleteFile();
+                        var old = filePath + ".old";
+                        File.Move(filePath, old);
+                        old.DeleteFile();
                     }
                 }
                 else
