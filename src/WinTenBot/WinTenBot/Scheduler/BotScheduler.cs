@@ -1,7 +1,7 @@
-﻿using sysIO = System.IO;
+﻿using System.IO;
 using Hangfire;
 using Serilog;
-using WinTenBot.Telegram;
+using WinTenBot.IO;
 using WinTenBot.Tools;
 
 namespace WinTenBot.Scheduler
@@ -25,22 +25,24 @@ namespace WinTenBot.Scheduler
         private static void StartLogCleanupScheduler()
         {
             var jobId = "logfile-cleanup";
-            var path = sysIO.Path.Combine("Storage", "Logs");
+            var path = Path.Combine("Storage", "Logs");
 
             Log.Debug($"Starting cron Log Cleaner with id {jobId}");
             RecurringJob.RemoveIfExists(jobId);
-            RecurringJob.AddOrUpdate(jobId, () => path.ClearLogs("Zizi", true), Cron.Hourly);
+            RecurringJob.AddOrUpdate(jobId, () =>
+                path.ClearLogs("Zizi", true), Cron.Hourly);
             RecurringJob.Trigger(jobId);
         }
 
         private static void StartLogglyCleanup()
         {
             const string jobId = "loggly-cleanup";
-            const string storageCaches = "Storage/Caches";
+            string storageCaches = Path.Combine("Storage", "Caches");
 
             Log.Debug($"Starting cron Loggly Cache Cleaner with id {jobId}");
             RecurringJob.RemoveIfExists(jobId);
-            RecurringJob.AddOrUpdate(jobId, () => storageCaches.ClearLogs("Loggly", false), Cron.Hourly);
+            RecurringJob.AddOrUpdate(jobId, () =>
+                storageCaches.ClearLogs("Loggly", false), Cron.Hourly);
             RecurringJob.Trigger(jobId);
         }
 
@@ -50,7 +52,8 @@ namespace WinTenBot.Scheduler
 
             Log.Debug("Starting cron Sync Word Filter to Local Storage");
             RecurringJob.RemoveIfExists(jobId);
-            RecurringJob.AddOrUpdate(jobId, () => Sync.SyncWordToLocalAsync(), Cron.Minutely);
+            RecurringJob.AddOrUpdate(jobId, () =>
+                Sync.SyncWordToLocalAsync(), Cron.Minutely);
             RecurringJob.Trigger(jobId);
         }
     }
