@@ -1,20 +1,20 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using Serilog;
 using WinTenBot.Common;
-using sysIO = System.IO;
 
 namespace WinTenBot.IO
 {
-    public static class Directory
+    public static class Dirs
     {
         public static string EnsureDirectory(this string dirPath)
         {
             Log.Information($"EnsuringDir of {dirPath}");
 
-            var path = sysIO.Path.GetDirectoryName(dirPath);
+            var path = Path.GetDirectoryName(dirPath);
             if (!path.IsNullOrEmpty())
-                sysIO.Directory.CreateDirectory(path);
+                Directory.CreateDirectory(path);
 
             return dirPath;
         }
@@ -23,16 +23,16 @@ namespace WinTenBot.IO
         {    
             long size = 0;
 
-            var d = new sysIO.DirectoryInfo(path);
+            var d = new DirectoryInfo(path);
             // Add file sizes.
-            sysIO.FileInfo[] fis = d.GetFiles();
-            foreach (sysIO.FileInfo fi in fis) 
+            var fis = d.GetFiles();
+            foreach (var fi in fis) 
             {      
                 size += fi.Length;    
             }
             // Add subdirectory sizes.
-            sysIO.DirectoryInfo[] dis = d.GetDirectories();
-            foreach (sysIO.DirectoryInfo di in dis) 
+            var dis = d.GetDirectories();
+            foreach (var di in dis) 
             {
                 size += DirSize(path);   
             }
@@ -47,18 +47,18 @@ namespace WinTenBot.IO
 
         public static string GetDirectory(this string path)
         {
-            return sysIO.Path.GetDirectoryName(path) ?? path;
+            return Path.GetDirectoryName(path) ?? path;
         }
 
         public static void RemoveFiles(this string path, string filter)
         {
             Log.Information($"Deleting files in {path}");
-            var files = sysIO.Directory.GetFiles(path)
+            var files = Directory.GetFiles(path)
                 .Where(file => file.Contains(filter, StringComparison.CurrentCulture));
             
-            foreach (string file in files)
+            foreach (var file in files)
             {
-                sysIO.File.Delete(file);
+                File.Delete(file);
             }
         }
     }

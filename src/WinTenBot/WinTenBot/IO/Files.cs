@@ -1,21 +1,21 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Serilog;
 using WinTenBot.Model;
-using SysIO = System.IO;
 
 namespace WinTenBot.IO
 {
-    public static class File
+    public static class Files
     {
         public static void DeleteFile(this string filePath)
         {
-            if (!SysIO.File.Exists(filePath)) return;
+            if (!File.Exists(filePath)) return;
 
             try
             {
                 Log.Information($"Deleting {filePath}");
-                SysIO.File.Delete(filePath);
+                File.Delete(filePath);
 
                 Log.Information($"File {filePath} deleted successfully");
             }
@@ -32,7 +32,7 @@ namespace WinTenBot.IO
             filePath = $"{cachePath}/{filePath}";
             Log.Information($"Writing content to {filePath}");
 
-            SysIO.Path.GetDirectoryName(filePath).EnsureDirectory();
+            Path.GetDirectoryName(filePath).EnsureDirectory();
 
             await System.IO.File.WriteAllTextAsync(filePath, content)
                 .ConfigureAwait(false);
@@ -47,7 +47,7 @@ namespace WinTenBot.IO
             filePath = $"{cachePath}/{filePath}";
             Log.Information($"Writing content to {filePath}");
 
-            SysIO.Path.GetDirectoryName(filePath).EnsureDirectory();
+            Path.GetDirectoryName(filePath).EnsureDirectory();
 
             System.IO.File.WriteAllText(filePath, content);
             Log.Information("Writing file success..");
