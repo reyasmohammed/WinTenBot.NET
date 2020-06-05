@@ -19,6 +19,7 @@ namespace WinTenBot.Providers
             var flushInterval = TimeSpan.FromSeconds(1);
             var rollingInterval = RollingInterval.Day;
             var datadogKey = BotSettings.DatadogApiKey;
+            var rollingFile = 50 * 1024 * 1024;
 
             var serilogConfig = new LoggerConfiguration()
                 .MinimumLevel.Debug()
@@ -28,7 +29,7 @@ namespace WinTenBot.Providers
                 .Enrich.FromLogContext()
                 .WriteTo.Console(theme: SystemConsoleTheme.Colored, outputTemplate: outputTemplate)
                 .WriteTo.File(logPath, rollingInterval: rollingInterval, flushToDiskInterval: flushInterval,
-                    retainedFileCountLimit: 7);
+                    shared: true, fileSizeLimitBytes: rollingFile);
 
             if (datadogKey != "YOUR_API_KEY" || datadogKey.IsNotNullOrEmpty())
             {
