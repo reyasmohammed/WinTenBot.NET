@@ -131,25 +131,26 @@ namespace WinTenBot.Tools
 
         public static async Task SyncWordToLocalAsync()
         {
-            Log.Information("Getting data from MySql");
+            // Log.Information("Getting data from MySql");
             var cloudQuery = await new Query("word_filter")
-                .ExecForMysql(true)
+                .ExecForMysql()
                 .GetAsync()
                 .ConfigureAwait(false);
 
             var cloudWords = cloudQuery.ToJson().MapObject<List<WordFilter>>();
 
             var localQuery = await new Query("word_filter")
-                .ExecForSqLite(true)
+                .ExecForSqLite()
                 .GetAsync()
                 .ConfigureAwait(false);
 
             if (cloudQuery.Count() == localQuery.Count())
             {
-                Log.Information("Seem not need sync words to Local storage");
+                // Log.Information("Seem not need sync words to Local storage");
                 return;
             }
 
+            Log.Information("Starting sync Words to Local");
             var clearData = await new Query("word_filter")
                 .ExecForSqLite(true)
                 .DeleteAsync()
