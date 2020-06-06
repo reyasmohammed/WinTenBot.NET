@@ -24,7 +24,8 @@ namespace WinTenBot.Tools
             var rssService = new RssService();
 
             Log.Information("Getting RSS settings..");
-            var rssSettings = await rssService.GetRssSettingsAsync(chatId);
+            var rssSettings = await rssService.GetRssSettingsAsync(chatId)
+                .ConfigureAwait(false);
 
             var tasks = rssSettings.Select(async rssSetting =>
             {
@@ -35,71 +36,8 @@ namespace WinTenBot.Tools
                 Log.Information($"Processing {rssUrl} for {chatId}.");
                 try
                 {
-                    await ExecuteUrlAsync(chatId, rssUrl);
-
-                    // var rssFeeds = await FeedReader.ReadAsync(rssUrl);
-                    // var rssTitle = rssFeeds.Title;
-                    //
-                    // var castLimit = 1;
-                    // var castStep = 0;
-                    //
-                    // foreach (var rssFeed in rssFeeds.Items)
-                    // {
-                    //     // Prevent flood in first time;
-                    //     if (castLimit == castStep)
-                    //     {
-                    //         Log.Information($"Send stopped due limit {castLimit} for prevent flooding in first time");
-                    //         break;
-                    //     }
-                    //
-                    //     var titleLink = $"{rssTitle} - {rssFeed.Title}".MkUrl(rssFeed.Link);
-                    //     var category = rssFeed.Categories.MkJoin(", ");
-                    //     var sendText = $"{titleLink}" +
-                    //                    $"\nTags: {category}";
-                    //
-                    //     var where = new Dictionary<string, object>()
-                    //     {
-                    //         {"chat_id", chatId},
-                    //         {"url", rssFeed.Link}
-                    //     };
-                    //
-                    //     var isExist = await rssService.IsExistInHistory(where);
-                    //     if (!isExist)
-                    //     {
-                    //         Log.Information($"Sending feed to {chatId}");
-                    //
-                    //         try
-                    //         {
-                    //             await Bot.Client.SendTextMessageAsync(chatId, sendText, ParseMode.Html);
-                    //
-                    //             var data = new Dictionary<string, object>()
-                    //             {
-                    //                 {"url", rssFeed.Link},
-                    //                 {"rss_source", rssUrl},
-                    //                 {"chat_id", chatId},
-                    //                 {"title", rssFeed.Title},
-                    //                 {"publish_date", rssFeed.PublishingDate.ToString()},
-                    //                 {"author", rssFeed.Author},
-                    //                 {"created_at", DateTime.Now.ToString(CultureInfo.InvariantCulture)}
-                    //             };
-                    //
-                    //             Log.Information($"Writing to RSS History");
-                    //             await rssService.SaveRssHistoryAsync(data);
-                    //
-                    //             castStep++;
-                    //             newRssCount++;
-                    //         }
-                    //         catch (ChatNotFoundException chatNotFoundException)
-                    //         {
-                    //             Log.Information($"May Bot not added in {chatId}.");
-                    //             Log.Error(chatNotFoundException, "Chat Not Found");
-                    //         }
-                    //     }
-                    //     else
-                    //     {
-                    //         Log.Information($"This feed has sent to {chatId}");
-                    //     }
-                    // }
+                    await ExecuteUrlAsync(chatId, rssUrl)
+                        .ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -110,7 +48,7 @@ namespace WinTenBot.Tools
                 // }
             });
 
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(tasks).ConfigureAwait(false);
 
             Log.Information($"RSS Scheduler finished. New RSS Count: {newRssCount}");
 
@@ -122,7 +60,8 @@ namespace WinTenBot.Tools
             int newRssCount = 0;
             var rssService = new RssService();
 
-            var rssFeeds = await FeedReader.ReadAsync(rssUrl);
+            var rssFeeds = await FeedReader.ReadAsync(rssUrl)
+                .ConfigureAwait(false);
             var rssTitle = rssFeeds.Title;
 
             // var castLimit = 10;
@@ -143,23 +82,24 @@ namespace WinTenBot.Tools
                     ["rss_source"] = rssUrl
                 };
 
-                var rssHistory = await rssService.GetRssHistory(whereHistory);
+                var rssHistory = await rssService.GetRssHistory(whereHistory)
+                    .ConfigureAwait(false);
                 var lastRssHistory = rssHistory.LastOrDefault();
 
-                if (rssHistory.Any())
+                if (!rssHistory.Any()) break;
+
+                var lastArticleDate = DateTime.Parse(lastRssHistory.PublishDate);
+                var currentArticleDate = rssFeed.PublishingDate.Value;
+
+                if (currentArticleDate < lastArticleDate)
                 {
-                    var lastArticleDate = DateTime.Parse(lastRssHistory.PublishDate);
-                    var currentArticleDate = rssFeed.PublishingDate.Value;
-                    
-                    if (currentArticleDate < lastArticleDate)
-                    {
-                        Log.Information($"Current article is older than last article. Stopped.");
-                        break;
-                    }
-                    
-                    Log.Information($"LastArticleDate: {lastArticleDate}");
-                    Log.Information($"CurrentArticleDate: {currentArticleDate}");
+                    Log.Information($"Current article is older than last article. Stopped.");
+                    break;
                 }
+
+                Log.Information($"LastArticleDate: {lastArticleDate}");
+                Log.Information($"CurrentArticleDate: {currentArticleDate}");
+
 
                 Log.Information("Prepare sending article.");
 
@@ -175,41 +115,47 @@ namespace WinTenBot.Tools
                     {"url", rssFeed.Link}
                 };
 
-                var isExist = await rssService.IsExistInHistory(where);
-                if (!isExist)
-                {
-                    Log.Information($"Sending feed to {chatId}");
-
-                    try
-                    {
-                        await BotSettings.Client.SendTextMessageAsync(chatId, sendText, ParseMode.Html);
-
-                        var data = new Dictionary<string, object>()
-                        {
-                            {"url", rssFeed.Link},
-                            {"rss_source", rssUrl},
-                            {"chat_id", chatId},
-                            {"title", rssFeed.Title},
-                            {"publish_date", rssFeed.PublishingDate.ToString()},
-                            {"author", rssFeed.Author},
-                            {"created_at", DateTime.Now.ToString(CultureInfo.InvariantCulture)}
-                        };
-
-                        Log.Information($"Writing to RSS History");
-                        await rssService.SaveRssHistoryAsync(data);
-
-                        // castStep++;
-                        newRssCount++;
-                    }
-                    catch (ChatNotFoundException chatNotFoundException)
-                    {
-                        Log.Information($"May Bot not added in {chatId}.");
-                        Log.Error(chatNotFoundException, "Chat Not Found");
-                    }
-                }
-                else
+                var isExist = await rssService.IsExistInHistory(where)
+                    .ConfigureAwait(false);
+                if (isExist)
                 {
                     Log.Information($"This feed has sent to {chatId}");
+                    break;
+                }
+
+                Log.Information($"Sending feed to {chatId}");
+
+                try
+                {
+                    await BotSettings.Client.SendTextMessageAsync(chatId, sendText, ParseMode.Html)
+                        .ConfigureAwait(false);
+
+                    var data = new Dictionary<string, object>()
+                    {
+                        {"url", rssFeed.Link},
+                        {"rss_source", rssUrl},
+                        {"chat_id", chatId},
+                        {"title", rssFeed.Title},
+                        {"publish_date", rssFeed.PublishingDate.ToString()},
+                        {"author", rssFeed.Author},
+                        {"created_at", DateTime.Now.ToString(CultureInfo.InvariantCulture)}
+                    };
+
+                    Log.Information($"Writing to RSS History");
+                    await rssService.SaveRssHistoryAsync(data)
+                        .ConfigureAwait(false);
+
+                    // castStep++;
+                    newRssCount++;
+                }
+                catch (ChatNotFoundException chatNotFoundException)
+                {
+                    Log.Information($"May Bot not added in {chatId}.");
+                    Log.Error(chatNotFoundException, "Chat Not Found");
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "RSS Broadcaster error");
                 }
             }
         }
@@ -217,7 +163,8 @@ namespace WinTenBot.Tools
         public static async Task<string> FindUrlFeed(this string url)
         {
             Log.Information($"Scanning {url} ..");
-            var urls = await FeedReader.GetFeedUrlsFromUrlAsync(url);
+            var urls = await FeedReader.GetFeedUrlsFromUrlAsync(url)
+                .ConfigureAwait(false);
             Log.Information($"UrlFeeds: {urls.ToJson()}");
 
             string feedUrl = "";
@@ -238,7 +185,8 @@ namespace WinTenBot.Tools
             bool isValid = false;
             try
             {
-                var feed = await FeedReader.ReadAsync(url);
+                var feed = await FeedReader.ReadAsync(url)
+                    .ConfigureAwait(false);
                 isValid = true;
             }
             catch (Exception ex)
