@@ -25,9 +25,22 @@ namespace WinTenBot
             context.Update.Message?.Text != null ||
             context.Update.EditedMessage?.Text != null;
 
-        public static bool NewCommand(IUpdateContext context) =>
-            context.Update.Message.Text.StartsWith("/");
-            // context.Update.Message?.Entities?.First()?.Type == MessageEntityType.BotCommand;
+        public static bool NewCommand(IUpdateContext context)
+        {
+            var isNewCommand = false;
+            if (context.Update.Message != null)
+            {
+                isNewCommand = context.Update.Message.Text.StartsWith("/");
+            }
+
+            if (context.Update.EditedMessage != null)
+            {
+                isNewCommand = context.Update.EditedMessage.Text.StartsWith("/");
+            }
+
+            return isNewCommand;
+        // return context.Update.Message?.Entities?.First()?.Type == MessageEntityType.BotCommand;
+        }
 
         public static bool PingReceived(IUpdateContext context) =>
             context.Update.Message?.Text.ToLower() == "ping" ||
