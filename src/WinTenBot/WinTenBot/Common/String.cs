@@ -209,5 +209,10 @@ namespace WinTenBot.Common
         {
             return str.Contains(filter);
         }
+
+        public static string ToLowerCase(this string str)
+        {
+            return str.ToLower(CultureInfo.CurrentCulture);
+        }
     }
 }
