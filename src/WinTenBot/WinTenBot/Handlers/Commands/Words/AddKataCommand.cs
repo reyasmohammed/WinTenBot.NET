@@ -8,7 +8,7 @@ using WinTenBot.Telegram;
 
 namespace WinTenBot.Handlers.Commands.Words
 {
-    public class WordFilterCommand : CommandBase
+    public class AddKataCommand : CommandBase
     {
         private TelegramService _telegramService;
         private WordFilterService _wordFilterService;
@@ -22,7 +22,7 @@ namespace WinTenBot.Handlers.Commands.Words
             var msg = context.Update.Message;
             var cleanedMsg = msg.Text.GetTextWithoutCmd();
             var partedMsg = cleanedMsg.Split(" ");
-            var paramOption = partedMsg.ValueOfIndex(1);
+            var paramOption = partedMsg.ValueOfIndex(1) ?? "";
             var word = partedMsg.ValueOfIndex(0);
             var isGlobalBlock = false;
 
@@ -46,7 +46,7 @@ namespace WinTenBot.Handlers.Commands.Words
                 if (paramOption.IsContains("g") && isSudoer) // Global
                 {
                     isGlobalBlock = true;
-                    await _telegramService.AppendTextAsync("Kata ini akan di blokir dengan mode Group-wide!")
+                    await _telegramService.AppendTextAsync("Kata ini akan di blokir Global!")
                         .ConfigureAwait(false);
                 }
 

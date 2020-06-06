@@ -89,7 +89,7 @@ namespace WinTenBot
             services.AddScoped<GlobalBanCommand>()
                 .AddScoped<DeleteBanCommand>();
 
-            services.AddScoped<WordFilterCommand>()
+            services.AddScoped<AddKataCommand>()
                 .AddScoped<WordSyncCommand>();
 
             services.AddScoped<PingHandler>()
@@ -262,6 +262,8 @@ namespace WinTenBot
                                 .UseWhen<PingHandler>(When.PingReceived)
                                 .UseWhen(When.NewCommand, cmdBranch => cmdBranch
                                     .UseCommand<AdminCommand>("admin")
+                                    .UseCommand<AddKataCommand>("wfil")
+                                    .UseCommand<AddKataCommand>("kata")
                                     .UseCommand<AddNotesCommand>("addfilter")
                                     .UseCommand<AfkCommand>("afk")
                                     .UseCommand<BanCommand>("ban")
@@ -314,7 +316,6 @@ namespace WinTenBot
                                     .UseCommand<WelcomeMessageCommand>("welmsg")
                                     .UseCommand<WelcomeButtonCommand>("welbtn")
                                     .UseCommand<WelcomeDocumentCommand>("weldoc")
-                                    .UseCommand<WordFilterCommand>("wfil")
                                     .UseCommand<WordSyncCommand>("wsync")
                                 )
                                 .Use<GenericMessageHandler>()
