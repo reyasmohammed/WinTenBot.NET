@@ -101,12 +101,12 @@ namespace WinTenBot.Telegram
                 var forCompare = word;
                 if (forCompare.IsValidUrl()) forCompare = forCompare.ParseUrl().Path;
 
-                foreach (WordFilter wordFilter in mappedWords)
+                foreach (var wordFilter in mappedWords)
                 {
-                    var forFilter = wordFilter.Word;
+                    var forFilter = wordFilter.Word.ToLowerCase().CleanExceptAlphaNumeric();
                     var isGlobal = wordFilter.IsGlobal;
                     var isDeep = wordFilter.DeepFilter;
-                    if (isDeep) forCompare = word.ToLower();
+                    forCompare = forCompare.ToLowerCase().CleanExceptAlphaNumeric();
 
                     if (forFilter == forCompare)
                     {
@@ -260,7 +260,8 @@ namespace WinTenBot.Telegram
                         inlineKeyboardMarkup = btnData.ToReplyMarkup(2);
                     }
 
-                    await telegramService.SendTextAsync(content, inlineKeyboardMarkup);
+                    await telegramService.SendTextAsync(content, inlineKeyboardMarkup)
+                        .ConfigureAwait(false);
 
                     foreach (var note in selectedNotes)
                     {
@@ -328,11 +329,13 @@ namespace WinTenBot.Telegram
 
                 if (typeData != MediaType.Unknown)
                 {
-                    await telegramService.SendMediaAsync(idData, typeData, content, buttonMarkup);
+                    await telegramService.SendMediaAsync(idData, typeData, content, buttonMarkup)
+                        .ConfigureAwait(false);
                 }
                 else
                 {
-                    await telegramService.SendTextAsync(content, buttonMarkup);
+                    await telegramService.SendTextAsync(content, buttonMarkup)
+                        .ConfigureAwait(false);
                 }
 
                 // await telegramProvider.SendTextAsync(content, buttonMarkup);
@@ -340,7 +343,8 @@ namespace WinTenBot.Telegram
 
             if (allTags > limitedCount)
             {
-                await telegramService.SendTextAsync("Due performance reason, we limit 5 batch call tags");
+                await telegramService.SendTextAsync("Due performance reason, we limit 5 batch call tags")
+                    .ConfigureAwait(false);
             }
         }
     }
