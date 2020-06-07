@@ -151,12 +151,6 @@ namespace WinTenBot.Common
             return System.String.Join(delim, obj.ToArray());
         }
 
-        public static string ToTitleCase(this string text)
-        {
-            var textInfo = new CultureInfo("en-US", false).TextInfo;
-            return textInfo.ToTitleCase(text.ToLower());
-        }
-
         public static string CleanExceptAlphaNumeric(this string str)
         {
             var arr = str.Where(c => (char.IsLetterOrDigit(c) ||
@@ -194,7 +188,7 @@ namespace WinTenBot.Common
             Regex r = new Regex(@"^\s+", RegexOptions.Multiline);
             return r.Replace(s, string.Empty);
         }
-        
+
         public static bool IsNullOrEmpty(this string str)
         {
             return string.IsNullOrEmpty(str);
@@ -213,6 +207,23 @@ namespace WinTenBot.Common
         public static string ToLowerCase(this string str)
         {
             return str.ToLower(CultureInfo.CurrentCulture);
+        }
+
+        public static string ToUpperCase(this string str)
+        {
+            return str.ToUpper(CultureInfo.CurrentCulture);
+        }
+
+        public static string ToTitleCase(this string text)
+        {
+            var textInfo = new CultureInfo("en-US", false).TextInfo;
+            return textInfo.ToTitleCase(text.ToLower());
+        }
+
+
+        public static string RemoveStrAfterFirst(this string str, string after)
+        {
+            return str.Substring(0, str.IndexOf(after, StringComparison.Ordinal) + 1);
         }
     }
 }
