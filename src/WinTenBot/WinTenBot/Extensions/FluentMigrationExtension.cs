@@ -2,9 +2,9 @@
 using FluentMigrator.Builders;
 using FluentMigrator.Infrastructure;
 
-namespace WinTenBot.Tools
+namespace WinTenBot.Extensions
 {
-    public static class FluentMigration
+    public static class FluentMigrationExtension
     {
         public static TNext AsMySqlText<TNext>(this IColumnTypeSyntax<TNext> createTableColumnAsTypeSyntax)
             where TNext : IFluentSyntax
