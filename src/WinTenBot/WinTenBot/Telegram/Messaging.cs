@@ -129,14 +129,15 @@ namespace WinTenBot.Telegram
                         var result = $"'{forCompare}' == '{forFilter}' ? {isMust}. Deep: {isDeep}, Global: {isGlobal}";
                         if (BotSettings.IsDevelopment) Log.Debug(result);
                     }
-                    
-                }
 
-                if (isMust)
-                {
-                    Log.Information("Break");
+                    if (!isMust) continue;
+                    Log.Information("Break check now!");
                     break;
                 }
+
+                if (!isMust) continue;
+                Log.Information("Should break!");
+                break;
             }
 
             return isMust;
