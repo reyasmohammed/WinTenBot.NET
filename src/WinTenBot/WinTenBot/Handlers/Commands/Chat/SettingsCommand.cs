@@ -20,18 +20,24 @@ namespace WinTenBot.Handlers.Commands.Chat
             _settingsService = new SettingsService(context.Update.Message);
             var message = _telegramService.Message;
 
-            await _telegramService.DeleteAsync(message.MessageId);
+            await _telegramService.DeleteAsync(message.MessageId)
+                .ConfigureAwait(false);
 
-            var adminOrPrivate = await _telegramService.IsAdminOrPrivateChat();
+            var adminOrPrivate = await _telegramService.IsAdminOrPrivateChat()
+                .ConfigureAwait(false);
             if (adminOrPrivate)
             {
-                await _telegramService.SendTextAsync("Sedang mengambil pengaturan..");
-                var settings = await _settingsService.GetSettingButtonByGroup();
+                await _telegramService.SendTextAsync("Sedang mengambil pengaturan..")
+                    .ConfigureAwait(false);
+                var settings = await _settingsService.GetSettingButtonByGroup()
+                    .ConfigureAwait(false);
 
-                var btnMarkup = await settings.ToJson().JsonToButton(chunk: 2);
+                var btnMarkup = await settings.ToJson().JsonToButton(chunk: 2)
+                    .ConfigureAwait(false);
                 Log.Debug($"Settings: {settings.Count}");
 
-                await _telegramService.EditAsync("Settings Toggles", btnMarkup);
+                await _telegramService.EditAsync("Settings Toggles", btnMarkup)
+                    .ConfigureAwait(false);
             }
         }
     }

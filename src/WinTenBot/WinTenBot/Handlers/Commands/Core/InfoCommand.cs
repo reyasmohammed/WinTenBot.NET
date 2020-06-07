@@ -17,7 +17,8 @@ namespace WinTenBot.Handlers.Commands.Core
         {
             _telegramService = new TelegramService(context);
 
-            var me = await _telegramService.GetMeAsync();
+            var me = await _telegramService.GetMeAsync()
+                .ConfigureAwait(false);
             var botName = me.FirstName;
             var botVersion = BotSettings.ProductVersion;
 
@@ -27,7 +28,8 @@ namespace WinTenBot.Handlers.Commands.Core
                            "ℹ️ Bot Telegram resmi berbasis <b>WinTen API.</b> untuk manajemen dan peralatan grup. " +
                            "Untuk detail fitur pada perintah /start.\n\n";
 
-            if (await _telegramService.IsBeta())
+            if (await _telegramService.IsBeta()
+                .ConfigureAwait(false))
             {
                 sendText += "<b>Saya masih Beta, mungkin terdapat bug dan tidak stabil. " +
                             "Tidak di rekomendasikan untuk grup Anda.</b>\n\n";
@@ -60,7 +62,8 @@ namespace WinTenBot.Handlers.Commands.Core
                 }
             });
 
-            await _telegramService.SendTextAsync(sendText, inlineKeyboard);
+            await _telegramService.SendTextAsync(sendText, inlineKeyboard)
+                .ConfigureAwait(false);
         }
     }
 }

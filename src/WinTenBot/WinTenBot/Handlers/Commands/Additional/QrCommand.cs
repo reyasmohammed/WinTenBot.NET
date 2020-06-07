@@ -28,7 +28,7 @@ namespace WinTenBot.Handlers.Commands.Additional
                 data = repMsg.Text ?? repMsg.Caption;
             }
 
-            if (data == "")
+            if (data.IsNullOrEmpty())
             {
                 var sendText = "<b>Generate QR from text or caption media</b>" +
                                "\n<b>Usage : </b><code>/qr</code> (In-Reply)" +
@@ -47,9 +47,6 @@ namespace WinTenBot.Handlers.Commands.Additional
             }
 
             var urlQr = data.GenerateUrlQrApi();
-            var fileName = $"{msg.Chat.Id}_{msg.MessageId}.jpg";
-
-            // urlQr.SaveUrlTo(fileName);
             await _telegramService.SendMediaAsync(urlQr.ToString(), MediaType.Photo, replyMarkup: keyboard)
                 .ConfigureAwait(false);
         }

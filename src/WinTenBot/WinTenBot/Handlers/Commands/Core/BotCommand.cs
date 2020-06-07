@@ -23,10 +23,12 @@ namespace WinTenBot.Handlers.Commands.Core
             switch (param1)
             {
                 case "migrate":
-                    await _telegramService.SendTextAsync("Migrating ");
+                    await _telegramService.SendTextAsync("Migrating ")
+                        .ConfigureAwait(false);
                     MigrationHelper.MigrateMysql();
                     MigrationHelper.MigrateSqlite();
-                    await _telegramService.SendTextAsync("Migrate complete ");
+                    await _telegramService.SendTextAsync("Migrate complete ")
+                        .ConfigureAwait(false);
 
                     break;
             }
