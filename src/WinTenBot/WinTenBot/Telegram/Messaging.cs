@@ -110,7 +110,7 @@ namespace WinTenBot.Telegram
                     var forFilter = wordFilter.Word.ToLowerCase();
                     if (forFilter.EndsWith("*"))
                     {
-                        Log.Information("Filter source Ends with *");
+                        // Log.Information("Filter source Ends with *");
                         forFilter = forFilter.CleanExceptAlphaNumeric();
                         isMust = forCompare.Contains(forFilter);
 
