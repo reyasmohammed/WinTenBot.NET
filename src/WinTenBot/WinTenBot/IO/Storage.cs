@@ -11,7 +11,7 @@ namespace WinTenBot.IO
 {
     public static class Storage
     {
-       public static async Task ClearLog()
+        public static async Task ClearLog()
         {
             try
             {
@@ -45,7 +45,7 @@ namespace WinTenBot.IO
 
                         fileStream.Close();
                         await fileStream.DisposeAsync().ConfigureAwait(false);
-                        
+
                         filePath.DeleteFile();
                     }
                 }
@@ -113,6 +113,6 @@ namespace WinTenBot.IO
             {
                 Log.Error(ex, "Error Send .Log file to ChannelTarget.");
             }
-        }   
+        }
     }
 }

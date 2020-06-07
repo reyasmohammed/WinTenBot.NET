@@ -8,7 +8,8 @@ namespace WinTenBot.Common
         public static async Task<string> LoadInBotDocs(this string slug)
         {
             var path = $"Storage/InbotDocs/{slug}.html";
-            var html = await File.ReadAllTextAsync(path);
+            var html = await File.ReadAllTextAsync(path)
+                .ConfigureAwait(false);
 
             return html.Trim();
         }

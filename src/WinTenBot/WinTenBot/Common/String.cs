@@ -115,13 +115,13 @@ namespace WinTenBot.Common
 
         public static bool CheckUrlValid(this string source)
         {
-            return System.Uri.TryCreate(source, UriKind.Absolute, out System.Uri uriResult)
-                   && (uriResult.Scheme == System.Uri.UriSchemeHttps || uriResult.Scheme == System.Uri.UriSchemeHttp);
+            return Uri.TryCreate(source, UriKind.Absolute, out Uri uriResult)
+                   && (uriResult.Scheme == Uri.UriSchemeHttps || uriResult.Scheme == Uri.UriSchemeHttp);
         }
 
         public static string GetBaseUrl(this string url)
         {
-            var uri = new System.Uri(url);
+            var uri = new Uri(url);
             return uri.Host;
         }
 

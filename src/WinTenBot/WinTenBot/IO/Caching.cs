@@ -14,10 +14,11 @@ namespace WinTenBot.IO
 
         public static async Task WriteCacheAsync(this object data, string fileJson, bool indented = true)
         {
-            var filePath = Dirs.EnsureDirectory($"{workingDir}/{fileJson}");
+            var filePath = $"{workingDir}/{fileJson}".EnsureDirectory();
             var json = data.ToJson(indented);
-            
-            await json.ToFile(filePath);
+
+            await json.ToFile(filePath)
+                .ConfigureAwait(false);
             Log.Information("Writing cache success..");
         }
 
@@ -30,55 +31,56 @@ namespace WinTenBot.IO
         public static async Task<T> ReadCacheAsync<T>(this string fileJson)
         {
             var filePath = $"{workingDir}/{fileJson}";
-            var json = await System.IO.File.ReadAllTextAsync(filePath);
+            var json = await File.ReadAllTextAsync(filePath)
+                .ConfigureAwait(false);
             var dataTable = json.MapObject<T>();
-            
+
             // var dataTable = json.ToDataTable();
-            Log.Information($"Loaded cache items");
+            Log.Information("Loaded cache items");
             return dataTable;
         }
 
         public static bool IsFileCacheExist(this string fileName)
         {
             var filePath = $"{workingDir}/{fileName}";
-            var isExist = System.IO.File.Exists(filePath);
+            var isExist = File.Exists(filePath);
             Log.Information($"IsCache {fileName} Exist: {isExist}");
-            
+
             return isExist;
         }
 
         public static void ClearCache(string keyword)
         {
             Log.Information($"Deleting caches. Keyword {keyword}");
-            
-            var listFile = System.IO.Directory.GetFiles(workingDir);
-            var listFiltered = listFile.Where(file => 
+
+            var listFile = Directory.GetFiles(workingDir);
+            var listFiltered = listFile.Where(file =>
                 file.Contains(keyword)).ToArray();
-            
-            Log.Information($"Found cache target {listFiltered.Count()} of {listFile.Count()}");
+
+            Log.Information($"Found cache target {listFiltered.Length} of {listFile.Length}");
             foreach (var file in listFiltered)
             {
                 Log.Information($"Deleting {file}");
-                System.IO.File.Delete(file);
+                File.Delete(file);
             }
         }
-        
+
         public static void ClearCacheOlderThan(string keyword, int days = 1)
         {
             Log.Information($"Deleting caches older than {days} days");
-            
+
             var dirInfo = new DirectoryInfo(workingDir);
             var files = dirInfo.GetFiles();
             var filteredFiles = files.Where(fileInfo =>
                 fileInfo.CreationTimeUtc < DateTime.UtcNow.AddDays(-days) &&
                 fileInfo.Name.Contains(keyword)).ToArray();
 
-            Log.Information($"Found cache target {filteredFiles.Count()} of {files.Count()}");
+            Log.Information($"Found cache target {filteredFiles.Length} of {files.Length}");
 
             foreach (FileInfo file in filteredFiles)
             {
                 Log.Information($"Deleting {file.FullName}");
-                System.IO.File.Delete(file.FullName);
+                File.Delete(file.FullName);
             }
         }
     }

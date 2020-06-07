@@ -31,7 +31,7 @@ namespace WinTenBot.Common
 
         public static int ToBoolInt(this string str)
         {
-            return str.ToLower() == "disable" ? 0 : 1;
+            return str.ToLowerCase() == "disable" ? 0 : 1;
         }
 
         public static DataTable ToDataTable<T>(this IEnumerable<T> ts) where T : class

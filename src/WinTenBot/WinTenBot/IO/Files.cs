@@ -34,7 +34,7 @@ namespace WinTenBot.IO
 
             Path.GetDirectoryName(filePath).EnsureDirectory();
 
-            await System.IO.File.WriteAllTextAsync(filePath, content)
+            await File.WriteAllTextAsync(filePath, content)
                 .ConfigureAwait(false);
             
             Log.Information("Writing file success..");
@@ -49,7 +49,7 @@ namespace WinTenBot.IO
 
             Path.GetDirectoryName(filePath).EnsureDirectory();
 
-            System.IO.File.WriteAllText(filePath, content);
+            File.WriteAllText(filePath, content);
             Log.Information("Writing file success..");
         }
     }

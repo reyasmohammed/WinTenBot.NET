@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net;
 using Flurl;
 using Serilog;
@@ -7,11 +8,12 @@ using WinTenBot.Model;
 
 namespace WinTenBot.Common
 {
-    public static class Uri
+    public static class Url
     {
-        public static string GenerateUrlQrApi(this string data)
+        public static Uri GenerateUrlQrApi(this string data)
         {
-            return $"https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data={Url.Encode(data)}";
+            var baseUrl = "https://api.qrserver.com";
+            return new Uri($"{baseUrl}/v1/create-qr-code/?size=300x300&margin=10&data={Flurl.Url.Encode(data)}");
         }
 
         public static void SaveUrlTo(this string remoteFileUrl, string localFileName)
@@ -37,16 +39,16 @@ namespace WinTenBot.Common
             return localPath;
         }
 
-        public static Url ParseUrl(this string urlPath)
+        public static Flurl.Url ParseUrl(this string urlPath)
         {
-            var url = new Url(urlPath);
+            var url = new Flurl.Url(urlPath);
 
             return url;
         }
 
         public static bool IsValidUrl(this string urlPath)
         {
-            return Url.IsValid(urlPath);
+            return Flurl.Url.IsValid(urlPath);
         }
     }
 }
