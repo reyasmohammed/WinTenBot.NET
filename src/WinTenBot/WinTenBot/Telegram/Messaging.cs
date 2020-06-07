@@ -100,23 +100,42 @@ namespace WinTenBot.Telegram
             {
                 var forCompare = word;
                 if (forCompare.IsValidUrl()) forCompare = forCompare.ParseUrl().Path;
+                forCompare = forCompare.ToLowerCase().CleanExceptAlphaNumeric();
 
                 foreach (var wordFilter in mappedWords)
                 {
-                    var forFilter = wordFilter.Word.ToLowerCase().CleanExceptAlphaNumeric();
                     var isGlobal = wordFilter.IsGlobal;
                     var isDeep = wordFilter.DeepFilter;
-                    forCompare = forCompare.ToLowerCase().CleanExceptAlphaNumeric();
 
-                    if (forFilter == forCompare)
+                    var forFilter = wordFilter.Word.ToLowerCase();
+                    if (forFilter.EndsWith("*"))
                     {
-                        isMust = true;
+                        Log.Information("Filter source Ends with *");
+                        forFilter = forFilter.CleanExceptAlphaNumeric();
+                        isMust = forCompare.Contains(forFilter);
+
+                        // forFilter = forFilter.RemoveStrAfterFirst("*");
+                        // var lenFilter = forFilter.CleanExceptAlphaNumeric().Length;
+                        // forCompare = forCompare.Substring(0, lenFilter);
+
+                        var result =
+                            $"'{forCompare}' LIKE '{forFilter}' ? {isMust}. Deep: {isDeep}, Global: {isGlobal}";
+                        if (BotSettings.IsDevelopment) Log.Debug(result);
                     }
+                    else
+                    {
+                        forFilter = wordFilter.Word.ToLowerCase().CleanExceptAlphaNumeric();
+                        if (forCompare == forFilter) isMust = true;
+                        var result = $"'{forCompare}' == '{forFilter}' ? {isMust}. Deep: {isDeep}, Global: {isGlobal}";
+                        if (BotSettings.IsDevelopment) Log.Debug(result);
+                    }
+                    
+                }
 
-                    var result = $"'{forCompare}' == '{forFilter}' ? {isMust}. Deep: {isDeep}, Global: {isGlobal}";
-                    // if (BotSettings.IsDevelopment) Log.Debug(result);
-
-                    if (isMust) break;
+                if (isMust)
+                {
+                    Log.Information("Break");
+                    break;
                 }
             }
 
