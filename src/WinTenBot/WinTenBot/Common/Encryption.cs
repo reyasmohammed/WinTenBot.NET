@@ -5,7 +5,7 @@ using Serilog;
 
 namespace WinTenBot.Common
 {
-    public static class EncryptionHelper
+    public static class Encryption
     {
         public static string Password { get; set; } = "1234";
         public static string Salt { get; set; } = "12345678";
@@ -14,7 +14,11 @@ namespace WinTenBot.Common
         {
             try
             {
-                return new EasyEncrypt(Password, Salt, Aes.Create()).Encrypt(input);
+                var aes = new EasyEncrypt(Password, Salt, Aes.Create());
+                var result = aes.Encrypt(input);
+                aes.Dispose();
+
+                return result;
             }
             catch (Exception ex)
             {
@@ -27,7 +31,11 @@ namespace WinTenBot.Common
         {
             try
             {
-                return new EasyEncrypt(Password, Salt, Aes.Create()).Decrypt(encryptedInput);
+                var aes = new EasyEncrypt(Password, Salt, Aes.Create());
+                var result = aes.Decrypt(encryptedInput);
+                aes.Dispose();
+
+                return result;
             }
             catch (Exception ex)
             {

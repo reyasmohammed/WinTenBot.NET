@@ -61,7 +61,8 @@ namespace WinTenBot.Common
             if (File.Exists(jsonPath))
             {
                 Log.Information($"Loading Json from path: {jsonPath}");
-                json = await File.ReadAllTextAsync(jsonPath);
+                json = await File.ReadAllTextAsync(jsonPath)
+                    .ConfigureAwait(false);
             }
             else
             {

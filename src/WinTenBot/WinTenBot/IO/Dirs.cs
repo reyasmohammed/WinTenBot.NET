@@ -32,7 +32,7 @@ namespace WinTenBot.IO
             }
             // Add subdirectory sizes.
             var dis = d.GetDirectories();
-            foreach (var di in dis) 
+            foreach (var unused in dis) 
             {
                 size += DirSize(path);   
             }
