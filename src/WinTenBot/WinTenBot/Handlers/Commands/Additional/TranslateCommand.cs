@@ -39,9 +39,11 @@ namespace WinTenBot.Handlers.Commands.Additional
 
                 Log.Information($"Param: {param.ToJson(true)}");
 
-                await _telegramService.SendTextAsync("🔄 Translating into Your language..");
+                await _telegramService.SendTextAsync("🔄 Translating into Your language..")
+                    .ConfigureAwait(false);
 
-                var translate = await forTranslate.Translate(param1);
+                var translate = await forTranslate.TranslateAsync(param1)
+                    .ConfigureAwait(false);
 
                 // var translate = forTranslate.TranslateTo(param1);
                 
@@ -53,12 +55,15 @@ namespace WinTenBot.Handlers.Commands.Additional
 
                 var translateResult = translate.MergedTranslation;
 
-                await _telegramService.EditAsync(translateResult);
+                await _telegramService.EditAsync(translateResult)
+                    .ConfigureAwait(false);
             }
             else
             {
-                var hintTranslate = await "Balas pesan yang ingin anda terjemahkan".Translate(userLang);
-                await _telegramService.SendTextAsync(hintTranslate.MergedTranslation);
+                var hint = await "Balas pesan yang ingin anda terjemahkan".TranslateAsync(userLang)
+                    .ConfigureAwait(false);
+                await _telegramService.SendTextAsync(hint.MergedTranslation)
+                    .ConfigureAwait(false);
             }
 
         }

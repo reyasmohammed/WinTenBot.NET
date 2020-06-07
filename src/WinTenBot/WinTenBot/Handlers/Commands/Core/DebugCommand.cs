@@ -22,7 +22,8 @@ namespace WinTenBot.Handlers.Commands.Core
             Log.Information(json.Length.ToString());
 
             var sendText = $"Debug:\n {json}";
-            await _telegramService.SendTextAsync(sendText);
+            await _telegramService.SendTextAsync(sendText)
+                .ConfigureAwait(false);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
-using WinTenBot.Providers;
+using WinTenBot.Common;
 using WinTenBot.Services;
 
 namespace WinTenBot.Handlers.Commands.Chat
@@ -36,9 +36,10 @@ namespace WinTenBot.Handlers.Commands.Chat
                        $"👤 <b>{name}</b>\n" +
                        $"ID: <code>{userId}</code>\n" +
                        $"Username: @{username}\n" +
-                       $"Language: {userLang.ToUpper()}";
+                       $"Language: {userLang.ToUpperCase()}";
 
-            await _telegramService.SendTextAsync(text);
+            await _telegramService.SendTextAsync(text)
+                .ConfigureAwait(false);
             //            await context.Bot.Client.SendTextMessageAsync(
             //                msg.Chat,
             //                text,

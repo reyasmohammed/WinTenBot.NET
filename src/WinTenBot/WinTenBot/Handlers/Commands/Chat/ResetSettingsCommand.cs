@@ -21,12 +21,15 @@ namespace WinTenBot.Handlers.Commands.Chat
             var chat = _telegramService.Message.Chat;
             var msg = _telegramService.Message;
 
-            var adminOrPrivate = await _telegramService.IsAdminOrPrivateChat();
+            var adminOrPrivate = await _telegramService.IsAdminOrPrivateChat()
+                .ConfigureAwait(false);
             if (adminOrPrivate)
             {
                 Log.Information("Initializing reset Settings.");
-                await _telegramService.DeleteAsync(msg.MessageId);
-                await _telegramService.SendTextAsync("Sedang mengembalikan ke Pengaturan awal");
+                await _telegramService.DeleteAsync(msg.MessageId)
+                    .ConfigureAwait(false);
+                await _telegramService.SendTextAsync("Sedang mengembalikan ke Pengaturan awal")
+                    .ConfigureAwait(false);
 
                 var data = new Dictionary<string, object>()
                 {
@@ -46,11 +49,14 @@ namespace WinTenBot.Handlers.Commands.Chat
                     ["enable_welcome_message"] = 1,
                 };
 
-                var update = await _settingsService.SaveSettingsAsync(data);
+                var update = await _settingsService.SaveSettingsAsync(data)
+                    .ConfigureAwait(false);
                 Log.Information($"Result: {update}");
 
-                await _telegramService.EditAsync("Pengaturan awal berhasil di kembalikan");
-                await _telegramService.DeleteAsync(_telegramService.EditedMessageId, 2000);
+                await _telegramService.EditAsync("Pengaturan awal berhasil di kembalikan")
+                    .ConfigureAwait(false);
+                await _telegramService.DeleteAsync(_telegramService.EditedMessageId, 2000)
+                    .ConfigureAwait(false);
                 Log.Information("Settings has been reset.");
             }
         }

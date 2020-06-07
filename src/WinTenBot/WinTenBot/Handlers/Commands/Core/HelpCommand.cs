@@ -18,18 +18,22 @@ namespace WinTenBot.Handlers.Commands.Core
             _telegramService = new TelegramService(context);
 
             var sendText = "Untuk mendapatkan bantuan klik tombol dibawah ini";
-            var urlStart = await _telegramService.GetUrlStart("start=help");
+            var urlStart = await _telegramService.GetUrlStart("start=help")
+                .ConfigureAwait(false);
             var keyboard = new InlineKeyboardMarkup(
                 InlineKeyboardButton.WithUrl("Dapatkan bantuan", urlStart)
             );
 
             if (_telegramService.IsPrivateChat())
             {
-                sendText = await "home".LoadInBotDocs();
-                keyboard = await "Storage/Buttons/home.json".JsonToButton();
+                sendText = await "home".LoadInBotDocs()
+                    .ConfigureAwait(false);
+                keyboard = await "Storage/Buttons/home.json".JsonToButton()
+                    .ConfigureAwait(false);
             }
 
-            await _telegramService.SendTextAsync(sendText, keyboard);
+            await _telegramService.SendTextAsync(sendText, keyboard)
+                .ConfigureAwait(false);
         }
     }
 }
