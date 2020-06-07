@@ -1,5 +1,5 @@
 ﻿using FluentMigrator;
-using WinTenBot.Tools;
+using WinTenBot.Extensions;
 
 namespace WinTenBot.Migrations.MySql
 {

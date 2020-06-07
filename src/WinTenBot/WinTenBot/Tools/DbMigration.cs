@@ -4,12 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using WinTenBot.Migrations.MySql;
 
-namespace WinTenBot.Providers
+namespace WinTenBot.Tools
 {
-    public static class FluentMigratorProvider
+    public static class DbMigration
     {
         public static string ConnectionString { get; set; }
-        
+
         public static void RunMySqlMigration()
         {
             var serviceProvider = CreateMysqlServices();
@@ -21,7 +21,7 @@ namespace WinTenBot.Providers
                 UpdateMySqlDatabase(scope.ServiceProvider);
             }
         }
-        
+
         /// <summary>
         /// Configure the dependency injection services
         /// </summary>
@@ -32,7 +32,6 @@ namespace WinTenBot.Providers
                 .ConfigureRunner(rb => rb
                     .AddMySql5()
                     .WithGlobalConnectionString(ConnectionString)
-                    
                     .ScanIn(typeof(CreateTableAfk).Assembly).For.Migrations()
                     .ScanIn(typeof(CreateTableChatSettings).Assembly).For.Migrations()
                     .ScanIn(typeof(CreateTableGlobalBan).Assembly).For.Migrations()
