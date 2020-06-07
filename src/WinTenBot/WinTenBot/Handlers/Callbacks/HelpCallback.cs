@@ -15,13 +15,15 @@ namespace WinTenBot.Handlers.Callbacks
             _telegramService = telegramService;
             CallBackData = telegramService.CallbackQuery.Data;
 
-            Parallel.Invoke(async () => await ExecuteAsync());
+            Parallel.Invoke(async () =>
+                await ExecuteAsync().ConfigureAwait(false));
         }
 
         private async Task ExecuteAsync()
         {
             var partsCallback = CallBackData.SplitText(" ");
-            var sendText = await partsCallback[1].LoadInBotDocs();
+            var sendText = await partsCallback[1].LoadInBotDocs()
+                .ConfigureAwait(false);
             Log.Information($"Docs: {sendText}");
             var subPartsCallback = partsCallback[1].SplitText("/");
 
@@ -40,10 +42,11 @@ namespace WinTenBot.Handlers.Callbacks
                 }
             }
 
-            var keyboard = await $"Storage/Buttons/{jsonButton}.json".JsonToButton();
-
-
-            await _telegramService.EditMessageCallback(sendText, keyboard);
+            var keyboard = await $"Storage/Buttons/{jsonButton}.json".JsonToButton()
+                .ConfigureAwait(false);
+            
+            await _telegramService.EditMessageCallback(sendText, keyboard)
+                .ConfigureAwait(false);
         }
     }
 }

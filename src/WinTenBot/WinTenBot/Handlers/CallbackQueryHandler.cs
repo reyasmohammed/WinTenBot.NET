@@ -51,7 +51,8 @@ namespace WinTenBot.Handlers
 
             // await context.Bot.Client.AnswerCallbackQueryAsync(cq.Id, "PONG", true);
 
-            await next(context, cancellationToken);
+            await next(context, cancellationToken)
+                .ConfigureAwait(false);
         }
     }
 }
