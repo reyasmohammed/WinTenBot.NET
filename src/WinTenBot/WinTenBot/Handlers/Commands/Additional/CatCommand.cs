@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Flurl.Http;
@@ -10,7 +11,7 @@ using Telegram.Bot.Types.Enums;
 using WinTenBot.Common;
 using WinTenBot.Model;
 using WinTenBot.Services;
-using sysIO = System.IO;
+using File = System.IO.File;
 
 namespace WinTenBot.Handlers.Commands.Additional
 {
@@ -65,18 +66,25 @@ namespace WinTenBot.Handlers.Commands.Additional
 
                 Log.Information($"Adding kochenk {urlFile}");
 
-                var fileName = sysIO.Path.GetFileName(urlFile);
+                var fileName = Path.GetFileName(urlFile);
                 var timeStamp = DateTime.UtcNow.ToString("yyyy-MM-dd");
-                var saveName = sysIO.Path.Combine(chatId.ToString(), $"kochenk_{timeStamp}_" + fileName);
+                var saveName = Path.Combine(chatId.ToString(), $"kochenk_{timeStamp}_" + fileName);
                 var savedPath = urlFile.SaveToCache(saveName);
 
-                var fileStream = sysIO.File.OpenRead(savedPath);
-                listAlbum.Add(new InputMediaPhoto()
+                var fileStream = File.OpenRead(savedPath);
+                // listAlbum.Add(new InputMediaPhoto()
+                // {
+                    // Caption = $"Kochenk {i}",
+                    // Media = new InputMedia(fileStream, fileName),
+                    // ParseMode = ParseMode.Html
+                // });
+
+                var inputMediaPhoto = new InputMediaPhoto(new InputMedia(fileStream, fileName))
                 {
                     Caption = $"Kochenk {i}",
-                    Media = new InputMedia(urlFile),
                     ParseMode = ParseMode.Html
-                });
+                };
+                listAlbum.Add(inputMediaPhoto);
 
                 // listAlbum.Add(new InputMediaPhoto(new InputMedia()));
                 await fileStream.DisposeAsync().ConfigureAwait(false);
