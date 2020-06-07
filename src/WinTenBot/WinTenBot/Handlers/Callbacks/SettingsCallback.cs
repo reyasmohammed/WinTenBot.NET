@@ -22,7 +22,8 @@ namespace WinTenBot.Handlers.Callbacks
 
             Log.Information("Receiving Setting Callback.");
 
-            Parallel.Invoke(async () => await ExecuteToggleAsync());
+            Parallel.Invoke(async () =>
+                await ExecuteToggleAsync().ConfigureAwait(false));
         }
 
         private async Task ExecuteToggleAsync()
@@ -31,13 +32,14 @@ namespace WinTenBot.Handlers.Callbacks
             var fromId = CallbackQuery.From.Id;
             var msgId = CallbackQuery.Message.MessageId;
 
-            var isAdmin = await _telegramService.IsAdminGroup(fromId);
+            var isAdmin = await _telegramService.IsAdminGroup(fromId)
+                .ConfigureAwait(false);
             if (!isAdmin)
             {
                 Log.Information("He is not admin.");
                 return;
             }
-            
+
             var callbackData = CallbackQuery.Data;
             var partedData = callbackData.Split(" ");
             var callbackParam = partedData.ValueOfIndex(1);
@@ -60,18 +62,22 @@ namespace WinTenBot.Handlers.Callbacks
                 [columnTarget] = newValue
             };
 
-            await settingService.SaveSettingsAsync(data);
+            await settingService.SaveSettingsAsync(data)
+                .ConfigureAwait(false);
 
-            var settingBtn = await settingService.GetSettingButtonByGroup();
-            var btnMarkup = await settingBtn.ToJson().JsonToButton(chunk: 2);
+            var settingBtn = await settingService.GetSettingButtonByGroup()
+                .ConfigureAwait(false);
+            var btnMarkup = await settingBtn.ToJson().JsonToButton(chunk: 2)
+                .ConfigureAwait(false);
             Log.Debug($"Settings: {settingBtn.Count}");
 
             _telegramService.SentMessageId = msgId;
-            
+
             var editText = $"Settings Toggles" +
                            $"\nParam: {columnTarget} to {newValue}";
-            await _telegramService.EditMessageCallback(editText, btnMarkup);
-            
+            await _telegramService.EditMessageCallback(editText, btnMarkup)
+                .ConfigureAwait(false);
+
             // var lastReplyMarkup = CallbackQuery.Message.ReplyMarkup.InlineKeyboard;
             // Log.Debug($"LastReplyMarkup: {lastReplyMarkup.ToJson(true)}");
         }

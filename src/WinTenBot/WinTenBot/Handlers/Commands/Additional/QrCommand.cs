@@ -33,7 +33,8 @@ namespace WinTenBot.Handlers.Commands.Additional
                 var sendText = "<b>Generate QR from text or caption media</b>" +
                                "\n<b>Usage : </b><code>/qr</code> (In-Reply)" +
                                "\n                <code>/qr your text here</code> (In-Message)";
-                await _telegramService.SendTextAsync(sendText);
+                await _telegramService.SendTextAsync(sendText)
+                    .ConfigureAwait(false);
                 return;
             }
 
@@ -49,7 +50,8 @@ namespace WinTenBot.Handlers.Commands.Additional
             var fileName = $"{msg.Chat.Id}_{msg.MessageId}.jpg";
 
             // urlQr.SaveUrlTo(fileName);
-            await _telegramService.SendMediaAsync(urlQr, MediaType.Photo, replyMarkup: keyboard);
+            await _telegramService.SendMediaAsync(urlQr.ToString(), MediaType.Photo, replyMarkup: keyboard)
+                .ConfigureAwait(false);
         }
     }
 }
