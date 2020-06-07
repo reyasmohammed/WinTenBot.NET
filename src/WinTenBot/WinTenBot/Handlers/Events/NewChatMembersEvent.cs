@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -29,6 +29,7 @@ namespace WinTenBot.Handlers.Events
             _telegramService = new TelegramService(context);
             _settingsService = new SettingsService(msg);
             _globalBanService = new GlobalBanService(context.Update.Message);
+            await _telegramService.DeleteAsync(msg.MessageId);
 
             Log.Information("New Chat Members...");
 
