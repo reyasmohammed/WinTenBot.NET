@@ -2,7 +2,6 @@
 using Hangfire;
 using Serilog;
 using WinTenBot.Common;
-using WinTenBot.Model;
 using WinTenBot.Services;
 using WinTenBot.Telegram;
 using WinTenBot.Tools;
@@ -16,24 +15,14 @@ namespace WinTenBot.Scheduler
             Task.Run(async () =>
             {
                 Log.Information("Initializing RSS Scheduler.");
-
-                var baseId = "rss";
-                var cronInMinute = 5;
                 var rssService = new RssService();
-
                 Log.Information("Getting list Chat ID");
                 var listChatId = await rssService.GetListChatIdAsync()
                     .ConfigureAwait(false);
-                foreach (RssSetting row in listChatId)
+                foreach (var rssSetting in listChatId)
                 {
-                    var chatId = row.ChatId.ToInt64().ReduceChatId();
-                    var recurringId = $"{baseId}-{chatId}";
-
-                    Log.Information($"Creating Jobs for {chatId}");
-
-                    RecurringJob.RemoveIfExists(recurringId);
-                    RecurringJob.AddOrUpdate(recurringId, ()
-                        => RssBroadcaster.ExecBroadcasterAsync(chatId), $"*/{cronInMinute} * * * *");
+                    var chatId = rssSetting.ChatId.ToInt64().ReduceChatId();
+                    RegisterScheduler(chatId);
                 }
 
                 Log.Information("Registering RSS Scheduler complete.");
@@ -44,17 +33,19 @@ namespace WinTenBot.Scheduler
         {
             Log.Information("Initializing RSS Scheduler.");
 
-            var baseId = "rss-scheduler";
+            var baseId = "rss";
             var cronInMinute = 5;
-            var recurringId = $"{chatId}-{baseId}";
+            chatId = chatId.ToInt64().ReduceChatId();
+            var recurringId = $"{baseId}-{chatId}";
 
             Log.Information($"Creating Jobs for {chatId}");
 
             RecurringJob.RemoveIfExists(recurringId);
             RecurringJob.AddOrUpdate(recurringId, ()
                 => RssBroadcaster.ExecBroadcasterAsync(chatId), $"*/{cronInMinute} * * * *");
-            
-            Log.Information("Registering RSS Scheduler complete.");
+            RecurringJob.Trigger(recurringId);
+
+            Log.Information($"Registering RSS Scheduler for {chatId} complete.");
         }
     }
 }
