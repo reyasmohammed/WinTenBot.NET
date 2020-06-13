@@ -14,6 +14,7 @@ using Telegram.Bot;
 using Telegram.Bot.Framework;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Bots;
+using WinTenBot.Common;
 using WinTenBot.Extensions;
 using WinTenBot.Handlers;
 using WinTenBot.Handlers.Commands.Additional;
@@ -49,10 +50,9 @@ namespace WinTenBot
 
             BotSettings.GlobalConfiguration = Configuration;
             BotSettings.FillSettings();
-            SerilogProvider.InitializeSerilog();
+            Logger.SetupLogger();
 
             BotSettings.DbConnectionString = Configuration["CommonConfig:ConnectionString"];
-            SerilogProvider.LogglyToken = Configuration["CommonConfig:Watson"];
             DbMigration.ConnectionString = BotSettings.DbConnectionString;
 
             Log.Information($"ProductName: {Configuration["Engines:ProductName"]}");
