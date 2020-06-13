@@ -11,7 +11,8 @@ namespace WinTenBot.Common
     {
         public static void SetupLogger()
         {
-            const string outputTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss.ffff zzz} {Level:u3}] {Message:lj}{NewLine}{Exception}";
+            var consoleStamp = "[{Timestamp:yyyy-MM-dd HH:mm:ss.ffff zzz}";
+            var outputTemplate = $"{consoleStamp} {{Level:u3}}] {{Message:lj}}{{NewLine}}{{Exception}}";
             var logPath = "Storage/Logs/ZiziBot-.log";
             var flushInterval = TimeSpan.FromSeconds(1);
             var rollingInterval = RollingInterval.Day;
@@ -56,7 +57,7 @@ namespace WinTenBot.Common
 
             Log.Logger = serilogConfig.CreateLogger();
         }
-        
+
         public static string LogInfo(string message)
         {
             Log.Information(message);
