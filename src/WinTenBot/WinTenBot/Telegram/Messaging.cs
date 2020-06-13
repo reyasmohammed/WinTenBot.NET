@@ -74,7 +74,7 @@ namespace WinTenBot.Telegram
 
             var messageLink = $"https://t.me/{chatUsername}/{messageId}";
 
-            if (chatUsername == "")
+            if (chatUsername.IsNullOrEmpty())
             {
                 var trimmedChatId = message.Chat.Id.ToString().Substring(4);
                 messageLink = $"https://t.me/c/{trimmedChatId}/{messageId}";
@@ -84,7 +84,7 @@ namespace WinTenBot.Telegram
             return messageLink;
         }
 
-        public static async Task<bool> IsMustDelete(string words)
+        private static async Task<bool> IsMustDelete(string words)
         {
             var isMust = false;
             var query = await new Query("word_filter")
@@ -111,32 +111,21 @@ namespace WinTenBot.Telegram
                     if (forFilter.EndsWith("*"))
                     {
                         var distinctChar = forCompare.DistinctChar();
-                        // var result = $"'{forCompare}' LIKE '{forFilter}' ? {isMust}. Global: {isGlobal}";
-
-                        // Log.Information("Filter source Ends with *");
                         forFilter = forFilter.CleanExceptAlphaNumeric();
                         isMust = forCompare.Contains(forFilter);
-                        if (BotSettings.IsDevelopment)
-                            Log.Debug($"'{forCompare}' LIKE '{forFilter}' ? {isMust}. Global: {isGlobal}");
-                        
+                        $"'{forCompare}' LIKE '{forFilter}' ? {isMust}. Global: {isGlobal}".LogDebug();
+
                         if (!isMust)
                         {
                             isMust = distinctChar.Contains(forFilter);
-                            // forCompare = distinctChar;
-                            if (BotSettings.IsDevelopment)
-                                Log.Debug($"'{distinctChar}' LIKE '{forFilter}' ? {isMust}. Global: {isGlobal}");
+                            $"'{distinctChar}' LIKE '{forFilter}' ? {isMust}. Global: {isGlobal}".LogDebug();
                         }
-
-                        // forFilter = forFilter.RemoveStrAfterFirst("*");
-                        // var lenFilter = forFilter.CleanExceptAlphaNumeric().Length;
-                        // forCompare = forCompare.Substring(0, lenFilter);
                     }
                     else
                     {
                         forFilter = wordFilter.Word.ToLowerCase().CleanExceptAlphaNumeric();
                         if (forCompare == forFilter) isMust = true;
-                        var result = $"'{forCompare}' == '{forFilter}' ? {isMust}. Deep: {isDeep}, Global: {isGlobal}";
-                        if (BotSettings.IsDevelopment) Log.Debug(result);
+                        $"'{forCompare}' == '{forFilter}' ? {isMust}. Deep: {isDeep}, Global: {isGlobal}".LogDebug();
                     }
 
                     if (!isMust) continue;
@@ -152,10 +141,9 @@ namespace WinTenBot.Telegram
             return isMust;
         }
 
-        public static async Task ScanMessageAsync(this TelegramService telegramService)
+        private static async Task ScanMessageAsync(this TelegramService telegramService)
         {
             var message = telegramService.MessageOrEdited;
-            var chatId = message.Chat.Id;
             var msgId = message.MessageId;
 
             var text = message.Text ?? message.Caption;
@@ -164,7 +152,7 @@ namespace WinTenBot.Telegram
                 var isMustDelete = await IsMustDelete(text)
                     .ConfigureAwait(false);
 
-                Log.Information($"Message {message.MessageId} IsMustDelete: {isMustDelete}");
+                Log.Information($"Message {msgId} IsMustDelete: {isMustDelete}");
 
                 if (isMustDelete)
                     await telegramService.DeleteAsync(message.MessageId)
@@ -176,7 +164,7 @@ namespace WinTenBot.Telegram
             }
         }
 
-        public static async Task ScanPhotoAsync(this TelegramService telegramService)
+        private static async Task ScanPhotoAsync(this TelegramService telegramService)
         {
             var message = telegramService.MessageOrEdited;
             var chatId = message.Chat.Id;
@@ -215,10 +203,6 @@ namespace WinTenBot.Telegram
             try
             {
                 Log.Information("Starting check Message");
-
-                var message = telegramService.MessageOrEdited;
-
-                // var settingService = new SettingsService(message);
                 var chatSettings = telegramService.CurrentSetting;
 
                 if (!chatSettings.EnableWordFilterGroupWide)
@@ -262,7 +246,6 @@ namespace WinTenBot.Telegram
                 InlineKeyboardMarkup inlineKeyboardMarkup = null;
 
                 var message = telegramService.MessageOrEdited;
-                // var settingService = new SettingsService(message);
                 var chatSettings = telegramService.CurrentSetting;
                 if (!chatSettings.EnableFindNotes)
                 {
@@ -279,7 +262,8 @@ namespace WinTenBot.Telegram
 
                 var notesService = new NotesService();
 
-                var selectedNotes = await notesService.GetNotesBySlug(message.Chat.Id, message.Text);
+                var selectedNotes = await notesService.GetNotesBySlug(message.Chat.Id, message.Text)
+                    .ConfigureAwait(false);
                 if (selectedNotes.Count > 0)
                 {
                     var content = selectedNotes[0].Content;
@@ -311,7 +295,6 @@ namespace WinTenBot.Telegram
         public static async Task FindTagsAsync(this TelegramService telegramService)
         {
             var message = telegramService.MessageOrEdited;
-            // var settingService = new SettingsService(message);
             var chatSettings = telegramService.CurrentSetting;
             if (!chatSettings.EnableFindTags)
             {
@@ -330,9 +313,9 @@ namespace WinTenBot.Telegram
             var partsText = message.Text.Split(new char[] {' ', '\n', ','})
                 .Where(x => x.Contains("#")).ToArray();
 
-            var allTags = partsText.Count();
+            var allTags = partsText.Length;
             var limitedTags = partsText.Take(5).ToArray();
-            var limitedCount = limitedTags.Count();
+            var limitedCount = limitedTags.Length;
 
             Log.Information($"AllTags: {allTags.ToJson(true)}");
             Log.Information($"First 5: {limitedTags.ToJson(true)}");
@@ -342,7 +325,8 @@ namespace WinTenBot.Telegram
                 var trimTag = split.TrimStart('#');
                 Log.Information($"Processing : {trimTag}");
 
-                var tagData = await tagsService.GetTagByTag(message.Chat.Id, trimTag);
+                var tagData = await tagsService.GetTagByTag(message.Chat.Id, trimTag)
+                    .ConfigureAwait(false);
                 Log.Information($"Data of tag: {trimTag} {tagData.ToJson(true)}");
 
                 var content = tagData[0].Content;
@@ -366,8 +350,6 @@ namespace WinTenBot.Telegram
                     await telegramService.SendTextAsync(content, buttonMarkup)
                         .ConfigureAwait(false);
                 }
-
-                // await telegramProvider.SendTextAsync(content, buttonMarkup);
             }
 
             if (allTags > limitedCount)
