@@ -10,16 +10,13 @@ namespace WinTenBot.Scheduler
     {
         public static void StartScheduler()
         {
+            Tools.Hangfire.DeleteAllJobs();
+            
             StartLogCleanupScheduler();
-            // StartLogglyCleanup();
             StartSyncWordFilter();
-            // StartSyncGlobalBanToLocal();
-
             RssScheduler.InitScheduler();
-        }
-
-        public static void StopScheduler()
-        {
+            
+            // StartSyncGlobalBanToLocal();
         }
 
         private static void StartLogCleanupScheduler()
@@ -31,18 +28,6 @@ namespace WinTenBot.Scheduler
             RecurringJob.RemoveIfExists(jobId);
             RecurringJob.AddOrUpdate(jobId, () =>
                 path.ClearLogs("Zizi", true), Cron.Hourly);
-            RecurringJob.Trigger(jobId);
-        }
-
-        private static void StartLogglyCleanup()
-        {
-            const string jobId = "loggly-cleanup";
-            string storageCaches = Path.Combine("Storage", "Caches");
-
-            Log.Debug($"Starting cron Loggly Cache Cleaner with id {jobId}");
-            RecurringJob.RemoveIfExists(jobId);
-            RecurringJob.AddOrUpdate(jobId, () =>
-                storageCaches.ClearLogs("Loggly", false), Cron.Hourly);
             RecurringJob.Trigger(jobId);
         }
 
