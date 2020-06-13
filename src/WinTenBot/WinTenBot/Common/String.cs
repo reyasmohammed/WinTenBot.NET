@@ -225,5 +225,10 @@ namespace WinTenBot.Common
         {
             return str.Substring(0, str.IndexOf(after, StringComparison.Ordinal) + 1);
         }
+
+        public static string DistinctChar(this string str)
+        {
+            return new string(str.ToCharArray().Distinct().ToArray());
+        }
     }
 }
