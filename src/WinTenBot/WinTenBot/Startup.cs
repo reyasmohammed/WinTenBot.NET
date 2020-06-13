@@ -44,11 +44,12 @@ namespace WinTenBot
     {
         public IConfiguration Configuration { get; }
 
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
 
             BotSettings.GlobalConfiguration = Configuration;
+            BotSettings.HostingEnvironment = env;
             BotSettings.FillSettings();
             Logger.SetupLogger();
 
