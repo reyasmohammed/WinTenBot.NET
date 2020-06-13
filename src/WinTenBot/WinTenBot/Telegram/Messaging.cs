@@ -110,17 +110,26 @@ namespace WinTenBot.Telegram
                     var forFilter = wordFilter.Word.ToLowerCase();
                     if (forFilter.EndsWith("*"))
                     {
+                        var distinctChar = forCompare.DistinctChar();
+                        // var result = $"'{forCompare}' LIKE '{forFilter}' ? {isMust}. Global: {isGlobal}";
+
                         // Log.Information("Filter source Ends with *");
                         forFilter = forFilter.CleanExceptAlphaNumeric();
                         isMust = forCompare.Contains(forFilter);
+                        if (BotSettings.IsDevelopment)
+                            Log.Debug($"'{forCompare}' LIKE '{forFilter}' ? {isMust}. Global: {isGlobal}");
+                        
+                        if (!isMust)
+                        {
+                            isMust = distinctChar.Contains(forFilter);
+                            // forCompare = distinctChar;
+                            if (BotSettings.IsDevelopment)
+                                Log.Debug($"'{distinctChar}' LIKE '{forFilter}' ? {isMust}. Global: {isGlobal}");
+                        }
 
                         // forFilter = forFilter.RemoveStrAfterFirst("*");
                         // var lenFilter = forFilter.CleanExceptAlphaNumeric().Length;
                         // forCompare = forCompare.Substring(0, lenFilter);
-
-                        var result =
-                            $"'{forCompare}' LIKE '{forFilter}' ? {isMust}. Deep: {isDeep}, Global: {isGlobal}";
-                        if (BotSettings.IsDevelopment) Log.Debug(result);
                     }
                     else
                     {
