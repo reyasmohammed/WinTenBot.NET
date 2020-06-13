@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Framework.Abstractions;
 using WinTenBot.Common;
-using WinTenBot.Model;
 using WinTenBot.Services;
 using WinTenBot.Telegram;
 
@@ -17,18 +16,19 @@ namespace WinTenBot.Handlers
         public async Task HandleAsync(IUpdateContext context, UpdateDelegate next, CancellationToken cancellationToken)
         {
             _telegramService = new TelegramService(context);
-            if (context.Update.ChannelPost != null) return;
+            if (_telegramService.Context.Update.ChannelPost != null) return;
 
-            var message = _telegramService.MessageOrEdited;
-            var fromUser = message.From;
-
-            if(BotSettings.IsDevelopment)
-                Log.Information($"New Update: {context.Update.ToJson(true)}");
-
-            await EnqueuePreTask();
-
-            await next(context, cancellationToken);
+            var update = _telegramService.Context.Update;
             
+            $"NewUpdate: {update.ToJson(true)}".LogDebug();
+
+            // Pre-Task is should be awaited.
+            await EnqueuePreTask().ConfigureAwait(false);
+
+            // Next, do what bot should do.
+            await next(context, cancellationToken).ConfigureAwait(false);
+
+            // Last, do additional task which bot may do
             EnqueueBackgroundTask();
         }
 
@@ -41,9 +41,7 @@ namespace WinTenBot.Handlers
 
             // var actions = new List<Action>();
             var shouldAwaitTasks = new List<Task>();
-
-            // if (_telegramProvider.IsNeedRunTasks())
-            // {
+            
             if (!_telegramService.IsPrivateChat())
             {
                 shouldAwaitTasks.Add(_telegramService.EnsureChatRestrictionAsync());
@@ -64,7 +62,8 @@ namespace WinTenBot.Handlers
 
             Log.Information("Awaiting should await task..");
 
-            await Task.WhenAll(shouldAwaitTasks.ToArray());
+            await Task.WhenAll(shouldAwaitTasks.ToArray())
+                .ConfigureAwait(false);
         }
 
         private void EnqueueBackgroundTask()
@@ -82,28 +81,14 @@ namespace WinTenBot.Handlers
                 nonAwaitTasks.Add(_telegramService.FindNotesAsync());
                 nonAwaitTasks.Add(_telegramService.FindTagsAsync());
             }
-            // }
-            // else
-            // {
-            // Log.Information("Seem not need queue some Tasks..");
-            // }
-
 
             nonAwaitTasks.Add(_telegramService.CheckMataZiziAsync());
             nonAwaitTasks.Add(_telegramService.HitActivityAsync());
 
-
-            // if (!_telegramProvider.IsPrivateChat())
-            // {
-            //     
-            // }
-
-
-            #pragma warning disable 4014
+#pragma warning disable 4014
             // This List Task should not await.
             Task.WhenAny(nonAwaitTasks.ToArray());
-            #pragma warning restore 4014
-            
+#pragma warning restore 4014
         }
     }
 }
