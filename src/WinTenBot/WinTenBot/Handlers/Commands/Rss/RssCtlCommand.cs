@@ -26,19 +26,24 @@ namespace WinTenBot.Handlers.Commands.Rss
                 var param1 = partedMsg.ValueOfIndex(1);
                 Log.Debug($"RssCtl Param1: {param1}");
 
-                await _telegramService.AppendTextAsync("Access Granted");
+                await _telegramService.AppendTextAsync("Access Granted")
+                    .ConfigureAwait(false);
                 switch (param1)
                 {
                     case "start":
-                        await _telegramService.AppendTextAsync("Starting RSS Service");
+                        await _telegramService.AppendTextAsync("Starting RSS Service")
+                            .ConfigureAwait(false);
                         RssScheduler.InitScheduler();
-                        await _telegramService.AppendTextAsync("Start successfully.");
+                        await _telegramService.AppendTextAsync("Start successfully.")
+                            .ConfigureAwait(false);
                         break;
 
                     case "stop":
-                        await _telegramService.AppendTextAsync("Stopping RSS Service");
+                        await _telegramService.AppendTextAsync("Stopping RSS Service")
+                            .ConfigureAwait(false);
                         Tools.Hangfire.DeleteAllJobs();
-                        await _telegramService.AppendTextAsync("Stop successfully.");
+                        await _telegramService.AppendTextAsync("Stop successfully.")
+                            .ConfigureAwait(false);
                         break;
                 }
             }

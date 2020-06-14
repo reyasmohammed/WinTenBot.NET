@@ -21,7 +21,8 @@ namespace WinTenBot.Handlers.Events
                            $"\nPengirim: {pinnedMsg.GetFromNameLink()}" +
                            $"\nPengepin: {msg.GetFromNameLink()}";
 
-            await _telegramService.SendTextAsync(sendText);
+            await _telegramService.SendTextAsync(sendText)
+                .ConfigureAwait(false);
         }
     }
 }

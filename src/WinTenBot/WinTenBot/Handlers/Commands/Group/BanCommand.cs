@@ -40,9 +40,11 @@ namespace WinTenBot.Handlers.Commands.Group
                 }
             }
 
-            await _telegramService.DeleteAsync(msg.MessageId);
+            await _telegramService.DeleteAsync(msg.MessageId)
+                .ConfigureAwait(false);
 
-            var isAdmin = await _telegramService.IsAdminGroup();
+            var isAdmin = await _telegramService.IsAdminGroup()
+                .ConfigureAwait(false);
 
             if (kickTargets[0].Id != msg.From.Id && isAdmin)
             {
@@ -52,7 +54,8 @@ namespace WinTenBot.Handlers.Commands.Group
                     var idTarget = target.Id;
                     var sendText = string.Empty;
 
-                    isKicked = await _telegramService.KickMemberAsync(target);
+                    isKicked = await _telegramService.KickMemberAsync(target)
+                        .ConfigureAwait(false);
 
                     if (isKicked)
                     {
@@ -65,16 +68,19 @@ namespace WinTenBot.Handlers.Commands.Group
                         sendText = $"Gagal memblokir {idTarget}";
                     }
 
-                    await _telegramService.AppendTextAsync(sendText);
+                    await _telegramService.AppendTextAsync(sendText)
+                        .ConfigureAwait(false);
                 }
 
                 if (isKicked)
                 {
-                    await _telegramService.AppendTextAsync($"Sebanyak {kickTargets.Count} berhasil di blokir.");
+                    await _telegramService.AppendTextAsync($"Sebanyak {kickTargets.Count} berhasil di blokir.")
+                        .ConfigureAwait(false);
                 }
                 else
                 {
-                    await _telegramService.AppendTextAsync("Gagal memblokir bbrp anggota");
+                    await _telegramService.AppendTextAsync("Gagal memblokir bbrp anggota")
+                        .ConfigureAwait(false);
                 }
             }
             else if (kickTargets[0].Id == fromId)
@@ -82,22 +88,26 @@ namespace WinTenBot.Handlers.Commands.Group
                 var idTarget = kickTargets[0];
                 var isKicked = false;
 
-                isKicked = await _telegramService.KickMemberAsync(idTarget);
+                isKicked = await _telegramService.KickMemberAsync(idTarget)
+                    .ConfigureAwait(false);
                 if (isKicked)
                 {
                     var sendText = $"{idTarget} berhasil di blokir ";
                     sendText += idTarget.Id == fromId ? $"oleh Self-ban" : $".";
-                    await _telegramService.AppendTextAsync(sendText);
+                    await _telegramService.AppendTextAsync(sendText)
+                        .ConfigureAwait(false);
                 }
                 else
                 {
                     var sendTexts = $"Blokir {idTarget} gagal.";
-                    await _telegramService.SendTextAsync(sendTexts);
+                    await _telegramService.SendTextAsync(sendTexts)
+                        .ConfigureAwait(false);
                 }
             }
             else
             {
-                await _telegramService.SendTextAsync("Hanya admin yang bisa mengeksekusi");
+                await _telegramService.SendTextAsync("Hanya admin yang bisa mengeksekusi")
+                    .ConfigureAwait(false);
             }
         }
     }

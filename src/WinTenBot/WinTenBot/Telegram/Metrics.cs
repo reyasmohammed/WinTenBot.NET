@@ -16,7 +16,8 @@ namespace WinTenBot.Telegram
             Log.Information("Starting Hit Activity");
 
             var message = telegramService.MessageOrEdited;
-            var botUser = await telegramService.GetMeAsync();
+            var botUser = await telegramService.GetMeAsync()
+                .ConfigureAwait(false);
             var data = new Dictionary<string, object>()
             {
                 {"via_bot", botUser.Username},
@@ -34,7 +35,8 @@ namespace WinTenBot.Telegram
 
             var insertHit = await new Query("hit_activity")
                 .ExecForMysql()
-                .InsertAsync(data);
+                .InsertAsync(data)
+                .ConfigureAwait(false);
 
             Log.Information($"Insert Hit: {insertHit}");
         }

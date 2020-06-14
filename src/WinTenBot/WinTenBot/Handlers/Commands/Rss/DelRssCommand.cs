@@ -18,20 +18,24 @@ namespace WinTenBot.Handlers.Commands.Rss
             _telegramService = new TelegramService(context);
             _rssService = new RssService(context.Update.Message);
 
-            var isAdminOrPrivateChat = await _telegramService.IsAdminOrPrivateChat();
+            var isAdminOrPrivateChat = await _telegramService.IsAdminOrPrivateChat()
+                .ConfigureAwait(false);
             if (isAdminOrPrivateChat)
             {
                 var urlFeed = _telegramService.Message.Text.GetTextWithoutCmd();
 
-                await _telegramService.SendTextAsync($"Sedang menghapus {urlFeed}");
+                await _telegramService.SendTextAsync($"Sedang menghapus {urlFeed}")
+                    .ConfigureAwait(false);
 
-                var delete = await _rssService.DeleteRssAsync(urlFeed);
+                var delete = await _rssService.DeleteRssAsync(urlFeed)
+                    .ConfigureAwait(false);
 
                 var success = delete.ToBool()
                     ? "berhasil."
                     : "gagal. Mungkin RSS tersebut sudah di hapus atau belum di tambahkan";
 
-                await _telegramService.EditAsync($"Hapus {urlFeed} {success}");
+                await _telegramService.EditAsync($"Hapus {urlFeed} {success}")
+                    .ConfigureAwait(false);
             }
         }
     }

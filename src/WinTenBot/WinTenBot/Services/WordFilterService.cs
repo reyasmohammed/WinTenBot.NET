@@ -25,10 +25,12 @@ namespace WinTenBot.Services
             var check = await new Query(TableName)
                 .Where(where)
                 .ExecForMysql(true)
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
+            
             var isExist = check.Any();
 
-            Log.Debug($"Group setting IsExist: {isExist}. Count {check.Count()}");
+            Log.Debug($"Group setting IsExist: {isExist}");
 
             return isExist;
         }
@@ -49,11 +51,13 @@ namespace WinTenBot.Services
             
             var insert = await new Query(TableName)
                 .ExecForMysql(true)
-                .InsertAsync(data);
+                .InsertAsync(data)
+                .ConfigureAwait(false);
             
             insert = await new Query(TableName)
                 .ExecForSqLite(true)
-                .InsertAsync(data);
+                .InsertAsync(data)
+                .ConfigureAwait(false);
 
             return insert > 0;
 

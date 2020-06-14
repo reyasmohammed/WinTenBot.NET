@@ -14,7 +14,7 @@ namespace WinTenBot.Handlers
 
             try
             {
-                await next(context);
+                await next(context, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception e)
             {

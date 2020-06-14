@@ -26,19 +26,26 @@ namespace WinTenBot.Handlers.Commands.Rss
             var msgText = msg.Text;
             var dateDate = DateTime.UtcNow.ToString("yyyy-MM-dd");
 
-            var isAdminOrPrivate = await _telegramService.IsAdminOrPrivateChat();
+            var isAdminOrPrivate = await _telegramService.IsAdminOrPrivateChat()
+                .ConfigureAwait(false);
             if (!isAdminOrPrivate)
             {
                 var send = "Maaf, hanya Admin yang dapat mengimport daftar RSS";
-                await _telegramService.SendTextAsync(send);
+                await _telegramService.SendTextAsync(send)
+                    .ConfigureAwait(false);
+                return;
             }
 
-            await _telegramService.AppendTextAsync("Sedang mempersiapkan");
+            await _telegramService.AppendTextAsync("Sedang mempersiapkan")
+                .ConfigureAwait(false);
             var filePath = $"{chatId}/rss-feed_{dateDate}_{msgId}.txt";
-            filePath = await _telegramService.DownloadFileAsync(filePath);
+            filePath = await _telegramService.DownloadFileAsync(filePath)
+                .ConfigureAwait(false);
 
-            await _telegramService.AppendTextAsync("Sedang membuka berkas");
-            var rssLists = File.ReadAllLines(filePath);
+            await _telegramService.AppendTextAsync("Sedang membuka berkas")
+                .ConfigureAwait(false);
+            var rssLists = await File.ReadAllLinesAsync(filePath, cancellationToken)
+                .ConfigureAwait(false);
             foreach (var rssList in rssLists)
             {
                 Log.Information($"Importing {rssList}");
@@ -49,13 +56,17 @@ namespace WinTenBot.Handlers.Commands.Rss
                     {"from_id", _telegramService.Message.From.Id}
                 };
 
-                await _rssService.SaveRssSettingAsync(data);
+                await _rssService.SaveRssSettingAsync(data)
+                    .ConfigureAwait(false);
             }
 
-            await _telegramService.AppendTextAsync($"Memeriksa RSS duplikat");
-            await _rssService.DeleteDuplicateAsync();
+            await _telegramService.AppendTextAsync($"Memeriksa RSS duplikat")
+                .ConfigureAwait(false);
+            await _rssService.DeleteDuplicateAsync()
+                .ConfigureAwait(false);
 
-            await _telegramService.AppendTextAsync($"{rssLists.Length} RSS berhasil di import");
+            await _telegramService.AppendTextAsync($"{rssLists.Length} RSS berhasil di import")
+                .ConfigureAwait(false);
         }
     }
 }

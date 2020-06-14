@@ -18,7 +18,8 @@ namespace WinTenBot.Handlers.Events
             _telegramService = new TelegramService(context);
             var leftMember = msg.LeftChatMember;
             var leftUserId = leftMember.Id;
-            var isBan = await leftUserId.CheckGBan();
+            var isBan = await leftUserId.CheckGBan()
+                .ConfigureAwait(false);
 
             if (!isBan)
             {
@@ -31,7 +32,8 @@ namespace WinTenBot.Handlers.Events
                 var sendText = $"Sampai jumpa lagi {leftFullName} " +
                                $"\nKami di <b>{chatTitle}</b> menunggumu kembali.. :(";
 
-                await _telegramService.SendTextAsync(sendText);
+                await _telegramService.SendTextAsync(sendText)
+                    .ConfigureAwait(false);
             }
             else
             {

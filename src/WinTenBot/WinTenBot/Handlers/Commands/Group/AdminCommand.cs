@@ -16,10 +16,12 @@ namespace WinTenBot.Handlers.Commands.Group
         {
             var msg = context.Update.Message;
             _telegramService = new TelegramService(context);
+            var client = _telegramService.Client;
 
-            await _telegramService.SendTextAsync("🍽 Loading..");
+            await _telegramService.SendTextAsync("🍽 Loading..").ConfigureAwait(false);
             //            var admins = context.Update.Message.Chat.AllMembersAreAdministrators;
-            var admins = await context.Bot.Client.GetChatAdministratorsAsync(msg.Chat.Id, cancellationToken);
+            var admins = await client.GetChatAdministratorsAsync(msg.Chat.Id, cancellationToken)
+                .ConfigureAwait(false);
             var creatorStr = string.Empty;
             var adminStr = string.Empty;
             int number = 1;
@@ -46,7 +48,8 @@ namespace WinTenBot.Handlers.Commands.Group
                            $"\n👥️ <b>Administrators</b>" +
                            $"\n{adminStr}";
 
-            await _telegramService.EditAsync(sendText);
+            await _telegramService.EditAsync(sendText)
+                .ConfigureAwait(false);
         }
     }
 }

@@ -26,13 +26,15 @@ namespace WinTenBot.Handlers.Commands.Notes
             _telegramService = new TelegramService(context);
             var msg = context.Update.Message;
 
-            await _telegramService.SendTextAsync("This feature currently disabled");
+            await _telegramService.SendTextAsync("This feature currently disabled")
+                .ConfigureAwait(false);
             return;
             
             if (msg.ReplyToMessage != null)
             {
                 var repMsg = msg.ReplyToMessage;
-                await _telegramService.SendTextAsync("Mengumpulkan informasi");
+                await _telegramService.SendTextAsync("Mengumpulkan informasi")
+                    .ConfigureAwait(false);
 
                 var partsContent = repMsg.Text.Split(new[] {"\n\n"}, StringSplitOptions.None);
                 var partsMsgText = msg.Text.GetTextWithoutCmd().Split("\n\n");
@@ -55,10 +57,13 @@ namespace WinTenBot.Handlers.Commands.Notes
                     data.Add("btn_data", partsMsgText[1]);
                 }
 
-                await _telegramService.EditAsync("Menyimpan..");
-                await _notesService.SaveNote(data);
+                await _telegramService.EditAsync("Menyimpan..")
+                    .ConfigureAwait(false);
+                await _notesService.SaveNote(data)
+                    .ConfigureAwait(false);
 
-                await _telegramService.EditAsync("Berhasil");
+                await _telegramService.EditAsync("Berhasil")
+                    .ConfigureAwait(false);
             }
         }
     }

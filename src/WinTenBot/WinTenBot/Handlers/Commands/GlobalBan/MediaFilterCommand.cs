@@ -36,7 +36,8 @@ namespace WinTenBot.Handlers.Commands.GlobalBan
 
                     var fileId = repMsg.GetFileId();
 
-                    var isExist = await _mediaFilterService.IsExist("file_id", fileId);
+                    var isExist = await _mediaFilterService.IsExist("file_id", fileId)
+                        .ConfigureAwait(false);
                     if (!isExist)
                     {
                         var data = new Dictionary<string, object>()
@@ -47,7 +48,8 @@ namespace WinTenBot.Handlers.Commands.GlobalBan
                             {"blocked_from", msg.Chat.Id}
                         };
 
-                        await _mediaFilterService.SaveAsync(data);
+                        await _mediaFilterService.SaveAsync(data)
+                            .ConfigureAwait(false);
                         sendText = "File ini berhasil di simpan";
                     }
                     else
@@ -63,7 +65,8 @@ namespace WinTenBot.Handlers.Commands.GlobalBan
                     "terima kasih atas laporan nya.";
             }
 
-            await _telegramService.SendTextAsync(sendText);
+            await _telegramService.SendTextAsync(sendText)
+                .ConfigureAwait(false);
         }
     }
 }

@@ -32,7 +32,8 @@ namespace WinTenBot.Services
             var data = await new Query(baseTable)
                 .Where(where)
                 .ExecForSqLite(true)
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             var isExist = data.Any();
             Log.Information($"Check RSS History: {isExist}");
@@ -46,7 +47,8 @@ namespace WinTenBot.Services
                 .Where("chat_id", _message.Chat.Id)
                 .Where("url_feed", urlFeed)
                 .ExecForMysql()
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             var isExist = data.Any();
             Log.Information($"Check RSS Setting: {isExist}");
@@ -58,7 +60,9 @@ namespace WinTenBot.Services
         {
             var insert = await new Query(rssSettingTable)
                 .ExecForMysql()
-                .InsertAsync(data);
+                .InsertAsync(data)
+                .ConfigureAwait(false);
+            
             return insert.ToBool();
         }
 
@@ -66,7 +70,8 @@ namespace WinTenBot.Services
         {
             var insert = await new Query(baseTable)
                 .ExecForSqLite(true)
-                .InsertAsync(data);
+                .InsertAsync(data)
+                .ConfigureAwait(false);
 
             return insert.ToBool();
         }
@@ -81,7 +86,8 @@ namespace WinTenBot.Services
             var data = await new Query(rssSettingTable)
                 .Where("chat_id", chatId)
                 .ExecForMysql()
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             var mapped = data.ToJson().MapObject<List<RssSetting>>();
             Log.Information("RSSData: " + mapped.ToJson(true));
@@ -95,7 +101,8 @@ namespace WinTenBot.Services
                 .Select("chat_id")
                 .Distinct()
                 .ExecForMysql()
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             var mapped = data.ToJson().MapObject<List<RssSetting>>();
 
@@ -108,7 +115,8 @@ namespace WinTenBot.Services
             var query = await new Query(baseTable)
                 .ExecForSqLite()
                 .Where(where)
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             return query.ToJson().MapObject<List<RssHistory>>();
         }
@@ -119,7 +127,8 @@ namespace WinTenBot.Services
                 .Where("chat_id", _message.Chat.Id)
                 .Where("url_feed", urlFeed)
                 .ExecForMysql()
-                .DeleteAsync();
+                .DeleteAsync()
+                .ConfigureAwait(false);
 
             $"Delete {urlFeed} status: {delete.ToBool()}".ToConsoleStamp();
 
@@ -128,7 +137,8 @@ namespace WinTenBot.Services
 
         public async Task DeleteDuplicateAsync()
         {
-            var duplicate = await rssSettingTable.MysqlDeleteDuplicateRowAsync("url_feed");
+            var duplicate = await rssSettingTable.MysqlDeleteDuplicateRowAsync("url_feed")
+                .ConfigureAwait(false);
             Log.Information($"Delete duplicate on {rssSettingTable} {duplicate}");
         }
     }

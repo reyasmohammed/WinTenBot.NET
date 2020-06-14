@@ -35,21 +35,26 @@ namespace WinTenBot.Handlers.Commands.Core
                 msgBuild.AppendLine($"<b>Reason:</b> {reason}");
                 msgBuild.AppendLine($"\nTerima kasih sudah melaporkan!");
 
-                var mentionAdmin = await _telegramService.GetMentionAdminsStr();
+                var mentionAdmin = await _telegramService.GetMentionAdminsStr()
+                    .ConfigureAwait(false);
 
-                var isAdmin = await _telegramService.IsAdminGroup();
+                var isAdmin = await _telegramService.IsAdminGroup()
+                    .ConfigureAwait(false);
                 if (!isAdmin) msgBuild.AppendLine(mentionAdmin);
                 
                 var sendText = msgBuild.ToString().Trim();
-                await _telegramService.ForwardMessageAsync(repMsg.MessageId);
-                await _telegramService.SendTextAsync(sendText);
+                await _telegramService.ForwardMessageAsync(repMsg.MessageId)
+                    .ConfigureAwait(false);
+                await _telegramService.SendTextAsync(sendText)
+                    .ConfigureAwait(false);
             }
             else
             {
                 var sendText = "ℹ️ <b>Balas</b> pesan yang mau di laporkan" +
                                "\n\n<b>Catatan:</b> GReport (Global Report) akan melaporkan pengguna ke Tim @WinTenDev " +
                                "dan memanggil admin di Grup ini.";
-                await _telegramService.SendTextAsync(sendText);
+                await _telegramService.SendTextAsync(sendText)
+                    .ConfigureAwait(false);
             }
         }
     }

@@ -22,15 +22,18 @@ namespace WinTenBot.Services
             var data = await new Query(BaseTable)
                 .Where(key, value)
                 .ExecForMysql(true)
-                .GetAsync();
-
-            Log.Information($"Check AFK Exist: {data.Count().ToBool()}");
-            return data.Any();
+                .GetAsync()
+                .ConfigureAwait(false);
+            var isExist = data.Any();
+            
+            Log.Information($"Check AFK Exist: {isExist}");
+            
+            return isExist;
         }
 
         public async Task<bool> IsExistInCache(string key, string val)
         {
-            var data = await ReadCacheAsync();
+            var data = await ReadCacheAsync().ConfigureAwait(false);
             var search = data.AsEnumerable()
                 .Where(row => row.Field<string>(key) == val);
             if (!search.Any()) return false;
@@ -42,13 +45,15 @@ namespace WinTenBot.Services
 
         public async Task<bool> IsAfkAsync(Message message)
         {
-            var isAfk = await IsExistInCache("user_id", message.From.Id.ToString());
+            var fromId = message.From.Id.ToString();
+            var chatId = message.Chat.Id.ToString();
+            var isAfk = await IsExistInCache("user_id", fromId).ConfigureAwait(false);
 
-            var afkCache = await ReadCacheAsync();
+            var afkCache = await ReadCacheAsync().ConfigureAwait(false);
             var filteredAfk = afkCache.AsEnumerable()
-                .Where(row => row.Field<object>("is_afk").ToBool() == true
-                              && row.Field<string>("chat_id").ToString() == message.Chat.Id.ToString()
-                              && row.Field<string>("user_id").ToString() == message.From.Id.ToString());
+                .Where(row => row.Field<object>("is_afk").ToBool()
+                              && row.Field<string>("chat_id").ToString() == chatId
+                              && row.Field<string>("user_id").ToString() == fromId);
             if (!filteredAfk.Any()) isAfk = false;
 
             Log.Information($"IsAfk: {isAfk}");
@@ -68,7 +73,8 @@ namespace WinTenBot.Services
             var checkExist = await new Query(BaseTable)
                 .Where(where)
                 .ExecForMysql()
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             var isExist = checkExist.Any();
 
@@ -77,13 +83,15 @@ namespace WinTenBot.Services
                 insert = await new Query(BaseTable)
                     .Where(where)
                     .ExecForMysql()
-                    .UpdateAsync(data);
+                    .UpdateAsync(data)
+                    .ConfigureAwait(false);
             }
             else
             {
                 insert = await new Query(BaseTable)
                     .ExecForMysql()
-                    .InsertAsync(data);
+                    .InsertAsync(data)
+                    .ConfigureAwait(false);
             }
 
             Log.Information($"SaveAfk: {insert}");
@@ -93,7 +101,8 @@ namespace WinTenBot.Services
         {
             var data = await new Query(BaseTable)
                 .ExecForMysql()
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             var dataTable = data.ToJson().ToDataTable();
             return dataTable;
@@ -101,15 +110,18 @@ namespace WinTenBot.Services
 
         public async Task UpdateCacheAsync()
         {
-            var data = await GetAllAfk();
+            var data = await GetAllAfk()
+                .ConfigureAwait(false);
             Log.Information($"Updating AFK caches to {FileJson}");
 
-            await data.WriteCacheAsync(FileJson);
+            await data.WriteCacheAsync(FileJson)
+                .ConfigureAwait(false);
         }
 
         public async Task<DataTable> ReadCacheAsync()
         {
-            var dataTable = await FileJson.ReadCacheAsync<DataTable>();
+            var dataTable = await FileJson.ReadCacheAsync<DataTable>()
+                .ConfigureAwait(false);
             return dataTable;
         }
     }

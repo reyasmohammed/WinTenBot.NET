@@ -22,10 +22,12 @@ namespace WinTenBot.Handlers.Commands.Notes
         {
             _telegramService = new TelegramService(context);
 
-            await _telegramService.SendTextAsync("This feature currently disabled");
+            await _telegramService.SendTextAsync("This feature currently disabled")
+                .ConfigureAwait(false);
             return;
             
-            var notesData = await _notesService.GetNotesByChatId(_telegramService.Message.Chat.Id);
+            var notesData = await _notesService.GetNotesByChatId(_telegramService.Message.Chat.Id)
+                .ConfigureAwait(false);
 
             var sendText = "Filters di Obrolan ini.";
 
@@ -43,9 +45,11 @@ namespace WinTenBot.Handlers.Commands.Notes
                            "\nUntuk menambahkannya ketik /addfilter";
             }
 
-            await _notesService.UpdateCache(_telegramService.Message.Chat.Id);
+            await _notesService.UpdateCache(_telegramService.Message.Chat.Id)
+                .ConfigureAwait(false);
 
-            await _telegramService.SendTextAsync(sendText);
+            await _telegramService.SendTextAsync(sendText)
+                .ConfigureAwait(false);
         }
     }
 }

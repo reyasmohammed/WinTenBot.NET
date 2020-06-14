@@ -22,7 +22,9 @@ namespace WinTenBot.Services
             var query = await new Query(baseTable)
                 .ExecForMysql(true)
                 .Where(key, value)
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
+            
             return query.Any();
 
             // var sql = $"SELECT * FROM {baseTable} WHERE {key} = '{value}'";
@@ -32,7 +34,8 @@ namespace WinTenBot.Services
 
         public async Task<bool> IsExistInCache(string key, string val)
         {
-            var data = await ReadCacheAsync();
+            var data = await ReadCacheAsync()
+                .ConfigureAwait(false);
             var search = data.AsEnumerable()
                 .Where(row => row.Field<string>(key) == val);
             if (!search.Any()) return false;
@@ -48,7 +51,8 @@ namespace WinTenBot.Services
             Log.Information(data.ToJson());
             var insert = await new Query(baseTable)
                 .ExecForMysql()
-                .InsertAsync(data);
+                .InsertAsync(data)
+                .ConfigureAwait(false);
             
             // var insert = await _mySqlProvider.Insert(baseTable, data);
             Log.Information($"SaveFile: {insert}");
@@ -58,7 +62,8 @@ namespace WinTenBot.Services
         {
             var query = await new Query(baseTable)
                 .ExecForMysql(true)
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
             // var sql = $"SELECT * FROM {baseTable}";
             // var data = await _mySqlProvider.ExecQueryAsync(sql);
             var data = query.ToJson().MapObject<DataTable>();
@@ -67,15 +72,18 @@ namespace WinTenBot.Services
 
         public async Task UpdateCacheAsync()
         {
-            var data = await GetAllMedia(); 
+            var data = await GetAllMedia()
+                .ConfigureAwait(false); 
             Log.Information($"Updating Media Filter caches to {fileJson}");
 
-            await data.WriteCacheAsync(fileJson);
+            await data.WriteCacheAsync(fileJson)
+                .ConfigureAwait(false);
         }
 
         public async Task<DataTable> ReadCacheAsync()
         {
-            var dataTable = await fileJson.ReadCacheAsync<DataTable>();
+            var dataTable = await fileJson.ReadCacheAsync<DataTable>()
+                .ConfigureAwait(false);
             return dataTable;
         }
     }

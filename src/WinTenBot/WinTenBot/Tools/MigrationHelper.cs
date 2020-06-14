@@ -14,7 +14,7 @@ namespace WinTenBot.Tools
         {
             var filePath = Environment.CurrentDirectory + $"/Storage/SQL/Sqlite/{tableName}.sql";
             Log.Debug($"Migrating :{filePath}");
-            await filePath.ExecuteFileForSqLite();
+            await filePath.ExecuteFileForSqLite().ConfigureAwait(false);
         }
 
         public static void MigrateMysql()
@@ -26,7 +26,7 @@ namespace WinTenBot.Tools
                 Log.Information($"Migrating => {file}");
                 var sql = File.ReadAllText(file);
                 var result = sql.ExecForMysqlNonQuery(true);
-                
+
                 // Log.Information($"Result: {result}");
             }
         }
@@ -45,7 +45,8 @@ namespace WinTenBot.Tools
             }
         }
 
-        public static void MigrateAll(){
+        public static void MigrateAll()
+        {
             MigrateMysql();
             MigrateSqlite();
         }
@@ -53,9 +54,12 @@ namespace WinTenBot.Tools
         public static void RunMigration()
         {
             Parallel.Invoke(
-                async () => await "word_filter".MigrateLocalStorage(),
-                async () => await "rss_history".MigrateLocalStorage(),
-                async ()=> await "warn_username_history".MigrateLocalStorage());
+                async () => await "word_filter".MigrateLocalStorage()
+                    .ConfigureAwait(false),
+                async () => await "rss_history".MigrateLocalStorage()
+                    .ConfigureAwait(false),
+                async () => await "warn_username_history".MigrateLocalStorage()
+                    .ConfigureAwait(false));
         }
     }
 }
