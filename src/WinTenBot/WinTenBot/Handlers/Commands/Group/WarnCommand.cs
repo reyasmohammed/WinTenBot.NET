@@ -16,16 +16,19 @@ namespace WinTenBot.Handlers.Commands.Group
             _telegramService = new TelegramService(context);
             var msg = _telegramService.Message;
 
-            if (!await _telegramService.IsAdminOrPrivateChat())
+            if (!await _telegramService.IsAdminOrPrivateChat()
+                .ConfigureAwait(false))
                 return;
 
             if (msg.ReplyToMessage != null)
             {
-                await _telegramService.WarnMemberAsync();
+                await _telegramService.WarnMemberAsync()
+                    .ConfigureAwait(false);
             }
             else
             {
-                await _telegramService.SendTextAsync("Balas pengguna yang akan di Warn", replyToMsgId: msg.MessageId);
+                await _telegramService.SendTextAsync("Balas pengguna yang akan di Warn", replyToMsgId: msg.MessageId)
+                    .ConfigureAwait(false);
             }
         }
     }

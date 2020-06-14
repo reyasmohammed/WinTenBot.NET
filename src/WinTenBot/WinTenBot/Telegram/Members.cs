@@ -56,23 +56,27 @@ namespace WinTenBot.Telegram
             if (message.ReplyToMessage != null)
             {
                 var repMsg = message.ReplyToMessage;
-                var isAfkReply = await afkService.IsAfkAsync(repMsg);
+                var isAfkReply = await afkService.IsAfkAsync(repMsg)
+                    .ConfigureAwait(false);
                 if (isAfkReply)
-                    await telegramService.SendTextAsync($"{repMsg.GetFromNameLink()} sedang afk");
+                    await telegramService.SendTextAsync($"{repMsg.GetFromNameLink()} sedang afk")
+                        .ConfigureAwait(false);
             }
 
-            var isAfk = await afkService.IsAfkAsync(message);
+            var isAfk = await afkService.IsAfkAsync(message)
+                .ConfigureAwait(false);
             if (isAfk)
             {
-                await telegramService.SendTextAsync($"{message.GetFromNameLink()} sudah tidak afk");
+                await telegramService.SendTextAsync($"{message.GetFromNameLink()} sudah tidak afk")
+                    .ConfigureAwait(false);
 
                 var data = new Dictionary<string, object>
                 {
                     {"chat_id", message.Chat.Id}, {"user_id", message.From.Id}, {"is_afk", 0}, {"afk_reason", ""}
                 };
 
-                await afkService.SaveAsync(data);
-                await afkService.UpdateCacheAsync();
+                await afkService.SaveAsync(data).ConfigureAwait(false);
+                await afkService.UpdateCacheAsync().ConfigureAwait(false);
             }
         }
 
@@ -95,7 +99,8 @@ namespace WinTenBot.Telegram
                     .Where("chat_id", chatId)
                     .OrderByDesc("timestamp")
                     .Limit(1)
-                    .GetAsync();
+                    .GetAsync()
+                    .ConfigureAwait(false);
 
                 if (!query.Any())
                 {
@@ -119,14 +124,14 @@ namespace WinTenBot.Telegram
                     msgBuild.AppendLine($"Mengubah Username menjadi @{fromUsername}");
                     changesCount++;
                 }
-                
+
                 if (fromFName != hitActivity.FromFirstName)
                 {
                     Log.Information("First Name changed detected!");
                     msgBuild.AppendLine($"Mengubah nama depan menjadi {fromFName}");
                     changesCount++;
                 }
-                
+
                 if (fromLName != hitActivity.FromLastName)
                 {
                     Log.Information("Last Name changed detected!");
@@ -134,9 +139,9 @@ namespace WinTenBot.Telegram
                     changesCount++;
                 }
 
-                if(changesCount>0)
-                    await telegramService.SendTextAsync(msgBuild.ToString().Trim());
-
+                if (changesCount > 0)
+                    await telegramService.SendTextAsync(msgBuild.ToString().Trim())
+                        .ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -166,13 +171,17 @@ namespace WinTenBot.Telegram
 
             var messageId = message.MessageId;
 
-            var isBan = await user.Id.CheckGBan();
+            var isBan = await user.Id.CheckGBan()
+                .ConfigureAwait(false);
             Log.Information($"IsBan: {isBan}");
             if (isBan)
             {
-                await telegramService.DeleteAsync(messageId);
-                await telegramService.KickMemberAsync(user);
-                await telegramService.UnbanMemberAsync(user);
+                await telegramService.DeleteAsync(messageId)
+                    .ConfigureAwait(false);
+                await telegramService.KickMemberAsync(user)
+                    .ConfigureAwait(false);
+                await telegramService.UnbanMemberAsync(user)
+                    .ConfigureAwait(false);
             }
 
             return isBan;
@@ -193,14 +202,18 @@ namespace WinTenBot.Telegram
                 return false;
             }
 
-            isBan = await user.IsCasBanAsync();
+            isBan = await user.IsCasBanAsync()
+                .ConfigureAwait(false);
             Log.Information($"{user} is CAS ban: {isBan}");
             if (isBan)
             {
                 var sendText = $"{user} is banned in CAS!";
-                await telegramService.SendTextAsync(sendText);
-                await telegramService.KickMemberAsync(user);
-                await telegramService.UnbanMemberAsync(user);
+                await telegramService.SendTextAsync(sendText)
+                    .ConfigureAwait(false);
+                await telegramService.KickMemberAsync(user)
+                    .ConfigureAwait(false);
+                await telegramService.UnbanMemberAsync(user)
+                    .ConfigureAwait(false);
             }
 
             return isBan;
@@ -221,7 +234,8 @@ namespace WinTenBot.Telegram
             }
 
             var user = message.From;
-            var spamWatch = await user.Id.CheckSpamWatch();
+            var spamWatch = await user.Id.CheckSpamWatch()
+                .ConfigureAwait(false);
             isBan = spamWatch.IsBan;
 
             Log.Information($"{user} is SpamWatch Ban => {isBan}");
@@ -231,9 +245,12 @@ namespace WinTenBot.Telegram
                 var sendText = $"{user} is banned in SpamWatch!" +
                                "\nFed: @SpamWatch" +
                                $"\nReason: {spamWatch.Reason}";
-                await telegramService.SendTextAsync(sendText);
-                await telegramService.KickMemberAsync(user);
-                await telegramService.UnbanMemberAsync(user);
+                await telegramService.SendTextAsync(sendText)
+                    .ConfigureAwait(false);
+                await telegramService.KickMemberAsync(user)
+                    .ConfigureAwait(false);
+                await telegramService.UnbanMemberAsync(user)
+                    .ConfigureAwait(false);
             }
 
             return isBan;
@@ -258,7 +275,8 @@ namespace WinTenBot.Telegram
                 Log.Information($"Warning User: {user}");
 
                 var warnLimit = 4;
-                var warnHistory = await UpdateWarnMemberStat(message);
+                var warnHistory = await UpdateWarnMemberStat(message)
+                    .ConfigureAwait(false);
                 var updatedStep = warnHistory.StepCount;
                 var lastMessageId = warnHistory.LastWarnMessageId;
                 var nameLink = user.GetNameLink();
@@ -274,17 +292,22 @@ namespace WinTenBot.Telegram
                 }
 
                 var muteUntil = DateTime.UtcNow.AddMinutes(3);
-                await telegramService.RestrictMemberAsync(fromId, until: muteUntil);
+                await telegramService.RestrictMemberAsync(fromId, until: muteUntil)
+                    .ConfigureAwait(false);
 
                 if (updatedStep > warnLimit)
                 {
                     var sendWarn = $"Batas peringatan telah di lampaui." +
                                    $"\n{nameLink} di tendang sekarang!";
-                    await telegramService.SendTextAsync(sendWarn);
+                    await telegramService.SendTextAsync(sendWarn)
+                        .ConfigureAwait(false);
 
-                    await telegramService.KickMemberAsync(user);
-                    await telegramService.UnbanMemberAsync(user);
-                    await ResetWarnMemberStatAsync(message);
+                    await telegramService.KickMemberAsync(user)
+                        .ConfigureAwait(false);
+                    await telegramService.UnbanMemberAsync(user)
+                        .ConfigureAwait(false);
+                    await ResetWarnMemberStatAsync(message)
+                        .ConfigureAwait(false);
 
                     return;
                 }
@@ -297,8 +320,10 @@ namespace WinTenBot.Telegram
                     }
                 });
 
-                await telegramService.SendTextAsync(sendText, inlineKeyboard);
-                await message.UpdateLastWarnMemberMessageIdAsync(telegramService.SentMessageId);
+                await telegramService.SendTextAsync(sendText, inlineKeyboard)
+                    .ConfigureAwait(false);
+                await message.UpdateLastWarnMemberMessageIdAsync(telegramService.SentMessageId)
+                    .ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -324,9 +349,10 @@ namespace WinTenBot.Telegram
 
             var warnHistory = await new Query(tableName)
                 .Where("from_id", fromId)
-                .Where("chat_id",chatId)
+                .Where("chat_id", chatId)
                 .ExecForSqLite(true)
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             var exist = warnHistory.Any();
 
@@ -354,9 +380,10 @@ namespace WinTenBot.Telegram
 
                 var insertHit = await new Query(tableName)
                     .Where("from_id", fromId)
-                    .Where("chat_id",chatId)
+                    .Where("chat_id", chatId)
                     .ExecForSqLite(true)
-                    .UpdateAsync(update);
+                    .UpdateAsync(update)
+                    .ConfigureAwait(false);
 
                 Log.Information($"Update step: {insertHit}");
             }
@@ -378,16 +405,18 @@ namespace WinTenBot.Telegram
 
                 var insertHit = await new Query(tableName)
                     .ExecForSqLite(true)
-                    .InsertAsync(data);
+                    .InsertAsync(data)
+                    .ConfigureAwait(false);
 
                 Log.Information($"Insert Hit: {insertHit}");
             }
 
             var updatedHistory = await new Query(tableName)
                 .Where("from_id", fromId)
-                .Where("chat_id",chatId)
+                .Where("chat_id", chatId)
                 .ExecForSqLite(true)
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             return updatedHistory.ToJson().MapObject<List<WarnMemberHistory>>().First();
         }
@@ -399,7 +428,7 @@ namespace WinTenBot.Telegram
             var tableName = "warn_member_history";
             var fromId = message.ReplyToMessage.From.Id;
             var chatId = message.Chat.Id;
-            
+
             var update = new Dictionary<string, object>
             {
                 {"last_warn_message_id", messageId},
@@ -408,9 +437,10 @@ namespace WinTenBot.Telegram
 
             var insertHit = await new Query(tableName)
                 .Where("from_id", fromId)
-                .Where("chat_id",chatId)
+                .Where("chat_id", chatId)
                 .ExecForSqLite(true)
-                .UpdateAsync(update);
+                .UpdateAsync(update)
+                .ConfigureAwait(false);
 
             Log.Information($"Update lastWarn: {insertHit}");
         }
@@ -431,9 +461,10 @@ namespace WinTenBot.Telegram
 
             var insertHit = await new Query(tableName)
                 .Where("from_id", fromId)
-                .Where("chat_id",chatId)
+                .Where("chat_id", chatId)
                 .ExecForSqLite(true)
-                .UpdateAsync(update);
+                .UpdateAsync(update)
+                .ConfigureAwait(false);
 
             Log.Information($"Update step: {insertHit}");
         }
@@ -454,9 +485,10 @@ namespace WinTenBot.Telegram
 
             var insertHit = await new Query(tableName)
                 .Where("from_id", userId)
-                .Where("chat_id",chatId)
+                .Where("chat_id", chatId)
                 .ExecForSqLite(true)
-                .UpdateAsync(update);
+                .UpdateAsync(update)
+                .ConfigureAwait(false);
 
             Log.Information($"Update step: {insertHit}");
         }
@@ -468,17 +500,16 @@ namespace WinTenBot.Telegram
         public static bool IsNoUsername(this User user)
         {
             var userId = user.Id;
-            var ignored =new []
+            var ignored = new[]
             {
                 "777000"
             };
 
             var match = ignored.FirstOrDefault(id => id == userId.ToString());
             if (!match.IsNotNullOrEmpty()) return user.Username == null;
-            
+
             Log.Information("This user true Ignored!");
             return false;
-
         }
 
         public static async Task CheckUsernameAsync(this TelegramService telegramService)
@@ -505,11 +536,13 @@ namespace WinTenBot.Telegram
 
                 if (noUsername)
                 {
-                    var updateResult = await UpdateWarnUsernameStat(message);
+                    var updateResult = await UpdateWarnUsernameStat(message)
+                        .ConfigureAwait(false);
                     var updatedStep = updateResult.StepCount;
                     var lastMessageId = updateResult.LastWarnMessageId;
 
-                    await telegramService.DeleteAsync(lastMessageId);
+                    await telegramService.DeleteAsync(lastMessageId)
+                        .ConfigureAwait(false);
 
                     var sendText = $"Hai {nameLink}, kamu belum memasang username!" +
                                    $"\nPeringatan ke {updatedStep} dari {warnLimit}";
@@ -520,24 +553,31 @@ namespace WinTenBot.Telegram
                     {
                         var sendWarn = $"Batas peringatan telah di lampaui." +
                                        $"\n{nameLink} di tendang sekarang!";
-                        await telegramService.SendTextAsync(sendWarn);
+                        await telegramService.SendTextAsync(sendWarn)
+                            .ConfigureAwait(false);
 
-                        await telegramService.KickMemberAsync(fromUser);
-                        await telegramService.UnbanMemberAsync(fromUser);
-                        await ResetWarnUsernameStatAsync(message);
+                        await telegramService.KickMemberAsync(fromUser)
+                            .ConfigureAwait(false);
+                        await telegramService.UnbanMemberAsync(fromUser)
+                            .ConfigureAwait(false);
+                        await ResetWarnUsernameStatAsync(message)
+                            .ConfigureAwait(false);
 
                         return;
                     }
 
-                    var urlStart = await telegramService.GetUrlStart("start=set-username");
+                    var urlStart = await telegramService.GetUrlStart("start=set-username")
+                        .ConfigureAwait(false);
                     Log.Information($"UrlStart: {urlStart}");
 
                     var keyboard = new InlineKeyboardMarkup(
                         InlineKeyboardButton.WithUrl("Cara Pasang Username", urlStart)
                     );
 
-                    await telegramService.SendTextAsync(sendText, keyboard);
-                    await message.UpdateLastWarnUsernameMessageIdAsync(telegramService.SentMessageId);
+                    await telegramService.SendTextAsync(sendText, keyboard)
+                .ConfigureAwait(false);
+                    await message.UpdateLastWarnUsernameMessageIdAsync(telegramService.SentMessageId)
+                        .ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
@@ -564,7 +604,8 @@ namespace WinTenBot.Telegram
                 .Where("from_id", data["from_id"])
                 .Where("chat_id", data["chat_id"])
                 .ExecForMysql(true)
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             var exist = warnHistory.Any();
 
@@ -588,7 +629,8 @@ namespace WinTenBot.Telegram
                     .Where("from_id", data["from_id"])
                     .Where("chat_id", data["chat_id"])
                     .ExecForMysql(true)
-                    .UpdateAsync(update);
+                    .UpdateAsync(update)
+                    .ConfigureAwait(false);
 
                 Log.Information($"Update step: {insertHit}");
             }
@@ -596,7 +638,8 @@ namespace WinTenBot.Telegram
             {
                 var insertHit = await new Query(tableName)
                     .ExecForMysql(true)
-                    .InsertAsync(data);
+                    .InsertAsync(data)
+                    .ConfigureAwait(false);
 
                 Log.Information($"Insert Hit: {insertHit}");
             }
@@ -605,7 +648,8 @@ namespace WinTenBot.Telegram
                 .Where("from_id", data["from_id"])
                 .Where("chat_id", data["chat_id"])
                 .ExecForMysql(true)
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             return updatedHistory.ToJson().MapObject<List<WarnUsernameHistory>>().First();
         }
@@ -620,7 +664,7 @@ namespace WinTenBot.Telegram
 
             var update = new Dictionary<string, object>
             {
-                {"step_count", 0}, 
+                {"step_count", 0},
                 {"updated_at", DateTime.UtcNow}
             };
 
@@ -628,7 +672,8 @@ namespace WinTenBot.Telegram
                 .Where("from_id", fromId)
                 .Where("chat_id", chatId)
                 .ExecForMysql(true)
-                .UpdateAsync(update);
+                .UpdateAsync(update)
+                .ConfigureAwait(false);
 
             Log.Information($"Update step: {insertHit}");
         }
@@ -651,7 +696,8 @@ namespace WinTenBot.Telegram
                 .Where("from_id", fromId)
                 .Where("chat_id", chatId)
                 .ExecForMysql(true)
-                .UpdateAsync(update);
+                .UpdateAsync(update)
+                .ConfigureAwait(false);
 
             Log.Information($"Update lastWarn: {insertHit}");
         }

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Serilog;
-using WinTenBot.Providers;
 
 namespace WinTenBot
 {
@@ -16,13 +15,10 @@ namespace WinTenBot
                 Log.Information("Starting WebAPI..");
                 // BuildWebHost(args).Run();
                 CreateWebHostBuilder(args).Build().Run();
-
-                return;
             }
             catch (Exception ex)
             {
                 Log.Fatal(ex, "Host terminated unexpectedly");
-                return;
             }
             finally
             {

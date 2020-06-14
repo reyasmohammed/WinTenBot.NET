@@ -62,7 +62,8 @@ namespace WinTenBot.Services
 
         public async Task<string> GetMentionAdminsStr()
         {
-            var admins = await Client.GetChatAdministratorsAsync(Message.Chat.Id);
+            var admins = await Client.GetChatAdministratorsAsync(Message.Chat.Id)
+                .ConfigureAwait(false);
             var adminStr = string.Empty;
             foreach (var admin in admins)
             {
@@ -86,7 +87,8 @@ namespace WinTenBot.Services
                 }
 
                 Log.Information($"Leaving from {chatTarget}");
-                await Client.LeaveChatAsync(chatTarget);
+                await Client.LeaveChatAsync(chatTarget)
+                    .ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -96,13 +98,15 @@ namespace WinTenBot.Services
 
         public async Task<long> GetMemberCount()
         {
-            var member = await Client.GetChatMembersCountAsync(Message.Chat.Id);
+            var member = await Client.GetChatMembersCountAsync(Message.Chat.Id)
+                .ConfigureAwait(false);
             return member;
         }
 
         public async Task<Chat> GetChat()
         {
-            var chat = await BotSettings.Client.GetChatAsync(Message.Chat.Id);
+            var chat = await BotSettings.Client.GetChatAsync(Message.Chat.Id)
+                .ConfigureAwait(false);
             return chat;
         }
 
@@ -114,7 +118,7 @@ namespace WinTenBot.Services
         {
             TimeProc = Message.Date.GetDelay();
 
-            if (sendText != "")
+            if (sendText.IsNotNullOrEmpty())
             {
                 sendText += $"\n\n⏱ <code>{TimeInit} s</code> | ⌛️ <code>{TimeProc} s</code>";
             }
@@ -135,7 +139,7 @@ namespace WinTenBot.Services
                     ParseMode.Html,
                     replyMarkup: replyMarkup,
                     replyToMessageId: replyToMsgId
-                );
+                ).ConfigureAwait(false);
             }
             catch (ApiRequestException apiRequestException)
             {
@@ -149,7 +153,7 @@ namespace WinTenBot.Services
                         sendText,
                         ParseMode.Html,
                         replyMarkup: replyMarkup
-                    );
+                    ).ConfigureAwait(false);
                 }
                 catch (ApiRequestException apiRequestException2)
                 {
@@ -171,7 +175,8 @@ namespace WinTenBot.Services
             {
                 case MediaType.Document:
                     return await Client.SendDocumentAsync(Message.Chat.Id, fileId, caption, ParseMode.Html,
-                        replyMarkup: replyMarkup, replyToMessageId: replyToMsgId);
+                        replyMarkup: replyMarkup, replyToMessageId: replyToMsgId)
+                        .ConfigureAwait(false);
                     break;
 
                 case MediaType.LocalDocument:
@@ -180,19 +185,22 @@ namespace WinTenBot.Services
                     {
                         InputOnlineFile inputOnlineFile = new InputOnlineFile(fs, fileName);
                         return await Client.SendDocumentAsync(Message.Chat.Id, inputOnlineFile, caption, ParseMode.Html,
-                            replyMarkup: replyMarkup, replyToMessageId: replyToMsgId);
+                            replyMarkup: replyMarkup, replyToMessageId: replyToMsgId)
+                            .ConfigureAwait(false);
                     }
 
                     break;
 
                 case MediaType.Photo:
                     return await Client.SendPhotoAsync(Message.Chat.Id, fileId, caption, ParseMode.Html,
-                        replyMarkup: replyMarkup, replyToMessageId: replyToMsgId);
+                        replyMarkup: replyMarkup, replyToMessageId: replyToMsgId)
+                        .ConfigureAwait(false);
                     break;
 
                 case MediaType.Video:
                     return await Client.SendVideoAsync(Message.Chat.Id, fileId, caption: caption, parseMode: ParseMode.Html,
-                    replyMarkup:replyMarkup, replyToMessageId:replyToMsgId);
+                    replyMarkup:replyMarkup, replyToMessageId:replyToMsgId)
+                        .ConfigureAwait(false);
                     break;
 
                 default:
@@ -206,7 +214,7 @@ namespace WinTenBot.Services
         {
             TimeProc = Message.Date.GetDelay();
 
-            if (sendText != "")
+            if (sendText.IsNotNullOrEmpty())
             {
                 sendText += $"\n\n⏱ <code>{TimeInit} s</code> | ⌛️ <code>{TimeProc} s</code>";
             }
@@ -218,7 +226,7 @@ namespace WinTenBot.Services
                 ParseMode.Html,
                 replyMarkup: replyMarkup,
                 disableWebPagePreview: disableWebPreview
-            );
+            ).ConfigureAwait(false);
 
             EditedMessageId = edit.MessageId;
         }
@@ -235,7 +243,7 @@ namespace WinTenBot.Services
                     ParseMode.Html,
                     replyMarkup: replyMarkup,
                     disableWebPagePreview: disableWebPreview
-                );
+                ).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -249,13 +257,15 @@ namespace WinTenBot.Services
             {
                 Log.Information("Sending new message");
                 AppendText = sendText;
-                await SendTextAsync(AppendText, replyMarkup);
+                await SendTextAsync(AppendText, replyMarkup)
+                    .ConfigureAwait(false);
             }
             else
             {
                 Log.Information("Next, edit existing message");
                 AppendText += $"\n{sendText}";
-                await EditAsync(AppendText, replyMarkup);
+                await EditAsync(AppendText, replyMarkup)
+                    .ConfigureAwait(false);
             }
         }
 
@@ -269,7 +279,8 @@ namespace WinTenBot.Services
                 var msgId = messageId != -1 ? messageId : SentMessageId;
 
                 Log.Information($"Delete MsgId: {msgId} on ChatId: {chatId}");
-                await Client.DeleteMessageAsync(chatId, msgId);
+                await Client.DeleteMessageAsync(chatId, msgId)
+                    .ConfigureAwait(false);
             }
             catch (ChatNotFoundException chatNotFoundException)
             {
@@ -287,14 +298,16 @@ namespace WinTenBot.Services
             var msgId = Message.MessageId;
             if (messageId != -1) msgId = messageId;
             var chatId = BotSettings.BotChannelLogs;
-            await Client.ForwardMessageAsync(chatId, fromChatId, msgId);
+            await Client.ForwardMessageAsync(chatId, fromChatId, msgId)
+                .ConfigureAwait(false);
         }
 
 
         public async Task AnswerCallbackQueryAsync(string text)
         {
             var callbackQueryId = Context.Update.CallbackQuery.Id;
-            await Client.AnswerCallbackQueryAsync(callbackQueryId, text);
+            await Client.AnswerCallbackQueryAsync(callbackQueryId, text)
+                .ConfigureAwait(false);
         }
         
         public void ResetTime()
@@ -316,14 +329,16 @@ namespace WinTenBot.Services
             if (fileId.IsNullOrEmpty()) fileId = Message.ReplyToMessage.GetFileId();
             Log.Information($"Downloading file {fileId}");
 
-            var file = await Client.GetFileAsync(fileId);
+            var file = await Client.GetFileAsync(fileId)
+                .ConfigureAwait(false);
 
             Log.Information($"DownloadFile: {file.ToJson(true)}");
 
             fileName = $"Storage/Caches/{fileName}".EnsureDirectory();
             using (var fileStream = File.OpenWrite(fileName))
             {
-                await Client.DownloadFileAsync(filePath: file.FilePath, destination: fileStream);
+                await Client.DownloadFileAsync(filePath: file.FilePath, destination: fileStream)
+                    .ConfigureAwait(false);
                 Log.Information($"File saved to {fileName}");
             }
 
@@ -340,7 +355,8 @@ namespace WinTenBot.Services
             Log.Information($"Kick {idTarget} from {Message.Chat.Id}");
             try
             {
-                await Client.KickChatMemberAsync(Message.Chat.Id, idTarget, DateTime.Now);
+                await Client.KickChatMemberAsync(Message.Chat.Id, idTarget, DateTime.Now)
+                    .ConfigureAwait(false);
                 isKicked = true;
             }
             catch (Exception ex)
@@ -358,12 +374,14 @@ namespace WinTenBot.Services
             Log.Information($"Unban {idTarget} from {Message.Chat.Id}");
             try
             {
-                await Client.UnbanChatMemberAsync(Message.Chat.Id, idTarget);
+                await Client.UnbanChatMemberAsync(Message.Chat.Id, idTarget)
+                    .ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "UnBan Member");
-                await SendTextAsync(ex.Message);
+                await SendTextAsync(ex.Message)
+                    .ConfigureAwait(false);
             }
         }
 
@@ -372,12 +390,14 @@ namespace WinTenBot.Services
             Log.Information($"Unban {userId} from {Message.Chat}");
             try
             {
-                await Client.UnbanChatMemberAsync(Message.Chat.Id, userId);
+                await Client.UnbanChatMemberAsync(Message.Chat.Id, userId)
+                    .ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "UnBan Member");
-                await SendTextAsync(ex.Message);
+                await SendTextAsync(ex.Message)
+                    .ConfigureAwait(false);
             }
         }
 
@@ -395,7 +415,8 @@ namespace WinTenBot.Services
                     canDeleteMessages: true,
                     canInviteUsers: true,
                     canRestrictMembers: true,
-                    canPinMessages: true);
+                    canPinMessages: true)
+                    .ConfigureAwait(false);
 
                 requestResult.IsSuccess = true;
             }
@@ -424,7 +445,8 @@ namespace WinTenBot.Services
                     canDeleteMessages: false,
                     canInviteUsers: false,
                     canRestrictMembers: false,
-                    canPinMessages: false);
+                    canPinMessages: false)
+                    .ConfigureAwait(false);
 
                 requestResult.IsSuccess = true;
             }
@@ -472,7 +494,8 @@ namespace WinTenBot.Services
 
             if (unMute) untilDate = DateTime.UtcNow;
 
-            await Client.RestrictChatMemberAsync(chatId, userId, permission, untilDate);
+            await Client.RestrictChatMemberAsync(chatId, userId, permission, untilDate)
+                .ConfigureAwait(false);
         }
 
         #endregion

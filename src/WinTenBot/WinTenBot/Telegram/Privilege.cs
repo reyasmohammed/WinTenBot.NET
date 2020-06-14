@@ -44,7 +44,8 @@ namespace WinTenBot.Telegram
         
         public static async Task<bool> IsAdminOrPrivateChat(this TelegramService telegramService)
         {
-            var isAdmin = await IsAdminGroup(telegramService);
+            var isAdmin = await IsAdminGroup(telegramService)
+                .ConfigureAwait(false);
             var isPrivateChat = IsPrivateChat(telegramService);
 
             return isAdmin || isPrivateChat;
@@ -68,7 +69,8 @@ namespace WinTenBot.Telegram
             if (IsPrivateChat(telegramService)) return false;
             if (userId >= 0) fromId = userId;
             
-            var admins = await client.GetChatAdministratorsAsync(chatId);
+            var admins = await client.GetChatAdministratorsAsync(chatId)
+                .ConfigureAwait(false);
             foreach (var admin in admins)
             {
                 if (fromId == admin.User.Id)
@@ -88,7 +90,8 @@ namespace WinTenBot.Telegram
             var message = telegramService.Message;
             var chatId = message.Chat.Id;
             
-            var allAdmins = await client.GetChatAdministratorsAsync(chatId);
+            var allAdmins = await client.GetChatAdministratorsAsync(chatId)
+                .ConfigureAwait(false);
             if(BotSettings.IsDevelopment)
                 Log.Information($"All Admin on {chatId} {allAdmins.ToJson(true)}");
 

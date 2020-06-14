@@ -24,11 +24,13 @@ namespace WinTenBot.Handlers.Commands.Welcome
 
             if (msg.Chat.Type == ChatType.Private)
             {
-                await _telegramService.SendTextAsync("Welcome hanya untuk grup saja");
+                await _telegramService.SendTextAsync("Welcome hanya untuk grup saja")
+                    .ConfigureAwait(false);
                 return;
             }
             
-            await _telegramService.SendTextAsync("/setwelcome sudah di pisah menjadi /welmsg, /welbtn dan /weldoc");
+            await _telegramService.SendTextAsync("/setwelcome sudah di pisah menjadi /welmsg, /welbtn dan /weldoc")
+                .ConfigureAwait(false);
             return;
 
             var partsMsg = msg.Text.Split(' ').ToArray();

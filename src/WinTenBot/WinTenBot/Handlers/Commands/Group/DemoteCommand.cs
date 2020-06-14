@@ -26,7 +26,7 @@ namespace WinTenBot.Handlers.Commands.Group
 
             var sendText = $"{nameLink} diturunkan dari admin";
 
-            var promote = await _telegramService.DemoteChatMemberAsync(userId);
+            var promote = await _telegramService.DemoteChatMemberAsync(userId).ConfigureAwait(false);
             if (!promote.IsSuccess)
             {
                 var errorCode = promote.ErrorCode;
@@ -36,7 +36,8 @@ namespace WinTenBot.Handlers.Commands.Group
                            $"\nPesan: {errorMessage}";
             }
 
-            await _telegramService.SendTextAsync(sendText);
+            await _telegramService.SendTextAsync(sendText)
+                .ConfigureAwait(false);
         }
     }
 }

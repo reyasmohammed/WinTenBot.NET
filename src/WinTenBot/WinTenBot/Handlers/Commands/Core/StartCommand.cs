@@ -31,8 +31,10 @@ namespace WinTenBot.Handlers.Commands.Core
                               $"Agar fungsi saya bekerja dengan fitur penuh, jadikan saya admin dengan level standard. " +
                               $"\nSaran dan fitur bisa di ajukan di @WinTenGroup atau @TgBotID.";
 
-            var urlStart = await _telegramService.GetUrlStart("start=help");
-            var urlAddTo = await _telegramService.GetUrlStart("startgroup=new");
+            var urlStart = await _telegramService.GetUrlStart("start=help")
+                .ConfigureAwait(false);
+            var urlAddTo = await _telegramService.GetUrlStart("startgroup=new")
+                .ConfigureAwait(false);
 
             switch (paramStart)
             {
@@ -45,7 +47,8 @@ namespace WinTenBot.Handlers.Commands.Core
                         }
                     });
                     var send = "Untuk cara pasang Username, silakan klik tombol di bawah ini";
-                    await _telegramService.SendTextAsync(send, setUsername);
+                    await _telegramService.SendTextAsync(send, setUsername)
+                        .ConfigureAwait(false);
                     break;
 
                 default:
@@ -69,7 +72,8 @@ namespace WinTenBot.Handlers.Commands.Core
                         });
                     }
 
-                    await _telegramService.SendTextAsync(sendText, keyboard);
+                    await _telegramService.SendTextAsync(sendText, keyboard)
+                        .ConfigureAwait(false);
                     break;
             }
         }

@@ -23,7 +23,8 @@ namespace WinTenBot.Services
             var query = await new Query(baseTable)
                 .Where("chat_id",chatId)
                 .ExecForMysql()
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             var data = query.ToJson().MapObject<DataTable>();
             return data;
@@ -37,7 +38,8 @@ namespace WinTenBot.Services
                 .Where("chat_id",chatId)
                 .OrWhereContains("slug",slug)
                 .ExecForMysql(true)
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             var mapped = query.ToJson().MapObject<List<CloudNote>>();
             return mapped;
@@ -55,15 +57,18 @@ namespace WinTenBot.Services
 
             var insert = await new Query(baseTable)
                 .ExecForMysql()
-                .InsertAsync( data);
+                .InsertAsync( data)
+                .ConfigureAwait(false);
             
             Log.Information($"SaveNote: {insert}");
         }
 
         public async Task UpdateCache(long chatId)
         {
-            var data = await GetNotesByChatId(chatId);
-            await data.WriteCacheAsync($"{chatId}/notes.json");
+            var data = await GetNotesByChatId(chatId)
+                .ConfigureAwait(false);
+            await data.WriteCacheAsync($"{chatId}/notes.json")
+                .ConfigureAwait(false);
         }
     }
 }

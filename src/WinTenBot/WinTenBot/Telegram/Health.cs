@@ -16,19 +16,22 @@ namespace WinTenBot.Telegram
     {
         public static async Task<string> GetUrlStart(this TelegramService telegramService, string param)
         {
-            var bot = await telegramService.Client.GetMeAsync();
+            var bot = await telegramService.Client.GetMeAsync()
+                .ConfigureAwait(false);
             var username = bot.Username;
             return $"https://t.me/{username}?{param}";
         }
 
         public static async Task<User> GetMeAsync(this TelegramService telegramService)
         {
-            return await telegramService.Client.GetMeAsync();
+            return await telegramService.Client.GetMeAsync()
+                .ConfigureAwait(false);
         }
 
         public static async Task<bool> IsBeta(this TelegramService telegramService)
         {
-            var me = await GetMeAsync(telegramService);
+            var me = await GetMeAsync(telegramService)
+                .ConfigureAwait(false);
             var isBeta = me.Username.ToLower().Contains("beta");
             Log.Information($"IsBeta: {isBeta}");
             return isBeta;
@@ -36,7 +39,8 @@ namespace WinTenBot.Telegram
 
         public static async Task<bool> IsBotAdded(this User[] users)
         {
-            var me = await BotSettings.Client.GetMeAsync();
+            var me = await BotSettings.Client.GetMeAsync()
+                .ConfigureAwait(false);
             return (from user in users where user.Id == me.Id select user.Id == me.Id).FirstOrDefault();
         }
 
@@ -82,8 +86,10 @@ namespace WinTenBot.Telegram
             Log.Information("I must leave right now!");
             var msgOut = $"Sepertinya saya salah alamat, saya pamit dulu..";
 
-            await telegramService.SendTextAsync(msgOut);
-            await telegramService.LeaveChat(chatId);
+            await telegramService.SendTextAsync(msgOut)
+                .ConfigureAwait(false);
+            await telegramService.LeaveChat(chatId)
+                .ConfigureAwait(false);
             return true;
         }
 
@@ -91,7 +97,7 @@ namespace WinTenBot.Telegram
         {
             return BotSettings.Clients[name];
         }
-        
+
         public static async Task EnsureChatHealthAsync(this TelegramService telegramService)
         {
             Log.Information("Ensuring chat health..");
@@ -108,9 +114,11 @@ namespace WinTenBot.Telegram
                 ["chat_title"] = message.Chat.Title,
             };
 
-            var update = await settingsService.SaveSettingsAsync(data);
+            var update = await settingsService.SaveSettingsAsync(data)
+                .ConfigureAwait(false);
 
-            await settingsService.UpdateCache();
+            await settingsService.UpdateCache()
+                .ConfigureAwait(false);
         }
     }
 }

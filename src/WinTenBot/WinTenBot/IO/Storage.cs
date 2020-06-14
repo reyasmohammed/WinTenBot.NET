@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Serilog;
 using Telegram.Bot.Types.InputFiles;
-using WinTenBot.Common;
 using WinTenBot.Model;
 
 namespace WinTenBot.IO

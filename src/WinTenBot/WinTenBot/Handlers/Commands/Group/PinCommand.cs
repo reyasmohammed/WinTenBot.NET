@@ -20,14 +20,17 @@ namespace WinTenBot.Handlers.Commands.Group
 
             if (msg.ReplyToMessage != null)
             {
-                var pin = client.PinChatMessageAsync(
-                    msg.Chat.Id,
-                    msg.ReplyToMessage.MessageId);
+                await client.PinChatMessageAsync(
+                        msg.Chat.Id,
+                        msg.ReplyToMessage.MessageId,
+                        cancellationToken: cancellationToken)
+                    .ConfigureAwait(false);
                 return;
 //                ConsoleHelper.WriteLine(pin.);
             }
 
-            await _telegramService.SendTextAsync(sendText);
+            await _telegramService.SendTextAsync(sendText)
+                .ConfigureAwait(false);
         }
     }
 }

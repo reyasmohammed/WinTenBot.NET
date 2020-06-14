@@ -43,13 +43,14 @@ namespace WinTenBot.Providers
 
         public static async Task<int> ExecForSqLite(this string sql, bool printSql = false, object param = null)
         {
-            var connection = InitSqLite();
+           var connection = InitSqLite();
             
             var factory = new QueryFactory(connection, new SqliteCompiler());
 
             if (printSql) factory.Logger = sqlResult => { Log.Debug($"SQLiteExec: {sqlResult}"); };
 
-            return await factory.StatementAsync(sql, param);
+            return await factory.StatementAsync(sql, param)
+                .ConfigureAwait(false);
         }
 
         public static async Task<IEnumerable<dynamic>> ExecForSqLiteQuery(this string sql, bool printSql = false, object param = null)
@@ -60,7 +61,8 @@ namespace WinTenBot.Providers
 
             if (printSql) factory.Logger = sqlResult => { Log.Debug($"SQLiteExec: {sqlResult}"); };
 
-            return await factory.SelectAsync(sql, param);
+            return await factory.SelectAsync(sql, param)
+                .ConfigureAwait(false);
         }
 
         public static async Task<int> DeleteDuplicateRow(this string tableName, string columnKey)
@@ -72,7 +74,8 @@ namespace WinTenBot.Providers
                       $"FROM {tableName} " +
                       $"GROUP BY {columnKey});";
 
-            var result = await sql.ExecForSqLite(true);
+            var result = await sql.ExecForSqLite(true)
+                .ConfigureAwait(false);
             Log.Information($"Deleted {result}");
 
             return result;
@@ -97,8 +100,10 @@ namespace WinTenBot.Providers
         {
             if (!File.Exists(filePath)) return false;
             
-            var sql = File.ReadAllText(filePath);
-            await sql.ExecForSqLite(true);
+            var sql = await File.ReadAllTextAsync(filePath)
+                .ConfigureAwait(false);
+            await sql.ExecForSqLite(true)
+                .ConfigureAwait(false);
 
             return true;
         }

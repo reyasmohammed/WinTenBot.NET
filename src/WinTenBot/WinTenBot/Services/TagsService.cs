@@ -19,14 +19,16 @@ namespace WinTenBot.Services
 
         public async Task<bool> IsExist(long chatId, string tagVal)
         {
-            var data = await GetTagByTag(chatId, tagVal);
+            var data = await GetTagByTag(chatId, tagVal)
+                .ConfigureAwait(false);
             return data.Count > 0;
         }
 
         public async Task<List<CloudTag>> GetTagsAsync()
         {
             var query = await new Query("tags")
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             var mapped = query.ToJson().MapObject<List<CloudTag>>();
             return mapped;
@@ -41,7 +43,8 @@ namespace WinTenBot.Services
                 .Where("id_chat", chatId)
                 .OrderBy("tag")
                 .ExecForMysql()
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             var mapped = query.ToJson().MapObject<List<CloudTag>>();
 
@@ -62,7 +65,8 @@ namespace WinTenBot.Services
                 .Where("tag", tag)
                 .OrderBy("tag")
                 .ExecForMysql(true)
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             var mapped = query.ToJson().MapObject<List<CloudTag>>();
 
@@ -78,7 +82,8 @@ namespace WinTenBot.Services
         {
             var insert = await new Query("tags")
                 .ExecForMysql(true)
-                .InsertAsync(data);
+                .InsertAsync(data)
+                .ConfigureAwait(false);
             
             Log.Information($"SaveTag: {insert}");
         }
@@ -89,7 +94,8 @@ namespace WinTenBot.Services
                 .ExecForMysql()
                 .Where("id_chat",chatId)
                 .Where("tag",tag)
-                .DeleteAsync();
+                .DeleteAsync()
+                .ConfigureAwait(false);
             
             // var sql = $"DELETE FROM {baseTable} WHERE id_chat = '{chatId}' AND tag = '{tag}'";
             // var delete = await _mySqlProvider.ExecNonQueryAsync(sql);
@@ -99,7 +105,8 @@ namespace WinTenBot.Services
         public async Task UpdateCacheAsync(Message message)
         {
             var chatId = message.Chat.Id;
-            var data = await GetTagsByGroupAsync("*", chatId);
+            var data = await GetTagsByGroupAsync("*", chatId)
+                .ConfigureAwait(false);
             data.BackgroundWriteCache($"{chatId}/{jsonCache}");
         }
     }

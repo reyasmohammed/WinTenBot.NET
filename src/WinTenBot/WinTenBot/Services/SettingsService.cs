@@ -33,7 +33,8 @@ namespace WinTenBot.Services
             var data = await new Query(baseTable)
                 .Where(where)
                 .ExecForMysql()
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
             var isExist = data.Any();
 
             Log.Information($"Group setting IsExist: {isExist}");
@@ -50,7 +51,8 @@ namespace WinTenBot.Services
             var data = await new Query(baseTable)
                 .Where(where)
                 .ExecForMysql()
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             var mapped = data.ToJson().MapObject<List<ChatSetting>>();
 
@@ -85,12 +87,13 @@ namespace WinTenBot.Services
                 .Select(selectColumns)
                 .Where(where)
                 .ExecForMysql(true)
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             // Log.Debug($"PreTranspose: {data.ToJson()}");
             // data.ToJson(true).ToFile("settings_premap.json");
             
-            var dataTable = data.ToJson().ToDataTable();
+            using var dataTable = data.ToJson().ToDataTable();
             
             var rowId = dataTable.Rows[0]["id"].ToString();
             Log.Debug($"RowId: {rowId}");
@@ -169,7 +172,9 @@ namespace WinTenBot.Services
             var check = await new Query(baseTable)
                 .Where(where)
                 .ExecForMysql()
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
+            
             var isExist = check.Any();
             
             var insert = -1;
@@ -180,7 +185,8 @@ namespace WinTenBot.Services
 
                 insert = await new Query(baseTable)
                     .ExecForMysql(true)
-                    .InsertAsync(data);
+                    .InsertAsync(data)
+                    .ConfigureAwait(false);
             }
             else
             {
@@ -189,7 +195,8 @@ namespace WinTenBot.Services
                 insert = await new Query(baseTable)
                     .Where(where)
                     .ExecForMysql(true)
-                    .UpdateAsync(data);
+                    .UpdateAsync(data)
+                    .ConfigureAwait(false);
             }
 
             return insert;
@@ -203,7 +210,8 @@ namespace WinTenBot.Services
             await new Query(baseTable)
                 .Where(where)
                 .ExecForMysql()
-                .UpdateAsync(data);
+                .UpdateAsync(data)
+                .ConfigureAwait(false);
         }
 
         public async Task<ChatSetting> ReadCache()
@@ -212,16 +220,20 @@ namespace WinTenBot.Services
             var cachePath = Path.Combine(chatId, "settings.json");
             if (!cachePath.IsFileCacheExist())
             {
-                await UpdateCache();
+                await UpdateCache()
+                    .ConfigureAwait(false);
             }
             
-            return await cachePath.ReadCacheAsync<ChatSetting>();
+            return await cachePath.ReadCacheAsync<ChatSetting>()
+                .ConfigureAwait(false);
         }
 
         public async Task UpdateCache()
         {
-            var data = await GetSettingByGroup();
-            await data.WriteCacheAsync($"{Message.Chat.Id}/settings.json");
+            var data = await GetSettingByGroup()
+                .ConfigureAwait(false);
+            await data.WriteCacheAsync($"{Message.Chat.Id}/settings.json")
+                .ConfigureAwait(false);
         }
     }
 }

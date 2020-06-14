@@ -29,7 +29,8 @@ namespace WinTenBot.Handlers.Commands.Welcome
             if (msg.Chat.Type != ChatType.Private)
             {
                 var chatTitle = msg.Chat.Title;
-                var settings = await _settingsService.GetSettingByGroup();
+                var settings = await _settingsService.GetSettingByGroup()
+                    .ConfigureAwait(false);
                 var welcomeMessage = settings.WelcomeMessage;
                 var welcomeButton = settings.WelcomeButton;
                 var welcomeMedia = settings.WelcomeMedia;
@@ -42,7 +43,7 @@ namespace WinTenBot.Handlers.Commands.Welcome
                 {
                     keyboard = welcomeButton.ToReplyMarkup(2);
                 }
-                
+
                 sendText = $"👥 <b>{chatTitle}</b>\n";
                 if (welcomeMessage.IsNullOrEmpty())
                 {
@@ -62,16 +63,19 @@ namespace WinTenBot.Handlers.Commands.Welcome
 //                sendText += " " + string.Join(", ",args);
                 if (welcomeMediaType != MediaType.Unknown)
                 {
-                    await _telegramService.SendMediaAsync(welcomeMedia, welcomeMediaType, sendText, keyboard);
+                    await _telegramService.SendMediaAsync(welcomeMedia, welcomeMediaType, sendText, keyboard)
+                        .ConfigureAwait(false);
                 }
                 else
                 {
-                    await _telegramService.SendTextAsync(sendText, keyboard);
+                    await _telegramService.SendTextAsync(sendText, keyboard)
+                        .ConfigureAwait(false);
                 }
             }
             else
             {
-                await _telegramService.SendTextAsync(sendText);
+                await _telegramService.SendTextAsync(sendText)
+                    .ConfigureAwait(false);
             }
         }
     }

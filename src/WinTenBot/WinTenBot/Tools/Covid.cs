@@ -27,10 +27,12 @@ namespace WinTenBot.Tools
             // var fileName = $"covid-all-{timeStamp}.json";
             // var urlApi = "https://coronavirus-tracker-api.herokuapp.com/all";
 
-            await UpdateCacheAsync();
+            await UpdateCacheAsync()
+                .ConfigureAwait(false);
 
             Log.Information($"Loading cache from {CacheFilename}");
-            var covidAll = await CacheFilename.ReadCacheAsync<CovidAll>();
+            var covidAll = await CacheFilename.ReadCacheAsync<CovidAll>()
+                .ConfigureAwait(false);
 
             // Log.Information($"CovidAll: {covidAll.ToJson(true)}");
 
@@ -64,7 +66,8 @@ namespace WinTenBot.Tools
         public static async Task<string> GetCovidAll()
         {
             var url = "https://corona.lmao.ninja/all";
-            var covidAll = await url.GetJsonAsync<Model.Lmao.CovidAll>();
+            var covidAll = await url.GetJsonAsync<Model.Lmao.CovidAll>()
+                .ConfigureAwait(false);
 
             var strBuild = new StringBuilder();
 
@@ -91,7 +94,8 @@ namespace WinTenBot.Tools
             try
             {
                 var urlApi = $"https://corona.lmao.ninja/countries/{country}";
-                var covid = await urlApi.GetJsonAsync<CovidByCountry>();
+                var covid = await urlApi.GetJsonAsync<CovidByCountry>()
+                    .ConfigureAwait(false);
 
                 var strBuild = new StringBuilder();
                 strBuild.AppendLine($"<b>Country:</b> {covid.Country}");
@@ -131,9 +135,11 @@ namespace WinTenBot.Tools
             if (!CacheFilename.IsFileCacheExist())
             {
                 Log.Information($"Getting information from {urlApi}");
-                var covidAll = await urlApi.GetJsonAsync<CovidAll>();
+                var covidAll = await urlApi.GetJsonAsync<CovidAll>()
+                    .ConfigureAwait(false);
 
-                await covidAll.WriteCacheAsync(CacheFilename);
+                await covidAll.WriteCacheAsync(CacheFilename)
+                    .ConfigureAwait(false);
             }
             else
             {

@@ -22,7 +22,8 @@ namespace WinTenBot.Handlers.Commands.Group
 
             if (msg.Chat.Type == ChatType.Private)
             {
-                await _telegramService.SendTextAsync("Report hanya untuk grup saja");
+                await _telegramService.SendTextAsync("Report hanya untuk grup saja")
+                    .ConfigureAwait(false);
                 return;
             }
 
@@ -32,8 +33,10 @@ namespace WinTenBot.Handlers.Commands.Group
 
                 if (msg.From.Id != repMsg.From.Id)
                 {
-                    var mentionAdmins = await _telegramService.GetMentionAdminsStr();
-                    var allListAdmin =await _telegramService.GetAllAdmins();
+                    var mentionAdmins = await _telegramService.GetMentionAdminsStr()
+                        .ConfigureAwait(false);
+                    var allListAdmin =await _telegramService.GetAllAdmins()
+                        .ConfigureAwait(false);
                     var allAdminId = allListAdmin.Select(a => a.User.Id);
                     
                     var reporterNameLink = msg.GetFromNameLink();
@@ -58,7 +61,8 @@ namespace WinTenBot.Handlers.Commands.Group
                         }
                     });
 
-                    await _telegramService.SendTextAsync(sendText);
+                    await _telegramService.SendTextAsync(sendText)
+                        .ConfigureAwait(false);
                     return;
                 }
 
@@ -66,7 +70,8 @@ namespace WinTenBot.Handlers.Commands.Group
             }
 
 
-            await _telegramService.SendTextAsync(sendText);
+            await _telegramService.SendTextAsync(sendText)
+                .ConfigureAwait(false);
         }
     }
 }

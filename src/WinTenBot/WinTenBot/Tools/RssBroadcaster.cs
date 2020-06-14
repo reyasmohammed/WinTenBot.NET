@@ -168,13 +168,13 @@ namespace WinTenBot.Tools
             Log.Information($"UrlFeeds: {urls.ToJson()}");
 
             string feedUrl = "";
-
-            if (urls.Count() == 1) // no url - probably the url is already the right feed url
+            var urlCount = urls.Count();
+            
+            if (urlCount == 1) // no url - probably the url is already the right feed url
                 feedUrl = url;
-            else if (urls.Count() == 1)
+            else if (urlCount == 1)
                 feedUrl = urls.First().Url;
-            else if (urls.Count() == 2
-            ) // if 2 urls, then its usually a feed and a comments feed, so take the first per default
+            else if (urlCount == 2) // if 2 urls, then its usually a feed and a comments feed, so take the first per default
                 feedUrl = urls.First().Url;
 
             return feedUrl;

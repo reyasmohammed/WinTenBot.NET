@@ -17,17 +17,22 @@ namespace WinTenBot.Handlers.Commands.Words
             _telegramService = new TelegramService(context);
 
             var isSudoer = _telegramService.IsSudoer();
-            var isAdmin = await _telegramService.IsAdminGroup();
+            var isAdmin = await _telegramService.IsAdminGroup()
+                .ConfigureAwait(false);
 
             if (isSudoer)
             {
-                await _telegramService.DeleteAsync(_telegramService.Message.MessageId);
+                await _telegramService.DeleteAsync(_telegramService.Message.MessageId)
+                    .ConfigureAwait(false);
 
-                await _telegramService.AppendTextAsync("Sedang mengsinkronkan Word Filter");
-                await Sync.SyncWordToLocalAsync();
-                await _telegramService.AppendTextAsync("Selesai mengsinkronkan.");
+                await _telegramService.AppendTextAsync("Sedang mengsinkronkan Word Filter")
+                    .ConfigureAwait(false);
+                await Sync.SyncWordToLocalAsync().ConfigureAwait(false);
+                await _telegramService.AppendTextAsync("Selesai mengsinkronkan.")
+                    .ConfigureAwait(false);
 
-                await _telegramService.DeleteAsync(delay: 3000);
+                await _telegramService.DeleteAsync(delay: 3000)
+                    .ConfigureAwait(false);
             }
         }
     }

@@ -32,12 +32,15 @@ namespace WinTenBot.Handlers.Commands.Core
 
                 var chatId = partsMsg[0].ToInt64();
                 Log.Information($"Target out: {chatId}");
-                await _telegramService.SendTextAsync(sendText, customChatId: chatId);
-                await _telegramService.LeaveChat(chatId);
+                await _telegramService.SendTextAsync(sendText, customChatId: chatId)
+                    .ConfigureAwait(false);
+                await _telegramService.LeaveChat(chatId)
+                    .ConfigureAwait(false);
             }
             else
             {
-                await _telegramService.SendTextAsync("Kamu tidak punya hak akses.");
+                await _telegramService.SendTextAsync("Kamu tidak punya hak akses.")
+                    .ConfigureAwait(false);
             }
         }
     }

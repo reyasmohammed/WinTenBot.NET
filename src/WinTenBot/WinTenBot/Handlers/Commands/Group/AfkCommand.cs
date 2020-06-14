@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Framework.Abstractions;
+using WinTenBot.Common;
 using WinTenBot.Services;
 using WinTenBot.Telegram;
 
@@ -32,7 +33,7 @@ namespace WinTenBot.Handlers.Commands.Group
 
             var sendText = $"{msg.GetFromNameLink()} Sedang afk.";
 
-            if (msg.Text.GetTextWithoutCmd() != "")
+            if (msg.Text.GetTextWithoutCmd().IsNotNullOrEmpty())
             {
                 var afkReason = msg.Text.GetTextWithoutCmd();
                 data.Add("afk_reason", afkReason);
@@ -40,9 +41,12 @@ namespace WinTenBot.Handlers.Commands.Group
                 sendText += $"\n<i>{afkReason}</i>";
             }
 
-            await _telegramService.SendTextAsync(sendText);
-            await _afkService.SaveAsync(data);
-            await _afkService.UpdateCacheAsync();
+            await _telegramService.SendTextAsync(sendText)
+                .ConfigureAwait(false);
+            await _afkService.SaveAsync(data)
+                .ConfigureAwait(false);
+            await _afkService.UpdateCacheAsync()
+                .ConfigureAwait(false);
         }
     }
 }

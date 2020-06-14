@@ -76,7 +76,8 @@ namespace WinTenBot.Handlers
             // await CheckGlobalBanAsync(msg);
             // CheckUsername(msg);
 
-            await next(context);
+            await next(context, cancellationToken)
+                .ConfigureAwait(false);
         }
     }
 }

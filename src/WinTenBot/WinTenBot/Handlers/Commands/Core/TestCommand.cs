@@ -27,7 +27,8 @@ namespace WinTenBot.Handlers.Commands.Core
             if (fromId.IsSudoer())
             {
                 Log.Information("Test started..");
-                await _telegramService.SendTextAsync("Sedang mengetes sesuatu");
+                await _telegramService.SendTextAsync("Sedang mengetes sesuatu")
+                    .ConfigureAwait(false);
 
                 // var data = await new Query("rss_history")
                 //     .Where("chat_id", chatId)
@@ -85,12 +86,14 @@ namespace WinTenBot.Handlers.Commands.Core
                     
                     Log.Information("Predicting message");
                     var isSpam = MachineLearning.PredictMessage(repMsgText);
-                    await _telegramService.EditAsync($"IsSpam: {isSpam}");
+                    await _telegramService.EditAsync($"IsSpam: {isSpam}")
+                        .ConfigureAwait(false);
                     
                     return;
                 }
 
-                await _telegramService.EditAsync("Complete");
+                await _telegramService.EditAsync("Complete")
+                    .ConfigureAwait(false);
             }
 
             // else

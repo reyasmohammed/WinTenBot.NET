@@ -29,7 +29,8 @@ namespace WinTenBot.Handlers.Events
             _telegramService = new TelegramService(context);
             _settingsService = new SettingsService(msg);
             _globalBanService = new GlobalBanService(context.Update.Message);
-            await _telegramService.DeleteAsync(msg.MessageId);
+            await _telegramService.DeleteAsync(msg.MessageId)
+                .ConfigureAwait(false);
 
             Log.Information("New Chat Members...");
 
